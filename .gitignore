@@ -1,0 +1,22 @@
+*.class
+
+# Log file
+*.log
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+# # ignore mac files
+.DS_Store
+
+# # ignore idea storage
+.idea/
+*.iml
+*.iws
+out/
+.gradle
+build

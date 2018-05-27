@@ -1,0 +1,38 @@
+info:
+  name: @project.artifactId@
+  version: @project.version@
+  origin: @scm.url@
+  commit: @buildNumber@
+  branch: @scmBranch@
+  built: @timestamp@
+
+spring:
+  application:
+    name: fwmt-legacy-gateway
+  jpa.properties.hibernate.default_schema: gateway
+  datasource:
+    username: ${cloud.services.postgresql.connection.username}
+    password: ${cloud.services.postgresql.connection.password}
+    url: ${cloud.services.postgresql.connection.jdbcurl}
+    driverClassName: org.postgresql.Driver
+    continue-on-error: true
+    schema: classpath:/db/schema-cloud.sql
+
+liquibase:
+  user: ${cloud.services.postgresql.connection.username}
+  password: ${cloud.services.postgresql.connection.password}
+  default-schema:
+  url: ${cloud.services.postgresql.connection.jdbcurl}
+  changeLog: classpath:db/changelog/db.changelog-master.yaml
+
+# The following data is sensitive and must not be shared
+totalmobile:
+  username: username
+  password: password
+  url: "https://ons.totalmobile.co.uk"
+  message-queue-path: "/Live/Services/TM/v20/Messaging/MessageQueueWs.asmx"
+  namespace: "http://schemas.consiliumtechnologies.com/wsdl/mobile/2007/07/messaging/"
+security.user:
+  name: name
+  password: password
+

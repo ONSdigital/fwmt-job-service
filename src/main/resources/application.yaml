@@ -1,0 +1,63 @@
+info:
+#  name: @project.artifactId@
+#  version: @project.version@
+#  origin: @scm.url@
+#  commit: @buildNumber@
+#  branch: @scmBranch@
+#  built: @timestamp@
+
+server:
+  port: 9091
+
+project:
+  basedir: ${basedir}
+
+spring.http.multipart:
+  max-file-size: 12800MB
+  max-request-size: 12800MB
+
+spring.datasource:
+  url: jdbc:postgresql://localhost/postgres?currentSchema=gateway
+  driver-class-name: org.postgresql.Driver
+  continue-on-error: true
+  schema: classpath:/schema.sql
+  username: postgres
+  password: postgres
+
+management.endpoint.health.show-details: always
+
+liquibase:
+  url: jdbc:postgresql://localhost:5432/postgres?currentSchema=gateway
+  default-schema: gateway
+  user: postgres
+  password: postgres
+
+logging:
+  level:
+    root: WARN
+    uk.gov.ons.fwmt: DEBUG
+    org.springframework.security: ERROR
+    org.springframework.web: ERROR
+    org.hibernate: ERROR
+    org.apache.commons.dbcp2: ERROR
+  file: target/SpringErrors/spring.log
+  pattern:
+    console: "%d{yyyy-MMM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{15} - %msg%n"
+    file: "%d{yyyy-MMM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{15} - %msg%n"
+
+security.user:
+  name: user
+  password: password
+
+totalmobile:
+  username: "..."
+  password: "..."
+  url: "https://ons.totalmobile.co.uk"
+  message-queue-path: "/Live/Services/TM/v20/Messaging/MessageQueueWs.asmx"
+  message-queue-wsdl-path: "src/main/resources/wsdl/Messaging_MessageQueueWs.wsdl"
+  message-queue-namespace: "http://schemas.consiliumtechnologies.com/wsdl/mobile/2007/07/messaging/"
+  message-queue-package: "com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging"
+  outgoing-ws-namespace: "http://schemas.consiliumtechnologies.com/services/mobile/2009/03/messaging"
+  web:
+    login-url: "/Live/WebAdmin/Login"
+    save-user-url: "/Live/WebAdmin/Administration/Users/SaveUser"

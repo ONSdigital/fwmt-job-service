@@ -1,0 +1,15 @@
+package uk.gov.ons.fwmt.job_service.error;
+
+public enum ExceptionCode {
+  UNKNOWN,
+  INVALID_FILE_NAME,
+  INVALID_MEDIA_TYPE,
+  UNKNOWN_JOB_ID,
+  UNKNOWN_USER_ID,
+  CSV_MISSING_COLUMN,
+  CSV_INVALID_FIELD,
+  CSV_OTHER,
+  TM_UNAUTHENTICATED,
+  TM_INACCESSIBLE,
+
+}

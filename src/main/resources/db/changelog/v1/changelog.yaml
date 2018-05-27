@@ -1,0 +1,119 @@
+databaseChangeLog:
+ - changeSet:
+    id: v1
+    author: James Berry
+    comment: Create sample table
+    changes:
+      - sqlFile:
+          path: 1_Setup_Sample.sql
+          relativeToChangelogFile: true
+          splitStatements: false
+ - changeSet:
+    id: v2
+    author: James Berry
+    comment: Create staff table
+    changes:
+      - sqlFile:
+          path: 2_Setup_Staff.sql
+          relativeToChangelogFile: true
+          splitStatements: false
+ - changeSet:
+    id: v3
+    author: James Berry
+    comment: Create leavers table
+    changes:
+      - sqlFile:
+          path: 3_Setup_Leavers.sql
+          relativeToChangelogFile: true
+          splitStatements: false
+ - changeSet:
+    id: v4
+    author: James Berry
+    comment: Create jobs table
+    changes:
+      - sqlFile:
+          path: 4_Setup_Jobs.sql
+          relativeToChangelogFile: true
+          splitStatements: false
+ - changeSet:
+    id: v5
+    author: James Berry
+    comment: Create users table
+    changes:
+      - sqlFile:
+          path: 5_Setup_Users.sql
+          relativeToChangelogFile: true
+          splitStatements: false
+ - changeSet:
+    id: v6
+    author: James Berry
+    comment: Create users table
+    changes:
+      - sqlFile:
+          path: 6_Add_Primary_and_Natural_Keys.sql
+          relativeToChangelogFile: true
+          splitStatements: false
+ - changeSet:
+    id: v7
+    author: Thomas Poot
+    comment: Alter the names of all columns to fit Postgres standards
+    changes:
+      - sqlFile:
+          path: 7_Rename_Tables_Camelcase.sql
+          relativeToChangelogFile: true
+          splitStatements: false
+ - changeSet:
+    id: v8
+    author: Thomas Poot
+    comment: Made the primary key of the sample table autoincrement
+    changes:
+      - sqlFile:
+          path: 8_Autoincrement_Sample_Primary_Key.sql
+          relativeToChangelogFile: true
+          splitStatements: false
+ - changeSet:
+    id: v9
+    author: Thomas Poot
+    comment: Made a new primary key for the users table
+    changes:
+      - sqlFile:
+          path: 9_Add_Id_to_Users.sql
+          relativeToChangelogFile: true
+          splitStatements: false
+ - changeSet:
+    id: v10
+    author: Jacob Harrison
+    comment: Removed the sample table
+    changes:
+      - sqlFile:
+          path: 10_Drop_Sample_Table.sql
+          relativeToChangelogFile: true
+          splitStatements: false
+ - changeSet:
+    id: v11
+    author: Thomas Poot
+    comment: Dropped remaining un-needed tables and set up new Legacy storage tables
+    changes:
+      - sqlFile:
+          path: 11_Rework_Gateway.sql
+          relativeToChangelogFile: true
+          splitStatements: false
+ - changeSet:
+    id: v12
+    author: Soundararajan
+    comment: Added new column to help loading users with new auth no
+    changes:
+      - sqlFile:
+          path: 12_Add_AlternateAuthNo_to_Users.sql
+          relativeToChangelogFile: true
+          splitStatements: false
+ - changeSet:
+    id: v13
+    author: Thomas Poot
+    comment: Added a last known authno to the jobs table
+    changes:
+      - sqlFile:
+          path: 13_Add_LastAuthNo_to_Jobs.sql
+          relativeToChangelogFile: true
+          splitStatements: false
+
