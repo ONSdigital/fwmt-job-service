@@ -9,10 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.UnprocessedCSVRow;
 import uk.gov.ons.fwmt.job_service.data.dto.SampleSummaryDTO;
-import uk.gov.ons.fwmt.job_service.data.dto.StaffSummaryDTO;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
-import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacyStaffIngest;
 import uk.gov.ons.fwmt.job_service.entity.TMJobEntity;
 import uk.gov.ons.fwmt.job_service.entity.TMUserEntity;
 import uk.gov.ons.fwmt.job_service.error.InvalidFileNameException;
@@ -33,7 +31,6 @@ public class LegacyServiceImpl implements LegacyService {
   private FileIngestService fileIngestService;
   private CSVParsingService csvParsingService;
   private TMJobConverterService tmJobConverterService;
-  private LegacyStaffPublishService legacyStaffPublishService;
   private TMService tmService;
   private TMUserRepo tmUserRepo;
   private TMJobRepo tmJobRepo;
@@ -43,7 +40,6 @@ public class LegacyServiceImpl implements LegacyService {
       FileIngestService fileIngestService,
       CSVParsingService csvParsingService,
       TMJobConverterService tmJobConverterService,
-      LegacyStaffPublishService legacyStaffPublishService,
       TMService tmService,
       TMUserRepo tmUserRepo,
       TMJobRepo tmJobRepo
@@ -51,7 +47,6 @@ public class LegacyServiceImpl implements LegacyService {
     this.fileIngestService = fileIngestService;
     this.csvParsingService = csvParsingService;
     this.tmJobConverterService = tmJobConverterService;
-    this.legacyStaffPublishService = legacyStaffPublishService;
     this.tmService = tmService;
     this.tmUserRepo = tmUserRepo;
     this.tmJobRepo = tmJobRepo;
@@ -167,24 +162,4 @@ public class LegacyServiceImpl implements LegacyService {
     return new SampleSummaryDTO(file.getOriginalFilename(), parsed, unprocessed);
   }
 
-  @Override public StaffSummaryDTO processStaffFile(MultipartFile file)
-      throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
-    FileIngest fileIngest = fileIngestService.ingestStaffFile(file);
-    Iterator<CSVParseResult<LegacyStaffIngest>> csvRowIterator = csvParsingService
-        .parseLegacyStaff(fileIngest.getReader());
-
-    int parsed = 0;
-
-    // parse csv
-    // lines are recorded in the database
-    // TODO determine where the 'result' of the staff delta goes
-    //    CSVParseFinalResult result = csvParsingService.parseLegacyStaff(new InputStreamReader(file.getInputStream()));
-
-    // construct reply
-    StaffSummaryDTO summary = new StaffSummaryDTO(file.getOriginalFilename(), parsed);
-
-    log.info("Ended a staff file ingest");
-
-    return summary;
-  }
 }

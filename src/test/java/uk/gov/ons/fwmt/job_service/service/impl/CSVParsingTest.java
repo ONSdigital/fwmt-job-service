@@ -5,7 +5,6 @@ import org.junit.Test;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
-import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacyStaffIngest;
 
 import java.io.*;
 import java.util.Iterator;
@@ -15,20 +14,6 @@ import static org.junit.Assert.*;
 public class CSVParsingTest {
   private CSVParsingServiceImpl csvParsingServiceImpl = new CSVParsingServiceImpl();
 
-  @Test
-  @Ignore
-  public void parseStaffCSV() throws Exception {
-    File testFile = new File("src/test/resources/sampledata/public/staffExampleAllRows.csv");
-
-    try (FileInputStream testFileInputStream = new FileInputStream(testFile)) {
-      Iterator<CSVParseResult<LegacyStaffIngest>> iterator = csvParsingServiceImpl
-          .parseLegacyStaff(new InputStreamReader(testFileInputStream));
-
-      CSVParseResult<LegacyStaffIngest> result = iterator.next();
-      assertTrue(result.isResult());
-    }
-
-  }
 
   @Test
   public void parseGFFSampleCSV() throws IOException {

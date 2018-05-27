@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.job_service.controller;
+package uk.gov.ons.fwmt.job_service.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

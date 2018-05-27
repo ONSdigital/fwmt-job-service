@@ -128,13 +128,4 @@ public class FileIngestServiceImpl implements FileIngestService {
     return new FileIngest(filename, reader);
   }
 
-  public FileIngest ingestStaffFile(MultipartFile file)
-      throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
-    // check filename
-    Filename filename = verifyCSVFilename(file.getOriginalFilename(), "staff");
-
-    Reader reader = new InputStreamReader(file.getInputStream());
-
-    return new FileIngest(filename, reader);
-  }
 }

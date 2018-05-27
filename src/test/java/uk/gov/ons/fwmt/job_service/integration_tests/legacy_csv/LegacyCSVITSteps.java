@@ -9,7 +9,6 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.ons.fwmt.job_service.integration_tests.helpers.SpringITBase;
 import uk.gov.ons.fwmt.job_service.repo.TMJobRepo;
-import uk.gov.ons.fwmt.job_service.repo.TMUserRepo;
 import uk.gov.ons.fwmt.job_service.service.impl.TMServiceImpl;
 
 import static org.junit.Assert.assertEquals;
@@ -20,15 +19,11 @@ public class LegacyCSVITSteps extends SpringITBase {
   private TMJobRepo tmJobRepo;
 
   @Autowired
-  private TMUserRepo tmUserRepo;
-
-  @Autowired
   private TMServiceImpl tmServiceImpl;
 
   @Given("^the database is clean$")
   public void theDatabaseIsClean() {
     tmJobRepo.deleteAll();
-    tmUserRepo.deleteAll();
   }
 
   @When("^the CSV '([a-zA-Z0-9_-]+)' is uploaded to the '([a-zA-Z]+)' endpoint$")

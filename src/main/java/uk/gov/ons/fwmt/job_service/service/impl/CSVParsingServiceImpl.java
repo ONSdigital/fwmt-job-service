@@ -175,19 +175,6 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     };
   }
 
-  @Override
-  public Iterator<CSVParseResult<LegacyStaffIngest>> parseLegacyStaff(Reader reader) throws IOException {
-    CSVParser parser = getCSVFormat().parse(reader);
-    return new CSVIterator<LegacyStaffIngest>(parser) {
-      @Override
-      public LegacyStaffIngest ingest(CSVRecord record) {
-        LegacyStaffIngest instance = new LegacyStaffIngest();
-        setFromCSVColumnAnnotations(instance, record, null);
-        return instance;
-      }
-    };
-  }
-
   private abstract class CSVIterator<T> implements Iterator<CSVParseResult<T>> {
     private final Iterator<CSVRecord> iter;
     private int rowNumber;
