@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.job_service.service.impl;
+package uk.gov.ons.fwmt.job_service.service.impl.totalmobile;
 
 import com.consiliumtechnologies.schemas.mobile._2009._03.visitstypes.AdditionalPropertyCollectionType;
 import com.consiliumtechnologies.schemas.mobile._2009._03.visitstypes.AdditionalPropertyType;
@@ -19,10 +19,10 @@ import uk.gov.ons.fwmt.job_service.data.annotation.JobAdditionalProperty;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.entity.TMJobEntity;
 import uk.gov.ons.fwmt.job_service.entity.TMUserEntity;
-import uk.gov.ons.fwmt.job_service.error.UnknownUserException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.UnknownUserException;
 import uk.gov.ons.fwmt.job_service.repo.TMJobRepo;
 import uk.gov.ons.fwmt.job_service.repo.TMUserRepo;
-import uk.gov.ons.fwmt.job_service.service.TMJobConverterService;
+import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;

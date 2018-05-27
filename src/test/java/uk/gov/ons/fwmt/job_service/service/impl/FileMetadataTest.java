@@ -2,8 +2,8 @@ package uk.gov.ons.fwmt.job_service.service.impl;
 
 import org.junit.Test;
 import org.springframework.mock.web.MockMultipartFile;
-import uk.gov.ons.fwmt.job_service.error.InvalidFileNameException;
-import uk.gov.ons.fwmt.job_service.error.MediaTypeNotSupportedException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
 
 import java.io.IOException;
 

@@ -13,11 +13,13 @@ import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.entity.TMJobEntity;
 import uk.gov.ons.fwmt.job_service.entity.TMUserEntity;
-import uk.gov.ons.fwmt.job_service.error.InvalidFileNameException;
-import uk.gov.ons.fwmt.job_service.error.MediaTypeNotSupportedException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
 import uk.gov.ons.fwmt.job_service.repo.TMJobRepo;
 import uk.gov.ons.fwmt.job_service.repo.TMUserRepo;
 import uk.gov.ons.fwmt.job_service.service.*;
+import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
+import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,7 +29,7 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class LegacyServiceImpl implements LegacyService {
+public class JobServiceImpl implements JobService {
   private FileIngestService fileIngestService;
   private CSVParsingService csvParsingService;
   private TMJobConverterService tmJobConverterService;
@@ -36,7 +38,7 @@ public class LegacyServiceImpl implements LegacyService {
   private TMJobRepo tmJobRepo;
 
   @Autowired
-  public LegacyServiceImpl(
+  public JobServiceImpl(
       FileIngestService fileIngestService,
       CSVParsingService csvParsingService,
       TMJobConverterService tmJobConverterService,

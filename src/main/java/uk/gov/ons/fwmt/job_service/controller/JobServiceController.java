@@ -17,9 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.gov.ons.fwmt.job_service.data.dto.GatewayCommonErrorDTO;
 import uk.gov.ons.fwmt.job_service.data.dto.SampleSummaryDTO;
-import uk.gov.ons.fwmt.job_service.error.InvalidFileNameException;
-import uk.gov.ons.fwmt.job_service.error.MediaTypeNotSupportedException;
-import uk.gov.ons.fwmt.job_service.service.LegacyService;
+import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
+import uk.gov.ons.fwmt.job_service.service.JobService;
 
 import java.io.IOException;
 
@@ -34,11 +34,11 @@ import java.io.IOException;
 @Slf4j
 @RestController
 public class JobServiceController {
-  private final LegacyService legacyService;
+  private final JobService jobService;
 
   @Autowired
-  public JobServiceController(LegacyService legacyService) {
-    this.legacyService = legacyService;
+  public JobServiceController(JobService jobService) {
+    this.jobService = jobService;
   }
 
   @RequestMapping(value = "/samples", method = RequestMethod.POST, produces = "application/json")
@@ -51,7 +51,7 @@ public class JobServiceController {
       RedirectAttributes redirectAttributes)
       throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
     log.info("Entered sample endpoint");
-    SampleSummaryDTO summary = legacyService.processSampleFile(file);
+    SampleSummaryDTO summary = jobService.processSampleFile(file);
     log.info("Exited sample endpoint");
     return ResponseEntity.ok(summary);
 

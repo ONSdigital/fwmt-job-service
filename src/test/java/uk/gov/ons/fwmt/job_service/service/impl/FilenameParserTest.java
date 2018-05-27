@@ -1,7 +1,7 @@
 package uk.gov.ons.fwmt.job_service.service.impl;
 
 import org.junit.Test;
-import uk.gov.ons.fwmt.job_service.error.InvalidFileNameException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
 
 import static org.junit.Assert.*;
 

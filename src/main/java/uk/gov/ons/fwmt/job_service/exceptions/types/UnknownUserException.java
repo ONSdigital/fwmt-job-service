@@ -1,4 +1,6 @@
-package uk.gov.ons.fwmt.job_service.error;
+package uk.gov.ons.fwmt.job_service.exceptions.types;
+
+import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 
 public class UnknownUserException extends FWMTCommonException {
   static final long serialVersionUID = 0L;

@@ -6,8 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.Filename;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
-import uk.gov.ons.fwmt.job_service.error.InvalidFileNameException;
-import uk.gov.ons.fwmt.job_service.error.MediaTypeNotSupportedException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 
 import java.io.IOException;

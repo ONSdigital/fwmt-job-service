@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.job_service.service.impl;
+package uk.gov.ons.fwmt.job_service.service.impl.totalmobile;
 
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.*;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 import org.springframework.ws.soap.client.core.SoapActionCallback;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
-import uk.gov.ons.fwmt.job_service.service.TMService;
+import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 
 import javax.xml.bind.JAXBElement;
 import java.util.Arrays;

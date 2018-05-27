@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.job_service.exceptions;
+package uk.gov.ons.fwmt.job_service.exceptions.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -7,9 +7,9 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import uk.gov.ons.fwmt.job_service.data.dto.GatewayCommonErrorDTO;
-import uk.gov.ons.fwmt.job_service.error.InvalidFileNameException;
-import uk.gov.ons.fwmt.job_service.error.MediaTypeNotSupportedException;
-import uk.gov.ons.fwmt.job_service.error.UnknownUserException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.UnknownUserException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalTime;

@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.job_service.service.impl;
+package uk.gov.ons.fwmt.job_service.service.impl.totalmobile;
 
 import com.consiliumtechnologies.schemas.mobile._2009._03.visitstypes.AdditionalPropertyCollectionType;
 import com.consiliumtechnologies.schemas.mobile._2015._05.optimisemessages.CreateJobRequest;
@@ -14,7 +14,7 @@ import uk.gov.ons.fwmt.job_service.repo.TMUserRepo;
 
 
 import static org.junit.Assert.assertEquals;
-import static uk.gov.ons.fwmt.job_service.service.impl.TMJobConverterServiceImpl.JOB_QUEUE;
+import static uk.gov.ons.fwmt.job_service.service.impl.totalmobile.TMJobConverterServiceImpl.JOB_QUEUE;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TMJobConverterServiceImplTest {

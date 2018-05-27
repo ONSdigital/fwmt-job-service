@@ -1,6 +1,7 @@
-package uk.gov.ons.fwmt.job_service.error;
+package uk.gov.ons.fwmt.job_service.exceptions.types;
 
 import lombok.Getter;
+import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.job_service.error;
+package uk.gov.ons.fwmt.job_service.exceptions;
 
 public enum ExceptionCode {
   UNKNOWN,
