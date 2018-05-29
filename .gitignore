@@ -4,7 +4,6 @@
 *.log
 
 # Package Files #
-*.jar
 *.war
 *.ear
 *.zip
@@ -20,3 +19,16 @@
 out/
 .gradle
 build
+
+#Eclipse files
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
