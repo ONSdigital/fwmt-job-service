@@ -1,14 +1,14 @@
 info:
-  name: @project.artifactId@
-  version: @project.version@
-  origin: @scm.url@
-  commit: @buildNumber@
-  branch: @scmBranch@
-  built: @timestamp@
+  #name: @project.artifactId@
+  #version: @project.version@
+  #origin: @scm.url@
+  #commit: @buildNumber@
+  #branch: @scmBranch@
+  #built: @timestamp@
 
 spring:
   application:
-    name: fwmt-legacy-gateway
+    name: fwmt-job-service
   jpa.properties.hibernate.default_schema: gateway
   datasource:
     username: ${cloud.services.postgresql.connection.username}
