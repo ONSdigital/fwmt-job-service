@@ -1,0 +1,9 @@
+applications:
+- name: fwmt-job-service-&{SPACE}
+  instances: 1
+  timeout: 180
+  host: fwmt-job-service-&{SPACE}
+  memory: 1024M
+  path: build/libs/fwmt-job-service.jar
+  services:
+  - fwmt-db
