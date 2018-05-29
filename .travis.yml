@@ -20,7 +20,7 @@ after_script:
   - docker rm $(docker ps -a -q)
 
 script: 
-  - "./gradlew check --stacktrace"
+  - "./gradlew check"
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
