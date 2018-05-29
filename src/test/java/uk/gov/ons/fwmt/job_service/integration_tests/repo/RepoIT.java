@@ -1,5 +1,6 @@
 package uk.gov.ons.fwmt.job_service.integration_tests.repo;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ public class RepoIT {
   @Autowired private TMJobRepo tmJobRepo;
 
   @Test
+  @Ignore
   @Transactional
   public void storeUserInDb() {
     TMUserEntity tmUserEntity = new TMUserEntity("9999", "testuser", false, null);
@@ -38,6 +40,7 @@ public class RepoIT {
   }
 
   @Test
+  @Ignore
   @Transactional
   public void storeJobInDb() {
     TMJobEntity tmJobEntity = new TMJobEntity("testjob", "2222");
