@@ -30,6 +30,11 @@ public class CSVParsingServiceImpl implements CSVParsingService {
 
   private FieldPeriodRepo fieldPeriodRepo;
 
+  @Autowired
+  public CSVParsingServiceImpl(FieldPeriodRepo fieldPeriodRepo) {
+    this.fieldPeriodRepo = fieldPeriodRepo;
+  }
+
   /**
    * Read the CSVColumn annotations on the class T and set Java bean properties
    * from the columns of a CSV record
@@ -40,11 +45,6 @@ public class CSVParsingServiceImpl implements CSVParsingService {
    *          events where there are many options
    * @param <T> A class with fields annotated with CSVColumn
    */
-
-  @Autowired
-  public CSVParsingServiceImpl(FieldPeriodRepo fieldPeriodRepo) {
-    this.fieldPeriodRepo = fieldPeriodRepo;
-  }
 
   private <T> void setFromCSVColumnAnnotations(T instance, CSVRecord record, String pivot) {
     Class<?> tClass = instance.getClass();
