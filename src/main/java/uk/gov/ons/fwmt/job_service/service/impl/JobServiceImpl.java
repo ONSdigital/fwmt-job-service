@@ -15,6 +15,7 @@ import uk.gov.ons.fwmt.job_service.entity.TMJobEntity;
 import uk.gov.ons.fwmt.job_service.entity.TMUserEntity;
 import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
 import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
+import uk.gov.ons.fwmt.job_service.repo.FieldPeriodRepo;
 import uk.gov.ons.fwmt.job_service.repo.TMJobRepo;
 import uk.gov.ons.fwmt.job_service.repo.TMUserRepo;
 import uk.gov.ons.fwmt.job_service.service.*;
@@ -36,6 +37,7 @@ public class JobServiceImpl implements JobService {
   private TMService tmService;
   private TMUserRepo tmUserRepo;
   private TMJobRepo tmJobRepo;
+  private FieldPeriodRepo fieldPeriodRepo;
 
   @Autowired
   public JobServiceImpl(
@@ -44,7 +46,8 @@ public class JobServiceImpl implements JobService {
       TMJobConverterService tmJobConverterService,
       TMService tmService,
       TMUserRepo tmUserRepo,
-      TMJobRepo tmJobRepo
+      TMJobRepo tmJobRepo,
+      FieldPeriodRepo  fieldPeriodRepo
   ) {
     this.fileIngestService = fileIngestService;
     this.csvParsingService = csvParsingService;
@@ -52,6 +55,7 @@ public class JobServiceImpl implements JobService {
     this.tmService = tmService;
     this.tmUserRepo = tmUserRepo;
     this.tmJobRepo = tmJobRepo;
+    this.fieldPeriodRepo = fieldPeriodRepo;
   }
 
   protected Optional<UnprocessedCSVRow> sendJobToUser(int row, LegacySampleIngest ingest, TMUserEntity userEntity) {

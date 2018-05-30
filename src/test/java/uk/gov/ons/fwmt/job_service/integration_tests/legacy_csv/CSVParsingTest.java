@@ -1,19 +1,28 @@
-package uk.gov.ons.fwmt.job_service.service.impl;
+package uk.gov.ons.fwmt.job_service.integration_tests.legacy_csv;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import cucumber.api.CucumberOptions;
+import cucumber.api.junit.Cucumber;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
+import uk.gov.ons.fwmt.job_service.service.impl.CSVParsingServiceImpl;
 
 import java.io.*;
 import java.util.Iterator;
 
 import static org.junit.Assert.*;
 
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class CSVParsingTest {
-  private CSVParsingServiceImpl csvParsingServiceImpl = new CSVParsingServiceImpl();
-
+  private CSVParsingServiceImpl csvParsingServiceImpl = new CSVParsingServiceImpl(null);
+  
 
   @Test
   public void parseGFFSampleCSV() throws IOException {
