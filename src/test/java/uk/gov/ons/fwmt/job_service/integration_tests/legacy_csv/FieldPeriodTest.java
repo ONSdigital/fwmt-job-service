@@ -3,6 +3,7 @@ package uk.gov.ons.fwmt.job_service.integration_tests.legacy_csv;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -19,13 +20,17 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class FieldPeriodTest {
+
+  @Autowired
+  private CSVParsingServiceImpl csvParsingServiceImpl;
+  
   void testGFFDate(LocalDateTime expected, String fieldPeriod) {
-    LocalDateTime actual = CSVParsingServiceImpl.convertToGFFDate(fieldPeriod);
+    LocalDateTime actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
     assertEquals(expected, actual);
   }
 
   void testLFSDate(LocalDateTime expected, String fieldPeriod) {
-    LocalDateTime actual = convertToLocalDateTime(CSVParsingServiceImpl.convertToLFSDate(fieldPeriod));
+    LocalDateTime actual = convertToLocalDateTime(csvParsingServiceImpl.convertToLFSDate(fieldPeriod));
     assertEquals(expected, actual);
   }
 

@@ -27,6 +27,9 @@ import java.util.*;
 @Slf4j
 @Service
 public class CSVParsingServiceImpl implements CSVParsingService {
+  
+  private FieldPeriodRepo fieldPeriodRepo;
+  
   /**
    * Read the CSVColumn annotations on the class T and set Java bean properties
    * from the columns of a CSV record
@@ -37,14 +40,13 @@ public class CSVParsingServiceImpl implements CSVParsingService {
    *          events where there are many options
    * @param <T> A class with fields annotated with CSVColumn
    */
-  private static FieldPeriodRepo fieldPeriodRepo;
   
   @Autowired
   public CSVParsingServiceImpl(FieldPeriodRepo fieldPeriodRepo) {
     this.fieldPeriodRepo = fieldPeriodRepo;
   }
 
-  private static <T> void setFromCSVColumnAnnotations(T instance, CSVRecord record, String pivot) {
+  private <T> void setFromCSVColumnAnnotations(T instance, CSVRecord record, String pivot) {
     Class<?> tClass = instance.getClass();
     PropertyAccessor accessor = PropertyAccessorFactory.forBeanPropertyAccess(instance);
     for (Field field : tClass.getDeclaredFields()) {
@@ -81,7 +83,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
    * Create a unique Job ID that can be used by TotalMobile from existing fields
    * within the CSV The method varies on the type of survey
    */
-  protected static String constructTmJobId(CSVRecord record, LegacySampleSurveyType surveyType) {
+  protected String constructTmJobId(CSVRecord record, LegacySampleSurveyType surveyType) {
     switch (surveyType) {
     case GFF:
       // quota '-' addr '-' stage
@@ -97,7 +99,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     }
   }
 
-  public static LocalDateTime convertToGFFDate(String stage) {
+  public LocalDateTime convertToGFFDate(String stage) {
     int year = 2010 + Integer.parseInt(stage.substring(0, 1));
     int month = Integer.parseInt(stage.substring(1, 3));
     // if we are reissuing (month above 12), we minus 20 to get a normal month
@@ -116,7 +118,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
 
   // technically, 'stage' here is the field period 'fp'
   // TODO double check to ensure that this is correct
-  public static Date convertToLFSDate(String stage) {
+  public Date convertToLFSDate(String stage) {
     if (fieldPeriodRepo.existsByFieldPeriod(stage)) {
       Calendar cal = Calendar.getInstance();
       FieldPeriod fieldPeriod = fieldPeriodRepo.findByFieldPeriod(stage);
