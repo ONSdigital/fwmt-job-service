@@ -27,9 +27,9 @@ import java.util.*;
 @Slf4j
 @Service
 public class CSVParsingServiceImpl implements CSVParsingService {
-  
+
   private FieldPeriodRepo fieldPeriodRepo;
-  
+
   /**
    * Read the CSVColumn annotations on the class T and set Java bean properties
    * from the columns of a CSV record
@@ -40,7 +40,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
    *          events where there are many options
    * @param <T> A class with fields annotated with CSVColumn
    */
-  
+
   @Autowired
   public CSVParsingServiceImpl(FieldPeriodRepo fieldPeriodRepo) {
     this.fieldPeriodRepo = fieldPeriodRepo;
@@ -194,16 +194,12 @@ public class CSVParsingServiceImpl implements CSVParsingService {
         // derive the coordinates, if we were given a non-null non-empty grid
         // ref
         if (instance.getOsGridRef() != null && instance.getOsGridRef().length() > 0) {
-          // TODO Confirm this is correct with new data map
-          // String[] osGridRefSplit = instance.getOsGridRef().split(",", 2);
-          // if (osGridRefSplit.length != 2) {
-          // throw new IllegalArgumentException("OS Grid Reference was not in
-          // the expected format");
-          // }
-          // instance.setGeoX(Float.parseFloat(osGridRefSplit[0]));
-          // instance.setGeoY(Float.parseFloat(osGridRefSplit[1]));
-          instance.setGeoX(null);
-          instance.setGeoY(null);
+          String[] osGridRefSplit = instance.getOsGridRef().split(",", 2);
+          if (osGridRefSplit.length != 2) {
+            throw new IllegalArgumentException("OS Grid Reference was not in the expected format");
+          }
+          instance.setGeoX(Float.parseFloat(osGridRefSplit[0]));
+          instance.setGeoY(Float.parseFloat(osGridRefSplit[1]));
         }
         return instance;
       }

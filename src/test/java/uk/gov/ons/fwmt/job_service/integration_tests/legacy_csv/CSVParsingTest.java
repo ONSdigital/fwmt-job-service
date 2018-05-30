@@ -26,6 +26,7 @@ import uk.gov.ons.fwmt.job_service.service.impl.CSVParsingServiceImpl;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Ignore
 public class CSVParsingTest {
   
   @Autowired
