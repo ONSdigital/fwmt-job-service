@@ -17,11 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.fwmt.job_service.data.annotation.JobAdditionalProperty;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
-import uk.gov.ons.fwmt.job_service.entity.TMJobEntity;
-import uk.gov.ons.fwmt.job_service.entity.TMUserEntity;
 import uk.gov.ons.fwmt.job_service.exceptions.types.UnknownUserException;
-import uk.gov.ons.fwmt.job_service.repo.TMJobRepo;
-import uk.gov.ons.fwmt.job_service.repo.TMUserRepo;
+import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
+import uk.gov.ons.fwmt.job_service.rest.UserResourceService;
+import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
+import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -41,16 +41,16 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   private static final String JOB_WORK_TYPE = "SS";
   private static final String JOB_WORLD = "Default";
 
-  private final TMJobRepo tmJobRepo;
-  private final TMUserRepo tmUserRepo;
+  private final JobResourceService jobResourceService;
+  private final UserResourceService userResourceService;
   private final DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
   private final ObjectFactory factory = new ObjectFactory();
 
   @Autowired
-  public TMJobConverterServiceImpl(TMJobRepo tmJobRepo, TMUserRepo tmUserRepo)
+  public TMJobConverterServiceImpl(JobResourceService jobResourceService, UserResourceService userResourceService)
       throws DatatypeConfigurationException {
-    this.tmJobRepo = tmJobRepo;
-    this.tmUserRepo = tmUserRepo;
+    this.jobResourceService = jobResourceService;
+    this.userResourceService = userResourceService;
   }
 
   protected static void addAdditionalProperty(CreateJobRequest request, String key, String value) {
@@ -195,9 +195,10 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     //    tmService.send(message);
 
     // save the job into our database
-    TMJobEntity entity = tmJobRepo.findByTmJobId(job.getTmJobId());
-    entity.setLastAuthNo(job.getAuth());
-    tmJobRepo.save(entity);
+    Optional<JobDto> jobDto = jobResourceService.findByTmJobId(job.getTmJobId());
+    jobDto.ifPresent(jobDto1 -> {jobDto1.setLastAuthNo(job.getAuth());
+      jobResourceService.updateJob(jobDto1);
+    });
   }
 
   @Deprecated
@@ -211,20 +212,18 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     //    tmService.send(message);
 
     // save the job into our database
-    TMJobEntity entity = new TMJobEntity();
-    entity.setTmJobId(job.getTmJobId());
-    entity.setLastAuthNo(job.getAuth());
-    tmJobRepo.save(entity);
+    JobDto jobDto = new JobDto(job.getTmJobId(),job.getAuth());
+    jobResourceService.createJob(jobDto);
   }
 
   @Deprecated
-  protected void publishJobToUser(LegacySampleIngest job, TMUserEntity user) {
+  protected void publishJobToUser(LegacySampleIngest job, UserDto user) {
     log.info("User was active");
     // don't do anything if we've seen this job ID and authno before
     // if we've seen the job ID but not the authno, it's a reallocation
-    if (tmJobRepo.existsByTmJobIdAndLastAuthNo(job.getTmJobId(), user.getAuthNo())) {
+    if (jobResourceService.existsByTmJobIdAndLastAuthNo(job.getTmJobId(), user.getAuthNo())) {
       log.info("Job has been sent previously");
-    } else if (tmJobRepo.existsByTmJobId(job.getTmJobId())) {
+    } else if (jobResourceService.existsByTmJobId(job.getTmJobId())) {
       log.info("Job is a reallocation");
       // reallocate
       reallocateJob(job, user.getTmUsername());
@@ -258,14 +257,14 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   @Deprecated
   public void publishJob(LegacySampleIngest job) throws UnknownUserException {
     // only send if the user is active
-    if (tmUserRepo.existsByAuthNoAndActive(job.getAuth(), true)) {
-      TMUserEntity userEntity = tmUserRepo.findByAuthNo(job.getAuth());
-      publishJobToUser(job, userEntity);
-    } else if (tmUserRepo.existsByAlternateAuthNoAndActive(job.getAuth(), true)) {
-      TMUserEntity userEntity = tmUserRepo.findByAlternateAuthNo(job.getAuth());
-      publishJobToUser(job, userEntity);
-    } else if (tmUserRepo.existsByAuthNoAndActive(job.getAuth(), false) ||
-        tmUserRepo.existsByAlternateAuthNoAndActive(job.getAuth(), false)) {
+    if (userResourceService.existsByAuthNoAndActive(job.getAuth(), true)) {
+      UserDto userDto = userResourceService.findByAuthNo(job.getAuth());
+      publishJobToUser(job, userDto);
+    } else if (userResourceService.existsByAlternateAuthNoAndActive(job.getAuth(), true)) {
+      UserDto userDto = userResourceService.findByAlternateAuthNo(job.getAuth());
+      publishJobToUser(job, userDto);
+    } else if (userResourceService.existsByAuthNoAndActive(job.getAuth(), false) ||
+            userResourceService.existsByAlternateAuthNoAndActive(job.getAuth(), false)) {
       log.info("User was not active");
     } else {
       log.error("User was not found");

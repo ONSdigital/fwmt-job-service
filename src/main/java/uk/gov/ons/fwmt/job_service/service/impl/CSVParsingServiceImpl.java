@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.ons.fwmt.job_service.data.annotation.CSVColumn;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.*;
-import uk.gov.ons.fwmt.job_service.entity.FieldPeriod;
-import uk.gov.ons.fwmt.job_service.repo.FieldPeriodRepo;
+import uk.gov.ons.fwmt.job_service.rest.FieldPeriodResourceService;
+import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 
 import java.io.IOException;
@@ -28,11 +28,11 @@ import java.util.*;
 @Service
 public class CSVParsingServiceImpl implements CSVParsingService {
 
-  private FieldPeriodRepo fieldPeriodRepo;
+  private FieldPeriodResourceService fieldPeriodResourceService;
 
   @Autowired
-  public CSVParsingServiceImpl(FieldPeriodRepo fieldPeriodRepo) {
-    this.fieldPeriodRepo = fieldPeriodRepo;
+  public CSVParsingServiceImpl(FieldPeriodResourceService fieldPeriodResourceService) {
+    this.fieldPeriodResourceService = fieldPeriodResourceService;
   }
 
   /**
@@ -119,9 +119,9 @@ public class CSVParsingServiceImpl implements CSVParsingService {
   // technically, 'stage' here is the field period 'fp'
   // TODO double check to ensure that this is correct
   public Date convertToLFSDate(String stage) {
-    if (fieldPeriodRepo.existsByFieldPeriod(stage)) {
+    if (fieldPeriodResourceService.existsByFieldPeriod(stage)) {
       Calendar cal = Calendar.getInstance();
-      FieldPeriod fieldPeriod = fieldPeriodRepo.findByFieldPeriod(stage);
+      final FieldPeriodDto fieldPeriod = fieldPeriodResourceService.findByFieldPeriod(stage).get();
       cal.setTime(fieldPeriod.getEndDate());
       cal.set(Calendar.HOUR, 11);
       cal.set(Calendar.MINUTE, 59);

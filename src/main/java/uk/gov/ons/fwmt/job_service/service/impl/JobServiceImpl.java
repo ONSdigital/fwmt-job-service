@@ -11,13 +11,13 @@ import uk.gov.ons.fwmt.job_service.data.csv_parser.UnprocessedCSVRow;
 import uk.gov.ons.fwmt.job_service.data.dto.SampleSummaryDTO;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
-import uk.gov.ons.fwmt.job_service.entity.TMJobEntity;
-import uk.gov.ons.fwmt.job_service.entity.TMUserEntity;
 import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
 import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
-import uk.gov.ons.fwmt.job_service.repo.FieldPeriodRepo;
-import uk.gov.ons.fwmt.job_service.repo.TMJobRepo;
-import uk.gov.ons.fwmt.job_service.repo.TMUserRepo;
+import uk.gov.ons.fwmt.job_service.rest.FieldPeriodResourceService;
+import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
+import uk.gov.ons.fwmt.job_service.rest.UserResourceService;
+import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
+import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
 import uk.gov.ons.fwmt.job_service.service.*;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
@@ -35,9 +35,9 @@ public class JobServiceImpl implements JobService {
   private CSVParsingService csvParsingService;
   private TMJobConverterService tmJobConverterService;
   private TMService tmService;
-  private TMUserRepo tmUserRepo;
-  private TMJobRepo tmJobRepo;
-  private FieldPeriodRepo fieldPeriodRepo;
+  private UserResourceService userResourceService;
+  private JobResourceService jobResourceService;
+  private FieldPeriodResourceService fieldPeriodResourceService;
 
   @Autowired
   public JobServiceImpl(
@@ -45,27 +45,27 @@ public class JobServiceImpl implements JobService {
       CSVParsingService csvParsingService,
       TMJobConverterService tmJobConverterService,
       TMService tmService,
-      TMUserRepo tmUserRepo,
-      TMJobRepo tmJobRepo,
-      FieldPeriodRepo  fieldPeriodRepo
+      UserResourceService userResourceService,
+      JobResourceService jobResourceService,
+      FieldPeriodResourceService  fieldPeriodResourceService
   ) {
     this.fileIngestService = fileIngestService;
     this.csvParsingService = csvParsingService;
     this.tmJobConverterService = tmJobConverterService;
     this.tmService = tmService;
-    this.tmUserRepo = tmUserRepo;
-    this.tmJobRepo = tmJobRepo;
-    this.fieldPeriodRepo = fieldPeriodRepo;
+    this.userResourceService = userResourceService;
+    this.jobResourceService = jobResourceService;
+    this.fieldPeriodResourceService = fieldPeriodResourceService;
   }
 
-  protected Optional<UnprocessedCSVRow> sendJobToUser(int row, LegacySampleIngest ingest, TMUserEntity userEntity) {
-    String authno = userEntity.getAuthNo();
-    String username = userEntity.getTmUsername();
+  protected Optional<UnprocessedCSVRow> sendJobToUser(int row, LegacySampleIngest ingest, UserDto userDto) {
+    String authno = userDto.getAuthNo();
+    String username = userDto.getTmUsername();
     try {
-      if (tmJobRepo.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), authno)) {
+      if (jobResourceService.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), authno)) {
         log.info("Job has been sent previously");
         return Optional.of(new UnprocessedCSVRow(row, "Job has been sent previously"));
-      } else if (tmJobRepo.existsByTmJobId(ingest.getTmJobId())) {
+      } else if (jobResourceService.existsByTmJobId(ingest.getTmJobId())) {
         log.info("Job is a reallocation");
         SendUpdateJobHeaderRequestMessage request = tmJobConverterService.updateJob(ingest, username);
         // TODO add error handling
@@ -79,16 +79,19 @@ public class JobServiceImpl implements JobService {
             SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
             tmService.send(request);
             // update the last auth no in the database
-            TMJobEntity jobEntity = tmJobRepo.findByTmJobId(ingest.getTmJobId());
-            jobEntity.setLastAuthNo(authno);
-            tmJobRepo.save(jobEntity);
+            Optional<JobDto> jobDto = jobResourceService.findByTmJobId(ingest.getTmJobId());
+            jobDto.ifPresent(jobDto1 -> {
+              jobDto1.setLastAuthNo(authno);
+              jobResourceService.updateJob(jobDto1);
+            });
+
           } else {
             log.info("Job is a new GFF job");
             // send the job to TM
             SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
             tmService.send(request);
             // save the job in the database
-            tmJobRepo.save(new TMJobEntity(ingest.getTmJobId(), username));
+            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), username));
           }
           break;
         case LFS:
@@ -97,7 +100,7 @@ public class JobServiceImpl implements JobService {
           SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
           tmService.send(request);
           // save the job in the database
-          tmJobRepo.save(new TMJobEntity(ingest.getTmJobId(), username));
+          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), username));
           break;
         default:
           throw new IllegalArgumentException("Unknown survey type");
@@ -111,17 +114,17 @@ public class JobServiceImpl implements JobService {
     }
   }
 
-  protected Optional<TMUserEntity> findUser(LegacySampleIngest ingest) {
+  protected Optional<UserDto> findUser(LegacySampleIngest ingest) {
     log.info("Handling entry with authno: " + ingest.getAuth());
-    TMUserEntity entity = tmUserRepo.findByAuthNo(ingest.getAuth());
-    if (entity != null) {
-      log.info("Found user by authno: " + entity.toString());
-      return Optional.of(entity);
+    UserDto userDto = userResourceService.findByAuthNo(ingest.getAuth());
+    if (userDto != null) {
+      log.info("Found user by authno: " + userDto.toString());
+      return Optional.of(userDto);
     }
-    entity = tmUserRepo.findByAlternateAuthNo(ingest.getAuth());
-    if (entity != null) {
-      log.info("Found user by alternate authno: " + entity.toString());
-      return Optional.of(entity);
+    userDto = userResourceService.findByAlternateAuthNo(ingest.getAuth());
+    if (userDto != null) {
+      log.info("Found user by alternate authno: " + userDto.toString());
+      return Optional.of(userDto);
     } else {
       return Optional.empty();
     }
@@ -144,7 +147,7 @@ public class JobServiceImpl implements JobService {
         continue;
       }
       LegacySampleIngest ingest = row.getResult();
-      Optional<TMUserEntity> user = findUser(ingest);
+      Optional<UserDto> user = findUser(ingest);
       if (!user.isPresent()) {
         log.info("User did not exist in the gateway");
         unprocessed.add(new UnprocessedCSVRow(row.getRow(), "User did not exist in the gateway: " + ingest.getAuth()));
