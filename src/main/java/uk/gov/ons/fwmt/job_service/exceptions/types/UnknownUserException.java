@@ -6,6 +6,6 @@ public class UnknownUserException extends FWMTCommonException {
   static final long serialVersionUID = 0L;
 
   public UnknownUserException(String authNo) {
-    super(ExceptionCode.UNKNOWN_USER_ID, "A user was not found on our system, authNo: " + authNo);
+    super(ExceptionCode.FWMT_JOB_SERVICE_0005, "A user was not found on our system, authNo: " + authNo);
   }
 }

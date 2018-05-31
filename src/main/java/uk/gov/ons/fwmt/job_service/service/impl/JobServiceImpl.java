@@ -13,6 +13,7 @@ import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.entity.TMJobEntity;
 import uk.gov.ons.fwmt.job_service.entity.TMUserEntity;
+import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
 import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
 import uk.gov.ons.fwmt.job_service.repo.FieldPeriodRepo;
@@ -47,8 +48,7 @@ public class JobServiceImpl implements JobService {
       TMService tmService,
       TMUserRepo tmUserRepo,
       TMJobRepo tmJobRepo,
-      FieldPeriodRepo  fieldPeriodRepo
-  ) {
+      FieldPeriodRepo fieldPeriodRepo) {
     this.fileIngestService = fileIngestService;
     this.csvParsingService = csvParsingService;
     this.tmJobConverterService = tmJobConverterService;
@@ -127,8 +127,8 @@ public class JobServiceImpl implements JobService {
     }
   }
 
-  @Override public SampleSummaryDTO processSampleFile(MultipartFile file)
-      throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
+  @Override
+  public SampleSummaryDTO processSampleFile(MultipartFile file) throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
     FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
     Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService
         .parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
@@ -139,25 +139,25 @@ public class JobServiceImpl implements JobService {
     while (csvRowIterator.hasNext()) {
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
       if (row.isError()) {
-        log.info("Entry could not be processed");
+        log.error(ExceptionCode.FWMT_JOB_SERVICE_0001 + " - Entry could not be processed");
         unprocessed.add(new UnprocessedCSVRow(row.getRow(), "Row could not be parsed: " + row.getErrorMessage()));
         continue;
       }
       LegacySampleIngest ingest = row.getResult();
       Optional<TMUserEntity> user = findUser(ingest);
       if (!user.isPresent()) {
-        log.info("User did not exist in the gateway");
+        log.error(ExceptionCode.FWMT_JOB_SERVICE_0005 + " - User did not exist in the gateway");
         unprocessed.add(new UnprocessedCSVRow(row.getRow(), "User did not exist in the gateway: " + ingest.getAuth()));
         continue;
       }
       if (!user.get().isActive()) {
-        log.info("User was not active");
+        log.error(ExceptionCode.FWMT_JOB_SERVICE_0005 + " - User was not active");
         unprocessed.add(new UnprocessedCSVRow(row.getRow(), "User was not active: " + ingest.getAuth()));
         continue;
       }
       Optional<UnprocessedCSVRow> unprocessedCSVRow = sendJobToUser(row.getRow(), ingest, user.get());
       if (unprocessedCSVRow.isPresent()) {
-        log.info("Job could not be sent");
+        log.error(ExceptionCode.FWMT_JOB_SERVICE_0004 + " - Job could not be sent");
         unprocessed.add(unprocessedCSVRow.get());
         continue;
       }
