@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'application'
@@ -11,10 +13,12 @@ description = "fwmt-job-service"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+version = '1.0.0'
+
 jar {
     group = 'uk.gov.ons.fwmt'
     baseName = 'fwmt-job-service'
-    version = '1.0.0'
+    version = version
 }
 
 buildscript {
@@ -77,15 +81,21 @@ task genJaxb {
 
 
 dependencies {
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version:'1.5.13.RELEASE'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web-services', version:'1.5.13.RELEASE'
-    compile(group: 'org.springframework.cloud', name: 'spring-cloud-spring-service-connector', version:'1.2.5.RELEASE') {
-exclude(module: 'log4j')
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.5.13.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web-services', version: '1.5.13.RELEASE'
+    compile(group: 'org.springframework.cloud', name: 'spring-cloud-spring-service-connector', version: '1.2.5.RELEASE') {
+        exclude(module: 'log4j')
+    }
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-cloudfoundry-connector', version: '1.2.5.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '1.5.13.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '1.5.13.RELEASE'
+    compile(group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3') {
+        exclude(module: 'commons-logging')
     }
     compile group: 'org.springframework.cloud', name: 'spring-cloud-cloudfoundry-connector', version:'1.2.5.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version:'1.5.13.RELEASE'
     compile(group: 'org.apache.httpcomponents', name: 'httpclient', version:'4.5.3') {
-exclude(module: 'commons-logging')
+        exclude(module: 'commons-logging')
     }
     compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
     compile group: 'org.json', name: 'json', version: '20180130'
@@ -107,6 +117,17 @@ exclude(module: 'commons-logging')
     testCompile "junit:junit:4.12"
     testCompile("org.springframework.boot:spring-boot-starter-test")
 
+}
+
+processResources {
+    filter ReplaceTokens, tokens: [
+            "project.artifactId": "name",
+            "project.version": "version",
+            "scm.url": "url",
+            "buildNumber": "buildnumber",
+            "scmBranch": "branch",
+            "timestamp": "timestamp",
+    ]
 }
 
 jacocoTestReport {
