@@ -50,6 +50,8 @@ totalmobile:
 
 service:
   resource:
+    username: "username"
+    password: "password"
     users:
       operation:
         find:
