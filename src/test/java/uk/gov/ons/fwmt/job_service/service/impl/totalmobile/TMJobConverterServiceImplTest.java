@@ -9,8 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import uk.gov.ons.fwmt.job_service.repo.TMJobRepo;
-import uk.gov.ons.fwmt.job_service.repo.TMUserRepo;
+import uk.gov.ons.fwmt.job_service.rest.UserResourceService;
 
 
 import static org.junit.Assert.assertEquals;
@@ -22,8 +21,8 @@ public class TMJobConverterServiceImplTest {
   @InjectMocks
   TMJobConverterServiceImpl tmJobConverterService;
 
-  @Mock TMJobRepo tmJobRepo;
-  @Mock TMUserRepo tmUserRepo;
+  @Mock
+  UserResourceService userResourceService;
 
   @Test
   public void addAdditionalProperty() {
