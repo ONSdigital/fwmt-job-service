@@ -10,15 +10,6 @@ services:
 #  - $HOME/.cache
 #
 
-before_install:
-  - docker build -t postgres_test src/test/docker/postgres
-  - docker run --name postgres -p 5433:5432 -d postgres_test
-  - docker ps
-
-after_script:
-  - docker stop $(docker ps -a -q)
-  - docker rm $(docker ps -a -q)
-
 script: 
   - "./gradlew check"
 

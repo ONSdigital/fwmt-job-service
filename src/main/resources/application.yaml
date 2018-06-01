@@ -16,21 +16,7 @@ spring.http.multipart:
   max-file-size: 12800MB
   max-request-size: 12800MB
 
-spring.datasource:
-  url: jdbc:postgresql://localhost/postgres?currentSchema=gateway
-  driver-class-name: org.postgresql.Driver
-  continue-on-error: true
-  schema: classpath:/schema.sql
-  username: postgres
-  password: postgres
-
 management.endpoint.health.show-details: always
-
-liquibase:
-  url: jdbc:postgresql://localhost:5432/postgres?currentSchema=gateway
-  default-schema: gateway
-  user: postgres
-  password: postgres
 
 logging:
   level:
@@ -61,3 +47,25 @@ totalmobile:
   web:
     login-url: "/Live/WebAdmin/Login"
     save-user-url: "/Live/WebAdmin/Administration/Users/SaveUser"
+
+service:
+  resource:
+    username: "username"
+    password: "password"
+    users:
+      operation:
+        find:
+          authUrl: "http://localhost:9095/users/auth/{authNo}"
+          altAuthUrl: "http://localhost:9095/users/alternative/{altAuthNo}"
+    jobs:
+      operation:
+        find:
+          jobUrl: "http://localhost:9095/jobs/{authNo}"
+        create:
+          url: "http://localhost:9095/jobs/"
+        update:
+          url: "http://localhost:9095/jobs/"
+    fieldPeriod:
+      operation:
+        find:
+          fieldPeriodUrl: "http://localhost:9095/fieldperiods"
