@@ -16,21 +16,8 @@ spring.http.multipart:
   max-file-size: 12800MB
   max-request-size: 12800MB
 
-spring.datasource:
-  url: jdbc:postgresql://localhost/postgres?currentSchema=gateway
-  driver-class-name: org.postgresql.Driver
-  continue-on-error: true
-  schema: classpath:/schema.sql
-  username: postgres
-  password: postgres
 
 management.endpoint.health.show-details: always
-
-liquibase:
-  url: jdbc:postgresql://localhost:5432/postgres?currentSchema=gateway
-  default-schema: gateway
-  user: postgres
-  password: postgres
 
 logging:
   level:

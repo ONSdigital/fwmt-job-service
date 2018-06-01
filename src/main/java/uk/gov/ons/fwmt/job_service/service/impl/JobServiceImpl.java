@@ -89,7 +89,7 @@ public class JobServiceImpl implements JobService {
             log.info("Job is a new GFF job");
             // send the job to TM
             SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
-            tmService.send(request);
+           // tmService.send(request);
             // save the job in the database
             jobResourceService.createJob(new JobDto(ingest.getTmJobId(), username));
           }
@@ -98,7 +98,7 @@ public class JobServiceImpl implements JobService {
           log.info("Job is a new LFS job");
           // send the job to TM
           SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
-          tmService.send(request);
+         // tmService.send(request);
           // save the job in the database
           jobResourceService.createJob(new JobDto(ingest.getTmJobId(), username));
           break;
@@ -116,15 +116,15 @@ public class JobServiceImpl implements JobService {
 
   protected Optional<UserDto> findUser(LegacySampleIngest ingest) {
     log.info("Handling entry with authno: " + ingest.getAuth());
-    UserDto userDto = userResourceService.findByAuthNo(ingest.getAuth());
-    if (userDto != null) {
+    Optional<UserDto> userDto = userResourceService.findByAuthNo(ingest.getAuth());
+    if (userDto.isPresent()) {
       log.info("Found user by authno: " + userDto.toString());
-      return Optional.of(userDto);
+      return userDto;
     }
     userDto = userResourceService.findByAlternateAuthNo(ingest.getAuth());
-    if (userDto != null) {
+    if (userDto.isPresent()) {
       log.info("Found user by alternate authno: " + userDto.toString());
-      return Optional.of(userDto);
+      return userDto;
     } else {
       return Optional.empty();
     }

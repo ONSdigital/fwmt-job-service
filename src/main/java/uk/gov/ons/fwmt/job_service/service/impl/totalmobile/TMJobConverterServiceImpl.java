@@ -258,11 +258,11 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   public void publishJob(LegacySampleIngest job) throws UnknownUserException {
     // only send if the user is active
     if (userResourceService.existsByAuthNoAndActive(job.getAuth(), true)) {
-      UserDto userDto = userResourceService.findByAuthNo(job.getAuth());
-      publishJobToUser(job, userDto);
+      Optional<UserDto> userDto = userResourceService.findByAuthNo(job.getAuth());
+      userDto.ifPresent(userDto1 ->publishJobToUser(job, userDto1));
     } else if (userResourceService.existsByAlternateAuthNoAndActive(job.getAuth(), true)) {
-      UserDto userDto = userResourceService.findByAlternateAuthNo(job.getAuth());
-      publishJobToUser(job, userDto);
+      Optional<UserDto> userDto = userResourceService.findByAlternateAuthNo(job.getAuth());
+      userDto.ifPresent(userDto1 -> publishJobToUser(job, userDto1));
     } else if (userResourceService.existsByAuthNoAndActive(job.getAuth(), false) ||
             userResourceService.existsByAlternateAuthNoAndActive(job.getAuth(), false)) {
       log.info("User was not active");

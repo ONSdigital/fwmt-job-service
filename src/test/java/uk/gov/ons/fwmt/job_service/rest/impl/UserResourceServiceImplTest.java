@@ -21,12 +21,12 @@ public class UserResourceServiceImplTest {
 
     @Test
     public void findByAuthNo() {
-        assertEquals("1111", userResourceService.findByAuthNo("1111").getAuthNo());
+        assertEquals("1111", userResourceService.findByAuthNo("1111").get().getAuthNo());
     }
 
     @Test
     public void findByAlternateAuthNo() {
-        assertEquals("1111", userResourceService.findByAlternateAuthNo("2222").getAuthNo());
+        assertEquals("1111", userResourceService.findByAlternateAuthNo("2222").get().getAuthNo());
     }
 
     @Test

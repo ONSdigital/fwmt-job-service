@@ -27,7 +27,7 @@ public class JobResourceServiceImplTest {
 
     @Test
     public void createJob() {
-        assertEquals(true, jobResourceService.createJob(new JobDto("testAuth1", "2235")));
+        assertEquals(true, jobResourceService.createJob(new JobDto("quota_1-addressno_1-801", "testUser")));
     }
 
     @Test
