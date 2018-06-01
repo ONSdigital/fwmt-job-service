@@ -2,6 +2,7 @@ package uk.gov.ons.fwmt.job_service.rest.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,10 @@ public class UserResourceServiceImpl implements UserResourceService {
     private transient RestTemplate restTemplate;
     @Autowired
     private transient BasicAuthorizationInterceptor basicInterceptor;
+    @Value("${service.resource.users.operation.find.authUrl}")
+    private transient String findAuthURL;
+    @Value("${service.resource.users.operation.find.altAuthUrl}")
+    private transient String findAltAuthURL;
 
     @PostConstruct
     private void initialize() {
@@ -34,7 +39,7 @@ public class UserResourceServiceImpl implements UserResourceService {
     public Optional<UserDto> findByAuthNo(String authNo) {
         log.info("findByAuthNo:{}", authNo);
         try {
-            final ResponseEntity<UserDto> userDto = restTemplate.exchange("http://localhost:9095/users/auth/{authNo}", HttpMethod.GET, null, UserDto.class, authNo);
+            final ResponseEntity<UserDto> userDto = restTemplate.exchange(findAuthURL, HttpMethod.GET, null, UserDto.class, authNo);
             if (userDto != null && userDto.getStatusCode().equals(HttpStatus.OK)) {
                 return Optional.ofNullable(userDto.getBody());
             }
@@ -47,8 +52,7 @@ public class UserResourceServiceImpl implements UserResourceService {
     @Override
     public Optional<UserDto> findByAlternateAuthNo(String authNo) {
         try {
-            final ResponseEntity<UserDto> userDto = restTemplate.exchange("http://localhost:9095/users/alternative/{altAuthNo}", HttpMethod.GET, null, UserDto.class, authNo);
-            //  final UserDto userDto = restTemplate.getForObject("http://localhost:9095/users/alternative", UserDto.class, "authNo");
+            final ResponseEntity<UserDto> userDto = restTemplate.exchange(findAltAuthURL, HttpMethod.GET, null, UserDto.class, authNo);
             if (userDto != null && userDto.getStatusCode().equals(HttpStatus.OK)) {
                 return Optional.ofNullable(userDto.getBody());
             }

@@ -16,7 +16,6 @@ spring.http.multipart:
   max-file-size: 12800MB
   max-request-size: 12800MB
 
-
 management.endpoint.health.show-details: always
 
 logging:
@@ -48,3 +47,23 @@ totalmobile:
   web:
     login-url: "/Live/WebAdmin/Login"
     save-user-url: "/Live/WebAdmin/Administration/Users/SaveUser"
+
+service:
+  resource:
+    users:
+      operation:
+        find:
+          authUrl: "http://localhost:9095/users/auth/{authNo}"
+          altAuthUrl: "http://localhost:9095/users/alternative/{altAuthNo}"
+    jobs:
+      operation:
+        find:
+          jobUrl: "http://localhost:9095/jobs/{authNo}"
+        create:
+          url: "http://localhost:9095/jobs/"
+        update:
+          url: "http://localhost:9095/jobs/"
+    fieldPeriod:
+      operation:
+        find:
+          fieldPeriodUrl: "http://localhost:9095/fieldperiods"

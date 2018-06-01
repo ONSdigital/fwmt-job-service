@@ -2,6 +2,7 @@ package uk.gov.ons.fwmt.job_service.rest.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -26,6 +27,12 @@ public class JobResourceServiceImpl implements JobResourceService {
     private transient RestTemplate restTemplate;
     @Autowired
     private transient BasicAuthorizationInterceptor basicInterceptor;
+    @Value("${service.resource.jobs.operation.find.jobUrl}")
+    private transient String findURL;
+    @Value("${service.resource.jobs.operation.create.url}")
+    private transient String createURL;
+    @Value("${service.resource.jobs.operation.update.url}")
+    private transient String updateUrl;
 
     @PostConstruct
     private void initialize() {
@@ -50,12 +57,12 @@ public class JobResourceServiceImpl implements JobResourceService {
     @Override
     public Optional<JobDto> findByTmJobId(String tmJobId) {
         try {
-            final ResponseEntity<JobDto> jobDtoResponseEntity = restTemplate.exchange("http://localhost:9095/jobs/{authNo}", HttpMethod.GET, null, JobDto.class, tmJobId);
+            final ResponseEntity<JobDto> jobDtoResponseEntity = restTemplate.exchange(findURL, HttpMethod.GET, null, JobDto.class, tmJobId);
             if (jobDtoResponseEntity != null && jobDtoResponseEntity.getStatusCode().equals(HttpStatus.OK)) {
                 return Optional.ofNullable(jobDtoResponseEntity.getBody());
             }
         } catch(HttpClientErrorException httpClientErrorException) {
-            //TODO log error
+            //TODO log error correctly
             log.error("findByTmJobId failed with error code: {}",httpClientErrorException.getMessage());
         }
         return Optional.empty();
@@ -66,10 +73,10 @@ public class JobResourceServiceImpl implements JobResourceService {
         try {
             final HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
             log.info("CreateJob :{}",jobDto.toString());
-            final ResponseEntity jobDtoResponseEntity = restTemplate.exchange("http://localhost:9095/jobs/", HttpMethod.POST, request, Void.class);
+            final ResponseEntity jobDtoResponseEntity = restTemplate.exchange(createURL, HttpMethod.POST, request, Void.class);
             return jobDtoResponseEntity.getStatusCode().equals(HttpStatus.CREATED);
         } catch (HttpClientErrorException httpClientErrorException) {
-            //TODO log error
+            //TODO log error correctly
             log.error("createJob failed with error code: {}",httpClientErrorException.getMessage());
         }
         return false;
@@ -80,7 +87,7 @@ public class JobResourceServiceImpl implements JobResourceService {
         try {
             final HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
             log.info("UpdateJob :{}",jobDto.toString());
-            final ResponseEntity jobDtoResponseEntity = restTemplate.exchange("http://localhost:9095/jobs/", HttpMethod.PUT, request, Void.class);
+            final ResponseEntity jobDtoResponseEntity = restTemplate.exchange(updateUrl, HttpMethod.PUT, request, Void.class);
             return jobDtoResponseEntity.getStatusCode().equals(HttpStatus.OK);
         } catch(HttpClientErrorException httpClientErrorException) {
             //TODO log error

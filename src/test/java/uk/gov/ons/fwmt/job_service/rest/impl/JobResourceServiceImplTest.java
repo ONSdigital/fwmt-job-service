@@ -22,7 +22,7 @@ public class JobResourceServiceImplTest {
 
     @Test
     public void findByTmJobId() {
-        assertEquals("1122", jobResourceService.findByTmJobId("1122").get().getTmJobId());
+        assertEquals("1122", jobResourceService.findByTmJobId("quota_1-addressno_1-801").get().getTmJobId());
     }
 
     @Test

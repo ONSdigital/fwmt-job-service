@@ -1,6 +1,7 @@
 package uk.gov.ons.fwmt.job_service.rest.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,8 @@ public class FieldPeriodResourceServiceImpl implements FieldPeriodResourceServic
     private transient RestTemplate restTemplate;
     @Autowired
     private transient BasicAuthorizationInterceptor basicInterceptor;
+    @Value("${service.resource.fieldPeriod.operation.find.fieldPeriodUrl}")
+    private transient String findURL;
 
     @PostConstruct
     private void initialize() {
@@ -30,18 +33,18 @@ public class FieldPeriodResourceServiceImpl implements FieldPeriodResourceServic
     }
 
     @Override
-    public boolean existsByFieldPeriod(String fieldPeriod) {
+    public boolean existsByFieldPeriod(final String fieldPeriod) {
         return false;
     }
 
     @Override
-    public Optional<FieldPeriodDto> findByFieldPeriod(String fieldPeriod) {
+    public Optional<FieldPeriodDto> findByFieldPeriod(final String fieldPeriod) {
         try {
             final ParameterizedTypeReference<List<FieldPeriodDto>> typeRef = new ParameterizedTypeReference<List<FieldPeriodDto>>() {
             };
-            final ResponseEntity<List<FieldPeriodDto>> fiListResponseEntity = restTemplate.exchange("http://localhost:9095/fieldperiods", HttpMethod.GET, null, typeRef);
+            final ResponseEntity<List<FieldPeriodDto>> fiListResponseEntity = restTemplate.exchange(findURL, HttpMethod.GET, null, typeRef);
             if (fiListResponseEntity != null && fiListResponseEntity.getStatusCode().equals(HttpStatus.OK)) {
-                List<FieldPeriodDto> fieldPeriodDtos = fiListResponseEntity.getBody();
+                final List<FieldPeriodDto> fieldPeriodDtos = fiListResponseEntity.getBody();
                 return fieldPeriodDtos.stream().filter(fieldPeriodDto -> fieldPeriodDto.getFieldPeriod().equals(fieldPeriod)).findAny();
             }
             return Optional.empty();
