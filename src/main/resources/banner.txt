@@ -1,0 +1,19 @@
+
+ FFFFFFFFFFFFFFFFFFFFFFWWWWWWWW                           WWWWWWWWMMMMMMMM               MMMMMMMMTTTTTTTTTTTTTTTTTTTTTTT
+ F████████████████████FW██████W                           W██████WM███████M             M███████MT█████████████████████T
+ F████████████████████FW██████W                           W██████WM████████M           M████████MT█████████████████████T
+ FF██████FFFFFFFFF████FW██████W                           W██████WM█████████M         M█████████MT█████TT███████TT█████T
+   F█████F       FFFFFF W█████W           WWWWW           W█████W M██████████M       M██████████MTTTTTT  T█████T  TTTTTT
+   F█████F               W█████W         W█████W         W█████W  M███████████M     M███████████M        T█████T        
+   F██████FFFFFFFFFF      W█████W       W███████W       W█████W   M███████M████M   M████M███████M        T█████T        
+   F███████████████F       W█████W     W█████████W     W█████W    M██████M M████M M████M M██████M        T█████T        
+   F███████████████F        W█████W   W█████W█████W   W█████W     M██████M  M████M████M  M██████M        T█████T        
+   F██████FFFFFFFFFF         W█████W W█████W W█████W W█████W      M██████M   M███████M   M██████M        T█████T        
+   F█████F                    W█████W█████W   W█████W█████W       M██████M    M█████M    M██████M        T█████T        
+   F█████F                     W█████████W     W█████████W        M██████M     MMMMM     M██████M        T█████T        
+ FF███████FF                    W███████W       W███████W         M██████M               M██████M      TT███████TT      
+ F████████FF                     W█████W         W█████W          M██████M               M██████M      T█████████T      
+ F████████FF                      W███W           W███W           M██████M               M██████M      T█████████T      
+ FFFFFFFFFFF                       WWW             WWW            MMMMMMMM               MMMMMMMM      TTTTTTTTTTT      
+                                                                                                                       
+                                                                                                                   
