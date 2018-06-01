@@ -4,6 +4,6 @@ applications:
   timeout: 180
   host: fwmt-job-service-&{SPACE}
   memory: 1024M
-  path: build/libs/fwmt-job-service.jar
+  path: build/libs/fwmt-job-service-&{VERSION}.jar
   services:
   - fwmt-db
