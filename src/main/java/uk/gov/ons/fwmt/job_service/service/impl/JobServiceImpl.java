@@ -11,8 +11,6 @@ import uk.gov.ons.fwmt.job_service.data.csv_parser.UnprocessedCSVRow;
 import uk.gov.ons.fwmt.job_service.data.dto.SampleSummaryDTO;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
-import uk.gov.ons.fwmt.job_service.entity.TMJobEntity;
-import uk.gov.ons.fwmt.job_service.entity.TMUserEntity;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
 import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
@@ -48,9 +46,6 @@ public class JobServiceImpl implements JobService {
       CSVParsingService csvParsingService,
       TMJobConverterService tmJobConverterService,
       TMService tmService,
-      TMUserRepo tmUserRepo,
-      TMJobRepo tmJobRepo,
-      FieldPeriodRepo fieldPeriodRepo) {
       UserResourceService userResourceService,
       JobResourceService jobResourceService,
       FieldPeriodResourceService  fieldPeriodResourceService
