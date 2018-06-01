@@ -11,12 +11,12 @@ public class CSVParsingException extends FWMTCommonException {
   @Getter private final List<String> rows;
 
   public CSVParsingException(String message, List<String> rows) {
-    super(ExceptionCode.CSV_OTHER, message);
+    super(ExceptionCode.FWMT_JOB_SERVICE_0008, message);
     this.rows = rows;
   }
 
   public CSVParsingException(String message, List<String> rows, Throwable cause) {
-    super(ExceptionCode.CSV_OTHER, message, cause);
+    super(ExceptionCode.FWMT_JOB_SERVICE_0008, message, cause);
     this.rows = rows;
   }
 }

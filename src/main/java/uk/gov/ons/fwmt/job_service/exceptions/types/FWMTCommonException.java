@@ -6,7 +6,7 @@ public class FWMTCommonException extends Exception {
   static final long serialVersionUID = 0L;
 
   protected String makePrefix(ExceptionCode code) {
-    return "FWMT-" + code.toString();
+    return code.toString();
   }
 
   public FWMTCommonException(ExceptionCode code) {
