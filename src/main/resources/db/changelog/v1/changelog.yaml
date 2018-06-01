@@ -116,4 +116,12 @@ databaseChangeLog:
           path: 13_Add_LastAuthNo_to_Jobs.sql
           relativeToChangelogFile: true
           splitStatements: false
-
+ - changeSet:
+    id: v14
+    author: James Berry
+    comment: Added 2018-2019 LFS Field Periods
+    changes:
+      - sqlFile:
+          path: 14_Add_2018-19_Field_Periods.sql
+          relativeToChangelogFile: true
+          splitStatements: false

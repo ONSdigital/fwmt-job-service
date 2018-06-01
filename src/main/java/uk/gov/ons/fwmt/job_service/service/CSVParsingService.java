@@ -9,6 +9,6 @@ import java.io.Reader;
 import java.util.Iterator;
 
 public interface CSVParsingService {
-  Iterator<CSVParseResult<LegacySampleIngest>> parseLegacySample(Reader reader, LegacySampleSurveyType legacySampleSurveyType)
-      throws IOException;
+  Iterator<CSVParseResult<LegacySampleIngest>> parseLegacySample(Reader reader,
+      LegacySampleSurveyType legacySampleSurveyType) throws IOException;
 }

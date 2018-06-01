@@ -6,30 +6,47 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.PropertyAccessor;
 import org.springframework.beans.PropertyAccessorFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.fwmt.job_service.data.annotation.CSVColumn;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.*;
+import uk.gov.ons.fwmt.job_service.rest.FieldPeriodResourceService;
+import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 @Slf4j
 @Service
 public class CSVParsingServiceImpl implements CSVParsingService {
+
+  private FieldPeriodResourceService fieldPeriodResourceService;
+
+  @Autowired
+  public CSVParsingServiceImpl(FieldPeriodResourceService fieldPeriodResourceService) {
+    this.fieldPeriodResourceService = fieldPeriodResourceService;
+  }
+
   /**
-   * Read the CSVColumn annotations on the class T and set Java bean properties from the columns of a CSV record
+   * Read the CSVColumn annotations on the class T and set Java bean properties
+   * from the columns of a CSV record
    *
    * @param instance An instance of the class that will be mutated
    * @param record A row of a CSV file
-   * @param pivot A string used to determine which field name should be used, in events where there are many options
+   * @param pivot A string used to determine which field name should be used, in
+   *          events where there are many options
    * @param <T> A class with fields annotated with CSVColumn
    */
-  private static <T> void setFromCSVColumnAnnotations(T instance, CSVRecord record, String pivot) {
+
+  private <T> void setFromCSVColumnAnnotations(T instance, CSVRecord record, String pivot) {
     Class<?> tClass = instance.getClass();
     PropertyAccessor accessor = PropertyAccessorFactory.forBeanPropertyAccess(instance);
     for (Field field : tClass.getDeclaredFields()) {
@@ -63,10 +80,10 @@ public class CSVParsingServiceImpl implements CSVParsingService {
   }
 
   /**
-   * Create a unique Job ID that can be used by TotalMobile from existing fields within the CSV
-   * The method varies on the type of survey
+   * Create a unique Job ID that can be used by TotalMobile from existing fields
+   * within the CSV The method varies on the type of survey
    */
-  protected static String constructTmJobId(CSVRecord record, LegacySampleSurveyType surveyType) {
+  protected String constructTmJobId(CSVRecord record, LegacySampleSurveyType surveyType) {
     switch (surveyType) {
     case GFF:
       // quota '-' addr '-' stage
@@ -82,8 +99,8 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     }
   }
 
-  protected static Date convertToGFFDate(String stage) {
-    int year = Integer.parseInt(stage.substring(0, 1));
+  public LocalDateTime convertToGFFDate(String stage) {
+    int year = 2010 + Integer.parseInt(stage.substring(0, 1));
     int month = Integer.parseInt(stage.substring(1, 3));
     // if we are reissuing (month above 12), we minus 20 to get a normal month
     if (month > 12) {
@@ -93,31 +110,45 @@ public class CSVParsingServiceImpl implements CSVParsingService {
       // normalize the month in case we reached 13
       month = ((month - 1) % 12) + 1;
     }
-    assert month > 0 && month < 13;
-    Calendar cal = Calendar.getInstance();
-    cal.set(2010 + year, month - 1, 1);
-    cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DATE));
-    cal.set(Calendar.HOUR, 11);
-    cal.set(Calendar.MINUTE, 59);
-    cal.set(Calendar.SECOND, 59);
-    cal.set(Calendar.AM_PM, Calendar.PM);
-    return cal.getTime();
+    assert month >= 1 && month < 12;
+    LocalDate initial = LocalDate.of(year, month, 1);
+    LocalDate endOfMonth = initial.withDayOfMonth(initial.lengthOfMonth());
+    return endOfMonth.atTime(23, 59, 59);
   }
 
   // technically, 'stage' here is the field period 'fp'
   // TODO double check to ensure that this is correct
-  protected static Date convertToLFSDate(String stage) {
-    int year = Integer.parseInt(stage.substring(0, 1));
-    int quarter = Integer.parseInt(stage.substring(1, 2));
-    int week = stage.toLowerCase().charAt(2) - 'a' + 3;
-    Calendar cal = Calendar.getInstance();
-    cal.set(2010 + year, 1 + (3 * (quarter - 1)) - 1, 1);
-    cal.set(Calendar.HOUR, 11);
-    cal.set(Calendar.MINUTE, 59);
-    cal.set(Calendar.SECOND, 59);
-    cal.set(Calendar.AM_PM, Calendar.PM);
-    cal.add(Calendar.DATE, (7 * (week)) - 1);
-    return cal.getTime();
+  public Date convertToLFSDate(String stage) {
+    if (fieldPeriodResourceService.existsByFieldPeriod(stage)) {
+      Calendar cal = Calendar.getInstance();
+      final FieldPeriodDto fieldPeriod = fieldPeriodResourceService.findByFieldPeriod(stage).get();
+      cal.setTime(fieldPeriod.getEndDate());
+      cal.set(Calendar.HOUR, 11);
+      cal.set(Calendar.MINUTE, 59);
+      cal.set(Calendar.SECOND, 59);
+      cal.set(Calendar.AM_PM, Calendar.PM);
+      return cal.getTime();
+    } else {
+      // BACKUP!!! THIS SHOULD NOT HAPPEN
+      int year = 2010 + Integer.parseInt(stage.substring(0, 1));
+      int quarter = Integer.parseInt(stage.substring(1, 2));
+      int week = stage.toLowerCase().charAt(2) - 'a' + 3;
+      Calendar cal = Calendar.getInstance();
+      cal.set(2010 + year, 1 + (3 * (quarter - 1)) - 1, 1);
+      cal.set(Calendar.HOUR, 11);
+      cal.set(Calendar.MINUTE, 59);
+      cal.set(Calendar.SECOND, 59);
+      cal.set(Calendar.AM_PM, Calendar.PM);
+      cal.add(Calendar.DATE, (7 * week) - 1);
+      return cal.getTime();
+    }
+  }
+
+  protected static Date toDate(LocalDateTime localDateTime) {
+    return Date.from(
+        localDateTime
+            .atZone(ZoneId.systemDefault())
+            .toInstant());
   }
 
   private static CSVFormat getCSVFormat() {
@@ -148,7 +179,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
           // set normal fields
           setFromCSVColumnAnnotations(instance, record, "GFF");
           // set derived due date
-          instance.setDueDate(convertToGFFDate(instance.getStage()));
+          instance.setDueDate(toDate(convertToGFFDate(instance.getStage())));
           // set survey type and extra data
           instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
           instance.setGffData(new LegacySampleGFFDataIngest());
@@ -160,9 +191,9 @@ public class CSVParsingServiceImpl implements CSVParsingService {
         }
         // derive the TM job id
         instance.setTmJobId(constructTmJobId(record, legacySampleSurveyType));
-        // derive the coordinates, if we were given a non-null non-empty grid ref
+        // derive the coordinates, if we were given a non-null non-empty grid
+        // ref
         if (instance.getOsGridRef() != null && instance.getOsGridRef().length() > 0) {
-          // TODO Confirm this is correct with new data map
           String[] osGridRefSplit = instance.getOsGridRef().split(",", 2);
           if (osGridRefSplit.length != 2) {
             throw new IllegalArgumentException("OS Grid Reference was not in the expected format");
@@ -186,11 +217,13 @@ public class CSVParsingServiceImpl implements CSVParsingService {
 
     abstract public T ingest(CSVRecord record);
 
-    @Override public boolean hasNext() {
+    @Override
+    public boolean hasNext() {
       return iter.hasNext();
     }
 
-    @Override public CSVParseResult<T> next() {
+    @Override
+    public CSVParseResult<T> next() {
       rowNumber++;
       CSVRecord record = iter.next();
       if (record == null) {
