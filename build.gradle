@@ -13,10 +13,12 @@ description = "fwmt-job-service"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+version = '1.0.0'
+
 jar {
     group = 'uk.gov.ons.fwmt'
     baseName = 'fwmt-job-service'
-    version = '1.0.0'
+    version = version
 }
 
 buildscript {
