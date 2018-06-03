@@ -68,40 +68,43 @@ public class JobServiceImpl implements JobService {
         return Optional.of(new UnprocessedCSVRow(row, "Job has been sent previously"));
       } else if (jobResourceService.existsByTmJobId(ingest.getTmJobId())) {
         log.info("Job is a reallocation");
-        SendUpdateJobHeaderRequestMessage request = tmJobConverterService.updateJob(ingest, username);
+        final SendUpdateJobHeaderRequestMessage request = tmJobConverterService.updateJob(ingest, username);
         // TODO add error handling
         tmService.send(request);
+        // update the last auth no in the database
+        final Optional<JobDto> jobDto = jobResourceService.findByTmJobId(ingest.getTmJobId());
+        jobDto.ifPresent(jobDto1 -> {
+          jobDto1.setLastAuthNo(ingest.getAuth());
+          jobResourceService.updateJob(jobDto1);
+        });
+
       } else {
         switch (ingest.getLegacySampleSurveyType()) {
         case GFF:
           if (ingest.isGffReissue()) {
             log.info("Job is a GFF reissue");
             // send the job to TM
-            SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
+            final SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
             tmService.send(request);
-            // update the last auth no in the database
-            Optional<JobDto> jobDto = jobResourceService.findByTmJobId(ingest.getTmJobId());
-            jobDto.ifPresent(jobDto1 -> {
-              jobDto1.setLastAuthNo(authno);
-              jobResourceService.updateJob(jobDto1);
-            });
-
+            tmService.send(request);
+            // save the job in the database
+            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
           } else {
             log.info("Job is a new GFF job");
             // send the job to TM
-            SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
-           // tmService.send(request);
+            final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
+            tmService.send(request);
             // save the job in the database
-            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), username));
+            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
           }
           break;
         case LFS:
           log.info("Job is a new LFS job");
           // send the job to TM
-          SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
-         // tmService.send(request);
+          final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
+          tmService.send(request);
           // save the job in the database
-          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), username));
+          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
           break;
         default:
           throw new IllegalArgumentException("Unknown survey type");
@@ -147,8 +150,8 @@ public class JobServiceImpl implements JobService {
         unprocessed.add(new UnprocessedCSVRow(row.getRow(), "Row could not be parsed: " + row.getErrorMessage()));
         continue;
       }
-      LegacySampleIngest ingest = row.getResult();
-      Optional<UserDto> user = findUser(ingest);
+      final LegacySampleIngest ingest = row.getResult();
+      final Optional<UserDto> user = findUser(ingest);
       if (!user.isPresent()) {
         log.error(ExceptionCode.FWMT_JOB_SERVICE_0005 + " - User did not exist in the gateway");
         unprocessed.add(new UnprocessedCSVRow(row.getRow(), "User did not exist in the gateway: " + ingest.getAuth()));
@@ -159,7 +162,7 @@ public class JobServiceImpl implements JobService {
         unprocessed.add(new UnprocessedCSVRow(row.getRow(), "User was not active: " + ingest.getAuth()));
         continue;
       }
-      Optional<UnprocessedCSVRow> unprocessedCSVRow = sendJobToUser(row.getRow(), ingest, user.get());
+      final Optional<UnprocessedCSVRow> unprocessedCSVRow = sendJobToUser(row.getRow(), ingest, user.get());
       if (unprocessedCSVRow.isPresent()) {
         log.error(ExceptionCode.FWMT_JOB_SERVICE_0004 + " - Job could not be sent");
         unprocessed.add(unprocessedCSVRow.get());
