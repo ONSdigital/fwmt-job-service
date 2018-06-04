@@ -12,7 +12,7 @@ import cucumber.api.CucumberOptions;
 import cucumber.api.DataTable;
 import cucumber.api.java.en.And;
 
-//@Ignore
+@Ignore
 @RunWith(Cucumber.class)
 @CucumberOptions(features = {"src/test/resources/cucumber/End2End.feature"}, glue = {
     "uk.gov.ons.fwmt.legacy_gateway.integration_tests.legacy_csv"})
