@@ -38,15 +38,15 @@ security.user:
 totalmobile:
   username: "..."
   password: "..."
-  url: "https://ons.totalmobile.co.uk"
-  message-queue-path: "/Live/Services/TM/v20/Messaging/MessageQueueWs.asmx"
+  url: "https://ons.totalmobile.co.uk/Live"
+  message-queue-path: "/Services/TM/v20/Messaging/MessageQueueWs.asmx"
   message-queue-wsdl-path: "src/main/resources/wsdl/Messaging_MessageQueueWs.wsdl"
   message-queue-namespace: "http://schemas.consiliumtechnologies.com/wsdl/mobile/2007/07/messaging/"
   message-queue-package: "com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging"
   outgoing-ws-namespace: "http://schemas.consiliumtechnologies.com/services/mobile/2009/03/messaging"
   web:
-    login-url: "/Live/WebAdmin/Login"
-    save-user-url: "/Live/WebAdmin/Administration/Users/SaveUser"
+    login-url: "/WebAdmin/Login"
+    save-user-url: "/WebAdmin/Administration/Users/SaveUser"
 
 service:
   resource:
