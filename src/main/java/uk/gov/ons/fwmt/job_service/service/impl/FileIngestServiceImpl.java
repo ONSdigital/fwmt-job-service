@@ -73,7 +73,7 @@ public class FileIngestServiceImpl implements FileIngestService {
         throw new InvalidFileNameException(rawFilename, "File names for samples should contain two underscores");
       break;
     default:
-      throw new IllegalArgumentException("File had an unrecognized endpoint of " + endpoint);
+      throw new InvalidFileNameException(rawFilename, "File had an unrecognized endpoint of " + endpoint);
     }
 
     // // Validate the TLA
@@ -90,7 +90,7 @@ public class FileIngestServiceImpl implements FileIngestService {
         tla = LegacySampleSurveyType.GFF;
         break;
       default:
-        throw new IllegalArgumentException("File had an unrecognized TLA of " + tlaString);
+        throw new InvalidFileNameException(rawFilename, "File had an unrecognized TLA of " + tlaString);
       }
     }
 
@@ -119,7 +119,7 @@ public class FileIngestServiceImpl implements FileIngestService {
   }
 
   public FileIngest ingestSampleFile(MultipartFile file)
-      throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
+      throws IOException, InvalidFileNameException {
     // check filename
     Filename filename = verifyCSVFilename(file.getOriginalFilename(), "sample");
 

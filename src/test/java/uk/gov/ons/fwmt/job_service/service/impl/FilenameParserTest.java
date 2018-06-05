@@ -25,6 +25,8 @@ public class FilenameParserTest {
       "BLAH_BLAH-THIS_IS_WRONG",
       "sample_2018-04-24T19-31-25Z.csv",
       "sample_LFS_2018-04-24T19-31-25Z.csp",
+      "samp_LFS_2018-04-24T19-31-25Z.csv",
+      "sample_LFA_2018-04-24T19-31-25Z.csv",
   };
 
   private final String[] invalidStaffFileNames = {
