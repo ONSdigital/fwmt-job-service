@@ -60,10 +60,10 @@ public class JobServiceImpl implements JobService {
   }
 
   protected Optional<UnprocessedCSVRow> sendJobToUser(int row, LegacySampleIngest ingest, UserDto userDto) {
-    String authno = userDto.getAuthNo();
+    String authNo = userDto.getAuthNo();
     String username = userDto.getTmUsername();
     try {
-      if (jobResourceService.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), authno)) {
+      if (jobResourceService.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), authNo)) {
         log.info("Job has been sent previously");
         return Optional.of(new UnprocessedCSVRow(row, "Job has been sent previously"));
       } else if (jobResourceService.existsByTmJobId(ingest.getTmJobId())) {
@@ -77,7 +77,6 @@ public class JobServiceImpl implements JobService {
           jobDto1.setLastAuthNo(ingest.getAuth());
           jobResourceService.updateJob(jobDto1);
         });
-
       } else {
         switch (ingest.getLegacySampleSurveyType()) {
         case GFF:
@@ -85,7 +84,6 @@ public class JobServiceImpl implements JobService {
             log.info("Job is a GFF reissue");
             // send the job to TM
             final SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
-            tmService.send(request);
             tmService.send(request);
             // save the job in the database
             jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
