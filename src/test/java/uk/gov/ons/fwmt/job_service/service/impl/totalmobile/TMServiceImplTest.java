@@ -5,31 +5,26 @@ import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.Obj
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.QueryMessagesRequest;
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendMessageRequest;
 import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.context.TestPropertySource;
+import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Matchers.any;
 
-@RunWith(MockitoJUnitRunner.class)
-@TestPropertySource(properties = {
-    "${totalmobile.url=url}",
-    "${totalmobile.message-queue-path=messageQueuePath}",
-    "${totalmobile.message-queue-package=messageQueuePackage}",
-    "${totalmobile.message-queue-namespace=namespace}",
-    "${totalmobile.username=username}",
-    "${totalmobile.password=password}"})
-@Ignore
 public class TMServiceImplTest {
 
-  @Mock TMServiceImpl tmServiceImpl;
+  @InjectMocks TMServiceImpl tmServiceImpl;
   @Mock ObjectFactory objectFactory;
+
+  @Before
+  public void setup() throws Exception {
+    tmServiceImpl = new TMServiceImpl(null, null, null, null, "username", "password");
+    MockitoAnnotations.initMocks(this);
+
+  }
 
   @Test
   public void shouldTestIfCreateSendMessageRequestIsCalled() {
