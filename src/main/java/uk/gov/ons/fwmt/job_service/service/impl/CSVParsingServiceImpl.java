@@ -100,20 +100,32 @@ public class CSVParsingServiceImpl implements CSVParsingService {
   }
 
   public LocalDateTime convertToGFFDate(String stage) {
-    int year = 2010 + Integer.parseInt(stage.substring(0, 1));
-    int month = Integer.parseInt(stage.substring(1, 3));
-    // if we are reissuing (month above 12), we minus 20 to get a normal month
-    if (month > 12) {
-      month = month - 20;
-      // add an extra month to the due date
-      month += 1;
-      // normalize the month in case we reached 13
-      month = ((month - 1) % 12) + 1;
+    if (fieldPeriodResourceService.existsByFieldPeriod(stage)) {
+      Calendar cal = Calendar.getInstance();
+      final FieldPeriodDto fieldPeriod = fieldPeriodResourceService.findByFieldPeriod(stage).get();
+      cal.setTime(fieldPeriod.getEndDate());
+      cal.set(Calendar.HOUR, 11);
+      cal.set(Calendar.MINUTE, 59);
+      cal.set(Calendar.SECOND, 59);
+      cal.set(Calendar.AM_PM, Calendar.PM);
+      return cal.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    } else {
+      // BACKUP!!! THIS SHOULD NOT HAPPEN
+      int year = 2010 + Integer.parseInt(stage.substring(0, 1));
+      int month = Integer.parseInt(stage.substring(1, 3));
+      // if we are reissuing (month above 12), we minus 20 to get a normal month
+      if (month > 12) {
+        month = month - 20;
+        // add an extra month to the due date
+        month += 1;
+        // normalize the month in case we reached 13
+        month = ((month - 1) % 12) + 1;
+      }
+      assert month >= 1 && month < 12;
+      LocalDate initial = LocalDate.of(year, month, 1);
+      LocalDate endOfMonth = initial.withDayOfMonth(initial.lengthOfMonth());
+      return endOfMonth.atTime(23, 59, 59);
     }
-    assert month >= 1 && month < 12;
-    LocalDate initial = LocalDate.of(year, month, 1);
-    LocalDate endOfMonth = initial.withDayOfMonth(initial.lengthOfMonth());
-    return endOfMonth.atTime(23, 59, 59);
   }
 
   // technically, 'stage' here is the field period 'fp'
