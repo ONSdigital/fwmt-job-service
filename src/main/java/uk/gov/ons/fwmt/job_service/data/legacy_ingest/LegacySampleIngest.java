@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import uk.gov.ons.fwmt.job_service.data.annotation.CSVColumn;
 import uk.gov.ons.fwmt.job_service.data.annotation.JobAdditionalProperty;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -149,7 +149,7 @@ public class LegacySampleIngest {
   // specific column
 
   private String tmJobId;
-  private Date dueDate;
+  private LocalDate dueDate;
 
   @JobAdditionalProperty("geoX")
   private Float geoX;

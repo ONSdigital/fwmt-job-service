@@ -12,9 +12,13 @@ server:
 project:
   basedir: ${basedir}
 
-spring.http.multipart:
-  max-file-size: 12800MB
-  max-request-size: 12800MB
+spring:
+  http.multipart:
+    max-file-size: 12800MB
+    max-request-size: 12800MB
+  jackson:
+      serialization:
+        WRITE_DATES_AS_TIMESTAMPS: false
 
 management.endpoint.health.show-details: always
 
@@ -50,7 +54,7 @@ totalmobile:
 
 service:
   resource:
-    username: "username"
+    username: "user"
     password: "password"
     users:
       operation:
@@ -68,4 +72,4 @@ service:
     fieldPeriod:
       operation:
         find:
-          fieldPeriodUrl: "http://localhost:9095/fieldperiods"
+          fieldPeriodUrl: "http://localhost:9095/fieldperiods/{fieldPeriod}"
