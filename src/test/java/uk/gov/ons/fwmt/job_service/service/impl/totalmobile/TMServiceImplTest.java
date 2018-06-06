@@ -109,7 +109,6 @@ public class TMServiceImplTest {
 
     //Then
     assertEquals(response,result);
-
   }
 
   @Test
@@ -123,9 +122,7 @@ public class TMServiceImplTest {
 
     //Then
     assertEquals(response,result);
-
   }
-
 
   @Test
   public void shouldReturnSuccessfulResponseWhenReceivesPermittedResponse() {
