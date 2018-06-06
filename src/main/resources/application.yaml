@@ -12,9 +12,13 @@ server:
 project:
   basedir: ${basedir}
 
-spring.http.multipart:
-  max-file-size: 12800MB
-  max-request-size: 12800MB
+spring:
+  http.multipart:
+    max-file-size: 12800MB
+    max-request-size: 12800MB
+  jackson:
+      serialization:
+        WRITE_DATES_AS_TIMESTAMPS: false
 
 management.endpoint.health.show-details: always
 

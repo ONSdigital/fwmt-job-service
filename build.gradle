@@ -106,6 +106,7 @@ dependencies {
     compile(files(genJaxb.classesDir).builtBy(genJaxb))
     jaxb "com.sun.xml.bind:jaxb-xjc:2.1.7"
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.5'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.5'
 
     testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.9.RELEASE') {
         exclude(module: 'android-json')
