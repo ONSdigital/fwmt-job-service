@@ -1,6 +1,12 @@
 package uk.gov.ons.fwmt.job_service.service.impl.totalmobile;
 
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.*;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.ObjectFactory;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.QueryMessagesRequest;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendAddJobTasksRequestMessage;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendMessageRequest;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.DeleteMessageRequest;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.QueryMessagesResponse;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
