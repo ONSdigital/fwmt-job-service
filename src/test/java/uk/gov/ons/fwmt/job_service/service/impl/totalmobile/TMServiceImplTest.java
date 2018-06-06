@@ -100,8 +100,32 @@ public class TMServiceImplTest {
   }
 
   @Test
-  public void jaxbUnwrap() {
+  public void sendsAResponseToBeUnwrapped() {
+    //Given
+    SendCreateJobRequestMessageResponse response = new SendCreateJobRequestMessageResponse();
+
+    //When
+    Object result = tmServiceImpl.jaxbUnwrap(response);
+
+    //Then
+    assertEquals(response,result);
+
   }
+
+  @Test
+  public void sendsAJAXBElementToBeUnwrapped() {
+    //Given
+    SendCreateJobRequestMessageResponse response = new SendCreateJobRequestMessageResponse();
+    when(jaxbElement.getValue()).thenReturn(response);
+
+    //When
+    Object result = tmServiceImpl.jaxbUnwrap(jaxbElement);
+
+    //Then
+    assertEquals(response,result);
+
+  }
+
 
   @Test
   public void shouldReturnSuccessfulResponseWhenReceivesPermittedResponse() {
