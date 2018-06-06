@@ -26,38 +26,42 @@ public class TMServiceImplTest {
   @Before
   public void setup() throws Exception {
     tmServiceImpl = new TMServiceImpl("https://ons.totalmobile.co.uk",
-        "/Live/Services/TM/v20/Messaging/MessageQueueWs.asmx",
-        "com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging",
-        "http://schemas.consiliumtechnologies.com/services/mobile/2009/03/messaging",
+        "messageQueuePath",
+        "messageQueuePackage",
+        "expectedNamespace",
         "username", "password");
     MockitoAnnotations.initMocks(this);
   }
 
   @Test(expected=IllegalArgumentException.class)
   public void SOAPLookupReceivesAMessageThatDoesNotMatchTM() {
-    //Given
-
     //When
     tmServiceImpl.lookupSOAPAction(Object.class);
   }
 
-//  public void SOAPLookupReceivesARequestMessage() {
-//    //Given
-//
-//    //When
-//
-//    //Then
-//
-//  }
-//
-//  public void SOAPLookupReceivesAResponseMessage(){
-//    //Given
-//
-//    //When
-//
-//    //Then
-//
-//  }
+  @Test
+  public void SOAPLookupReceivesARequestMessage() {
+    //Given
+    String expectedResult = "expectedNamespaceQuery";
+
+    //When
+    String result = tmServiceImpl.lookupSOAPAction(QueryMessagesRequest.class);
+
+    //Then
+    assertEquals(expectedResult, result);
+  }
+
+  @Test
+  public void SOAPLookupReceivesAResponseMessage(){
+    //Given
+    String expectedResult = "expectedNamespaceQueryMessages";
+
+    //When
+    String result = tmServiceImpl.lookupSOAPAction(QueryMessagesResponse.class);
+
+    //Then
+    assertEquals(expectedResult,result);
+  }
 
   @Test
   public void shouldTestIfCreateSendMessageRequestIsCalled() {
