@@ -48,8 +48,7 @@ public class JobServiceImpl implements JobService {
       TMService tmService,
       UserResourceService userResourceService,
       JobResourceService jobResourceService,
-      FieldPeriodResourceService  fieldPeriodResourceService
-  ) {
+      FieldPeriodResourceService fieldPeriodResourceService) {
     this.fileIngestService = fileIngestService;
     this.csvParsingService = csvParsingService;
     this.tmJobConverterService = tmJobConverterService;
@@ -85,7 +84,6 @@ public class JobServiceImpl implements JobService {
             log.info("Job is a GFF reissue");
             // send the job to TM
             final SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
-            tmService.send(request);
             tmService.send(request);
             // save the job in the database
             jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
@@ -135,7 +133,8 @@ public class JobServiceImpl implements JobService {
   }
 
   @Override
-  public SampleSummaryDTO processSampleFile(MultipartFile file) throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
+  public SampleSummaryDTO processSampleFile(MultipartFile file)
+      throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
     FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
     Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService
         .parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
