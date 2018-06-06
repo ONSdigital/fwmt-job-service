@@ -1,9 +1,6 @@
 package uk.gov.ons.fwmt.job_service.service.impl.totalmobile;
 
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.DeleteMessageRequest;
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.ObjectFactory;
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.QueryMessagesRequest;
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendMessageRequest;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,20 +8,56 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.ws.client.core.WebServiceTemplate;
 
+import javax.xml.bind.JAXBElement;
+
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
 public class TMServiceImplTest {
 
   @InjectMocks TMServiceImpl tmServiceImpl;
   @Mock ObjectFactory objectFactory;
+  @Mock WebServiceTemplate webServiceTemplate;
+  @Mock JAXBElement<Object> jaxbElement;
 
   @Before
   public void setup() throws Exception {
-    tmServiceImpl = new TMServiceImpl(null, null, null, null, "username", "password");
+    tmServiceImpl = new TMServiceImpl("https://ons.totalmobile.co.uk",
+        "/Live/Services/TM/v20/Messaging/MessageQueueWs.asmx",
+        "com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging",
+        "http://schemas.consiliumtechnologies.com/services/mobile/2009/03/messaging",
+        "username", "password");
     MockitoAnnotations.initMocks(this);
-
   }
+
+  @Test(expected=IllegalArgumentException.class)
+  public void SOAPLookupReceivesAMessageThatDoesNotMatchTM() {
+    //Given
+
+    //When
+    tmServiceImpl.lookupSOAPAction(Object.class);
+  }
+
+//  public void SOAPLookupReceivesARequestMessage() {
+//    //Given
+//
+//    //When
+//
+//    //Then
+//
+//  }
+//
+//  public void SOAPLookupReceivesAResponseMessage(){
+//    //Given
+//
+//    //When
+//
+//    //Then
+//
+//  }
 
   @Test
   public void shouldTestIfCreateSendMessageRequestIsCalled() {
@@ -67,6 +100,28 @@ public class TMServiceImplTest {
   }
 
   @Test
-  public void send() {
+  public void shouldReturnSuccessfulResponseWhenReceivesPermittedResponse() {
+    //Given
+    QueryMessagesRequest queryMessagesRequest = new QueryMessagesRequest();
+    when(webServiceTemplate.marshalSendAndReceive(any(),any(),any())).thenReturn(jaxbElement);
+    QueryMessagesResponse queryMessagesResponse = new QueryMessagesResponse();
+    when(jaxbElement.getValue()).thenReturn(queryMessagesResponse);
+
+    //When
+    QueryMessagesResponse result = tmServiceImpl.send(queryMessagesRequest);
+
+    //Then
+    assertEquals(queryMessagesResponse, result);
+  }
+
+  @Test(expected=IllegalArgumentException.class)
+  public void shouldThrowExceptionWhenReceivedResponseWIsNotInPermittedResponses() {
+    //Given
+    QueryMessagesRequest queryMessagesRequest = new QueryMessagesRequest();
+    when(webServiceTemplate.marshalSendAndReceive(any(),any(),any())).thenReturn(jaxbElement);
+    when(jaxbElement.getValue()).thenReturn(new Object());
+
+    //When
+    tmServiceImpl.send(queryMessagesRequest);
   }
 }

@@ -98,7 +98,7 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
    * If we have a specific mapping, we use such
    * If we do not, we use the general case of removing the word 'Response'
    */
-  private String lookupSOAPAction(Class<?> cl) {
+  protected String lookupSOAPAction(Class<?> cl) {
     if (!Arrays.asList(knownRequestTypes).contains(cl)) {
       throw new IllegalArgumentException("Message passed that does not match any TotalMobile message");
     }
