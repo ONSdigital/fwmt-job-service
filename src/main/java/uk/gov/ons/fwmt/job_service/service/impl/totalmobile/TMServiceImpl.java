@@ -106,7 +106,7 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
     if (messageActionMap.containsKey(cl)) {
       return namespace + messageActionMap.get(cl);
     } else {
-      return namespace + className.replace("Response", "");
+      return namespace + className;
     }
   }
 

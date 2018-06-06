@@ -52,12 +52,12 @@ public class TMServiceImplTest {
   }
 
   @Test
-  public void SOAPLookupReceivesAResponseMessage(){
+  public void SOAPLookupReceivesNonMappedRequestMessage(){
     //Given
-    String expectedResult = "expectedNamespaceQueryMessages";
+    String expectedResult = "expectedNamespaceSendAddJobTasksRequestMessage";
 
     //When
-    String result = tmServiceImpl.lookupSOAPAction(QueryMessagesResponse.class);
+    String result = tmServiceImpl.lookupSOAPAction(SendAddJobTasksRequestMessage.class);
 
     //Then
     assertEquals(expectedResult,result);
