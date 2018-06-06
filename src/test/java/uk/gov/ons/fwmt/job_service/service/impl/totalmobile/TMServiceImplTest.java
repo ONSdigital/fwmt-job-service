@@ -24,7 +24,7 @@ public class TMServiceImplTest {
   @Mock private JAXBElement<Object> jaxbElement;
 
   @Before
-  public void setup() throws Exception {
+  public void setUp() throws Exception {
     tmServiceImpl = new TMServiceImpl("https://ons.totalmobile.co.uk",
         "messageQueuePath",
         "messageQueuePackage",
