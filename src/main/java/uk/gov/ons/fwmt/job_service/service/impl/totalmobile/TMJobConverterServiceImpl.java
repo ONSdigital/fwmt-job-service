@@ -38,9 +38,9 @@ import java.util.Optional;
 @Service
 public class TMJobConverterServiceImpl implements TMJobConverterService {
   protected static final String JOB_QUEUE = "\\OPTIMISE\\INPUT";
-  private static final String JOB_SKILL = "Survey";
-  private static final String JOB_WORK_TYPE = "SS";
-  private static final String JOB_WORLD = "Default";
+  protected static final String JOB_SKILL = "Survey";
+  protected static final String JOB_WORK_TYPE = "SS";
+  protected static final String JOB_WORLD = "Default";
 
   private final JobResourceService jobResourceService;
   private final UserResourceService userResourceService;

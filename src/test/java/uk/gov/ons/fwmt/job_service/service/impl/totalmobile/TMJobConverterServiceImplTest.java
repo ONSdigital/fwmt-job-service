@@ -9,11 +9,17 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleGFFDataIngest;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.rest.UserResourceService;
+import uk.gov.ons.fwmt.job_service.utilities.TestIngestBuilder;
 
+import java.time.LocalDate;
 
 import static org.junit.Assert.assertEquals;
-import static uk.gov.ons.fwmt.job_service.service.impl.totalmobile.TMJobConverterServiceImpl.JOB_QUEUE;
+import static org.junit.Assert.assertNotNull;
+import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType.GFF;
+import static uk.gov.ons.fwmt.job_service.service.impl.totalmobile.TMJobConverterServiceImpl.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TMJobConverterServiceImplTest {
@@ -42,9 +48,33 @@ public class TMJobConverterServiceImplTest {
     assertEquals(expectedValue,createJobRequest.getJob().getAdditionalProperties().getAdditionalProperty().get(0).getValue());
   }
 
-//  @Test
-//  public void createJobRequestFromIngest() {
-//  }
+
+  @Test
+  public void createJobRequestFromIngest() {
+    //Given
+    String username = "testUser";
+    LegacySampleIngest testIngestData = new TestIngestBuilder().ingestBuild();
+
+    //When
+    CreateJobRequest result = tmJobConverterService.createJobRequestFromIngest(testIngestData,username);
+
+    //Then
+    assertNotNull(result.getJob());
+    assertNotNull(result.getJob().getLocation());
+    assertNotNull(result.getJob().getIdentity());
+    assertNotNull(result.getJob().getSkills());
+    assertNotNull(result.getJob().getWorld());
+    assertEquals(JOB_WORK_TYPE, result.getJob().getWorkType());
+    assertEquals(JOB_WORK_TYPE,result.getJob().getWorkType());
+    assertEquals(testIngestData.getAddressLine1(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(0));
+    assertEquals(testIngestData.getAddressLine2(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(1));
+    assertEquals(testIngestData.getAddressLine3(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(2));
+    assertEquals(testIngestData.getAddressLine4(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(3));
+    assertEquals(testIngestData.getDistrict(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(4));
+    assertEquals(testIngestData.getPostTown(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(5));
+    assertEquals(testIngestData.getPostcode(),result.getJob().getLocation().getAddressDetail().getPostCode());
+    assertEquals(testIngestData.getSerNo(),result.getJob().getLocation().getReference());
+  }
 //
 //  @Test
 //  public void updateJobHeaderRequestFromIngest() {
