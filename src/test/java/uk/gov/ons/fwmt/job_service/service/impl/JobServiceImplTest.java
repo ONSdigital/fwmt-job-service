@@ -31,21 +31,12 @@ import static org.mockito.Mockito.when;
 public class JobServiceImplTest {
 
   @InjectMocks private JobServiceImpl jobServiceImpl;
-  @Mock FileIngestService fileIngestService;
-  @Mock CSVParsingService csvParsingService;
-  @Mock UserResourceService userResourceService;
-  @Mock FileIngest fileIngest;
-  @Mock MultipartFile multipartFile;
-  @Mock Filename filename;
-
-
-  @Test
-  public void sendJobToUser() {
-  }
-
-  @Test
-  public void findUser() {
-  }
+  @Mock private FileIngestService fileIngestService;
+  @Mock private CSVParsingService csvParsingService;
+  @Mock private UserResourceService userResourceService;
+  @Mock private FileIngest fileIngest;
+  @Mock private MultipartFile multipartFile;
+  @Mock private Filename filename;
 
   @Test
   public void ShouldReturnUnprocessedRowWhenErrorMessageInCSVParsing() throws InvalidFileNameException, MediaTypeNotSupportedException, IOException {

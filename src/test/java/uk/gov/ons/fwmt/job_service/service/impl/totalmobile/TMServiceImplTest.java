@@ -18,10 +18,10 @@ import static org.mockito.Mockito.when;
 
 public class TMServiceImplTest {
 
-  @InjectMocks TMServiceImpl tmServiceImpl;
-  @Mock ObjectFactory objectFactory;
-  @Mock WebServiceTemplate webServiceTemplate;
-  @Mock JAXBElement<Object> jaxbElement;
+  @InjectMocks private TMServiceImpl tmServiceImpl;
+  @Mock private ObjectFactory objectFactory;
+  @Mock private WebServiceTemplate webServiceTemplate;
+  @Mock private JAXBElement<Object> jaxbElement;
 
   @Before
   public void setup() throws Exception {
