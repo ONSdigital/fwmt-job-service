@@ -50,7 +50,7 @@ totalmobile:
 
 service:
   resource:
-    username: "username"
+    username: "user"
     password: "password"
     users:
       operation:
@@ -68,4 +68,4 @@ service:
     fieldPeriod:
       operation:
         find:
-          fieldPeriodUrl: "http://localhost:9095/fieldperiods"
+          fieldPeriodUrl: "http://localhost:9095/fieldperiods/{fieldPeriod}"

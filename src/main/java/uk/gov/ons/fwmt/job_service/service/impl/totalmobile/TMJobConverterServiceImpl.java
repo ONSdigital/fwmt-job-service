@@ -28,6 +28,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -130,8 +131,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     request.getJob().getWorld().setReference(JOB_WORLD);
 
     // Set the job due date
-    GregorianCalendar dueDateCalendar = new GregorianCalendar();
-    dueDateCalendar.setTime(ingest.getDueDate());
+    GregorianCalendar dueDateCalendar = GregorianCalendar.from(ingest.getDueDate().atTime(23, 59, 59).atZone(ZoneId.of("UTC")));
     request.getJob().setDueDate(datatypeFactory.newXMLGregorianCalendar(dueDateCalendar));
     //    request.getJob().setDueDate("2018-05-31T00:00:00+01:00");
 

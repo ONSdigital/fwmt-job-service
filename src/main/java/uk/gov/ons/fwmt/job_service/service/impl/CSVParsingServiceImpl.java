@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.fwmt.job_service.data.annotation.CSVColumn;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
-import uk.gov.ons.fwmt.job_service.data.legacy_ingest.*;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleGFFDataIngest;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleLFSDataIngest;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.rest.FieldPeriodResourceService;
 import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
@@ -20,9 +23,9 @@ import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -99,16 +102,11 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     }
   }
 
-  public LocalDateTime convertToGFFDate(String stage) {
-    if (fieldPeriodResourceService.existsByFieldPeriod(stage)) {
-      Calendar cal = Calendar.getInstance();
-      final FieldPeriodDto fieldPeriod = fieldPeriodResourceService.findByFieldPeriod(stage).get();
-      cal.setTime(fieldPeriod.getEndDate());
-      cal.set(Calendar.HOUR, 11);
-      cal.set(Calendar.MINUTE, 59);
-      cal.set(Calendar.SECOND, 59);
-      cal.set(Calendar.AM_PM, Calendar.PM);
-      return cal.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+  public LocalDate convertToGFFDate(String stage) {
+    final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceService.findByFieldPeriod(stage);
+    if (existsByFieldperiod.isPresent()) {
+      final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
+      return fieldPeriod.getEndDate();
     } else {
       // BACKUP!!! THIS SHOULD NOT HAPPEN
       int year = 2010 + Integer.parseInt(stage.substring(0, 1));
@@ -124,43 +122,27 @@ public class CSVParsingServiceImpl implements CSVParsingService {
       assert month >= 1 && month < 12;
       LocalDate initial = LocalDate.of(year, month, 1);
       LocalDate endOfMonth = initial.withDayOfMonth(initial.lengthOfMonth());
-      return endOfMonth.atTime(23, 59, 59);
+      return endOfMonth;
     }
   }
 
   // technically, 'stage' here is the field period 'fp'
   // TODO double check to ensure that this is correct
-  public Date convertToLFSDate(String stage) {
-    if (fieldPeriodResourceService.existsByFieldPeriod(stage)) {
-      Calendar cal = Calendar.getInstance();
-      final FieldPeriodDto fieldPeriod = fieldPeriodResourceService.findByFieldPeriod(stage).get();
-      cal.setTime(fieldPeriod.getEndDate());
-      cal.set(Calendar.HOUR, 11);
-      cal.set(Calendar.MINUTE, 59);
-      cal.set(Calendar.SECOND, 59);
-      cal.set(Calendar.AM_PM, Calendar.PM);
-      return cal.getTime();
+  public LocalDate convertToLFSDate(String stage) {
+    final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceService.findByFieldPeriod(stage);
+    if (existsByFieldperiod.isPresent()) {
+      final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
+      return fieldPeriod.getEndDate();
     } else {
       // BACKUP!!! THIS SHOULD NOT HAPPEN
       int year = 2010 + Integer.parseInt(stage.substring(0, 1));
       int quarter = Integer.parseInt(stage.substring(1, 2));
       int week = stage.toLowerCase().charAt(2) - 'a' + 3;
-      Calendar cal = Calendar.getInstance();
-      cal.set(2010 + year, 1 + (3 * (quarter - 1)) - 1, 1);
-      cal.set(Calendar.HOUR, 11);
-      cal.set(Calendar.MINUTE, 59);
-      cal.set(Calendar.SECOND, 59);
-      cal.set(Calendar.AM_PM, Calendar.PM);
-      cal.add(Calendar.DATE, (7 * week) - 1);
-      return cal.getTime();
+      int month = 1 + (3 * (quarter - 1));
+      int day = (7 * week) - 1;
+      LocalDate initial = LocalDate.of(year, month, day);
+      return initial;
     }
-  }
-
-  protected static Date toDate(LocalDateTime localDateTime) {
-    return Date.from(
-        localDateTime
-            .atZone(ZoneId.systemDefault())
-            .toInstant());
   }
 
   private static CSVFormat getCSVFormat() {
@@ -191,7 +173,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
           // set normal fields
           setFromCSVColumnAnnotations(instance, record, "GFF");
           // set derived due date
-          instance.setDueDate(toDate(convertToGFFDate(instance.getStage())));
+          instance.setDueDate(convertToGFFDate(instance.getStage()));
           // set survey type and extra data
           instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
           instance.setGffData(new LegacySampleGFFDataIngest());
