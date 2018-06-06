@@ -5,10 +5,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.UnprocessedCSVRow;
-import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleGFFDataIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
@@ -28,9 +26,9 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class JobServiceSendJobTest {
-  @Mock JobResourceService mockJobResourceService;
-  @Mock TMJobConverterService mockTmJobConverterService;
-  @Mock TMService mockTmService;
+  @Mock private JobResourceService mockJobResourceService;
+  @Mock private TMJobConverterService mockTmJobConverterService;
+  @Mock private TMService mockTmService;
   @InjectMocks private JobServiceImpl jobService;
 
   @Before
