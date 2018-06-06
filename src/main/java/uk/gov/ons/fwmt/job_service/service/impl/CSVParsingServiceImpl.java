@@ -127,7 +127,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
   }
 
   // technically, 'stage' here is the field period 'fp'
-  // TODO double check to ensure that this is correct
+  // TODO else block is not currently used, not currently required but will need to be fixed if used
   public LocalDate convertToLFSDate(String stage) {
     final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceService.findByFieldPeriod(stage);
     if (existsByFieldperiod.isPresent()) {
