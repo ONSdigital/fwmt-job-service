@@ -34,13 +34,13 @@ public class TMServiceImplTest {
   }
 
   @Test(expected=IllegalArgumentException.class)
-  public void SOAPLookupReceivesAMessageThatDoesNotMatchTM() {
+  public void sOAPLookupReceivesAMessageThatDoesNotMatchTM() {
     //When
     tmServiceImpl.lookupSOAPAction(Object.class);
   }
 
   @Test
-  public void SOAPLookupReceivesARequestMessage() {
+  public void sOAPLookupReceivesARequestMessage() {
     //Given
     String expectedResult = "expectedNamespaceQuery";
 
@@ -52,7 +52,7 @@ public class TMServiceImplTest {
   }
 
   @Test
-  public void SOAPLookupReceivesNonMappedRequestMessage(){
+  public void sOAPLookupReceivesNonMappedRequestMessage(){
     //Given
     String expectedResult = "expectedNamespaceSendAddJobTasksRequestMessage";
 

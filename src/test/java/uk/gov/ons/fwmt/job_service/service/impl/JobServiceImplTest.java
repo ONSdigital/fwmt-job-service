@@ -39,7 +39,7 @@ public class JobServiceImplTest {
   @Mock private Filename filename;
 
   @Test
-  public void ShouldReturnUnprocessedRowWhenErrorMessageInCSVParsing() throws InvalidFileNameException, MediaTypeNotSupportedException, IOException {
+  public void shouldReturnUnprocessedRowWhenErrorMessageInCSVParsing() throws InvalidFileNameException, MediaTypeNotSupportedException, IOException {
     int expectedProcessedRows = 0;
     int expectedUnprocessedRows = 1;
     String expectedErrorMessage= "Row could not be parsed: TestError";
@@ -64,7 +64,7 @@ public class JobServiceImplTest {
   }
 
   @Test
-  public void ShouldReturnAuthNoWhenUserDoesNotExistInTM() throws InvalidFileNameException, MediaTypeNotSupportedException, IOException {
+  public void shouldReturnAuthNoWhenUserDoesNotExistInTM() throws InvalidFileNameException, MediaTypeNotSupportedException, IOException {
     int expectedProcessedRows = 0;
     int expectedUnprocessedRows = 1;
     String expectedErrorMessage= "User did not exist in the gateway: expectedAuth";
