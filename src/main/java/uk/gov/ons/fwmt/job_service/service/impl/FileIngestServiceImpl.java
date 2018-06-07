@@ -7,7 +7,6 @@ import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.Filename;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
-import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 
 import java.io.IOException;
@@ -29,18 +28,7 @@ public class FileIngestServiceImpl implements FileIngestService {
   public static final DateTimeFormatter TIMESTAMP_FORMAT_WINDOWS = DateTimeFormatter
       .ofPattern("yyyy-MM-dd'T'HH-mm-ss'Z'");
 
-  @Deprecated
-  protected void verifyCSVFileMetadata(MultipartFile file) throws MediaTypeNotSupportedException {
-    log.info("Began a file metadata check for a file with content " + file.getContentType());
-
-    // // // Check metadata
-    if (!"text/csv".equals(file.getContentType())) {
-      throw new MediaTypeNotSupportedException("text/csv", file.getContentType());
-    }
-
-    log.info("Passed a file metadata check");
-  }
-
+  // TODO consider spliting this up into manageable chunks
   protected Filename verifyCSVFilename(String rawFilename, String expectedEndpoint) throws InvalidFileNameException {
     log.info("Began a filename parse for " + rawFilename);
 
@@ -118,8 +106,7 @@ public class FileIngestServiceImpl implements FileIngestService {
     return new Filename(endpoint, tla, timestamp);
   }
 
-  public FileIngest ingestSampleFile(MultipartFile file)
-      throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
+  public FileIngest ingestSampleFile(MultipartFile file) throws IOException, InvalidFileNameException {
     // check filename
     Filename filename = verifyCSVFilename(file.getOriginalFilename(), "sample");
 
@@ -127,5 +114,4 @@ public class FileIngestServiceImpl implements FileIngestService {
 
     return new FileIngest(filename, reader);
   }
-
 }
