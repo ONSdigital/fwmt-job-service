@@ -81,7 +81,6 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   }
 
   protected CreateJobRequest createJobRequestFromIngest(LegacySampleIngest ingest, String username) {
-    // Setup the request object and all inner objects
     CreateJobRequest request = new CreateJobRequest();
     JobType job = new JobType();
     request.setJob(job);
@@ -96,10 +95,8 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     job.setAdditionalProperties(new AdditionalPropertyCollectionType());
     job.setWorld(new WorldIdentityType());
 
-    // Set the job id
     request.getJob().getIdentity().setReference(ingest.getTmJobId());
 
-    // Set the job location
     LocationType location = request.getJob().getLocation();
     List<String> addressLines = location.getAddressDetail().getLines().getAddressLine();
     addressLines.add(ingest.getAddressLine1());
@@ -111,26 +108,15 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     location.getAddressDetail().setPostCode(ingest.getPostcode());
     location.setReference(ingest.getSerNo());
 
-    // Set the job contact
     request.getJob().getContact().setName(ingest.getPostcode());
-
-    // Set the job skills
     request.getJob().getSkills().getSkill().add(JOB_SKILL);
-
-    // Set the job work type
     request.getJob().setWorkType(JOB_WORK_TYPE);
-
-    // Set the job world
     request.getJob().getWorld().setReference(JOB_WORLD);
 
-    // Set the job due date
-    GregorianCalendar dueDateCalendar = GregorianCalendar.from(ingest.getDueDate().atTime(23, 59, 59).atZone(ZoneId.of("UTC")));
+    GregorianCalendar dueDateCalendar = GregorianCalendar
+        .from(ingest.getDueDate().atTime(23, 59, 59).atZone(ZoneId.of("UTC")));
     request.getJob().setDueDate(datatypeFactory.newXMLGregorianCalendar(dueDateCalendar));
-
-    // Set the job description
     request.getJob().setDescription(ingest.getTla());
-
-    // Set the allocated interviewer
     request.getJob().getAllocatedTo().setUsername(username);
 
     // additional properties
@@ -145,7 +131,6 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
       break;
     }
 
-    // Set other required values
     request.getJob().setDuration(1);
     request.getJob().setVisitComplete(false);
     request.getJob().setDispatched(false);
