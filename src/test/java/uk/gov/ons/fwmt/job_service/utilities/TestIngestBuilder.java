@@ -14,7 +14,7 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setTimestamp("testTimestamp");
     ingest.setSerNo("testSerNo");
     ingest.setTla("testTla");
-    ingest.setStage("testStage");
+    ingest.setStage("807");
     ingest.setWave("testWave");
     ingest.setAddressLine1("testAddressLine1");
     ingest.setAddressLine2("testAddressLine2");
@@ -35,12 +35,11 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setAuth("testAuth");
     ingest.setLastUpdated("testLastUpdated");
     ingest.setTmJobId("testJobID");
-    ingest.setLegacySampleSurveyType(GFF);
     ingest.setDueDate(LocalDate.of(2018, 10, 10));
+
     //additional properties
     ingest.setGeoX(3.56f);
     ingest.setGeoY(3.56f);
-    ingest.setGffData(new LegacySampleGFFDataIngest());
     return ingest;
   }
 }

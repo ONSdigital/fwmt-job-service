@@ -10,6 +10,5 @@ public interface TMJobConverterService {
   SendUpdateJobHeaderRequestMessage updateJob(String tmJobId, String username);
   SendUpdateJobHeaderRequestMessage updateJob(LegacySampleIngest ingest, String username);
   SendCreateJobRequestMessage createReissue(LegacySampleIngest ingest, String username);
-  SendDeleteJobRequestMessage deleteJob(String tmJobId);
 }
 
