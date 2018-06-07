@@ -191,6 +191,5 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   public SendCreateJobRequestMessage createReissue(LegacySampleIngest ingest, String username) {
     return createJob(ingest, username);
   }
-
 }
 
