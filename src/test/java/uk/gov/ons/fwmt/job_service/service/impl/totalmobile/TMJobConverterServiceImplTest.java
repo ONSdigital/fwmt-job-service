@@ -19,7 +19,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType.GFF;
 import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType.LFS;
-import static uk.gov.ons.fwmt.job_service.service.impl.totalmobile.TMJobConverterServiceImpl.*;
+import static uk.gov.ons.fwmt.job_service.service.impl.totalmobile.TMJobConverterServiceImpl.JOB_QUEUE;
+import static uk.gov.ons.fwmt.job_service.service.impl.totalmobile.TMJobConverterServiceImpl.JOB_WORK_TYPE;
 
 public class TMJobConverterServiceImplTest {
 
