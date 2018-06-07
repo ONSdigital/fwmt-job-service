@@ -1,11 +1,8 @@
 package uk.gov.ons.fwmt.job_service.utilities;
 
-import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleGFFDataIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 
 import java.time.LocalDate;
-
-import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType.GFF;
 
 public class TestIngestBuilder extends LegacySampleIngest {
 
