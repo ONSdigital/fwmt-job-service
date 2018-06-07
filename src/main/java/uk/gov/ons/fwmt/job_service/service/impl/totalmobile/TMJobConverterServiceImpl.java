@@ -3,25 +3,27 @@ package uk.gov.ons.fwmt.job_service.service.impl.totalmobile;
 import com.consiliumtechnologies.schemas.mobile._2009._03.visitstypes.AdditionalPropertyCollectionType;
 import com.consiliumtechnologies.schemas.mobile._2009._03.visitstypes.AdditionalPropertyType;
 import com.consiliumtechnologies.schemas.mobile._2015._05.optimisemessages.CreateJobRequest;
-import com.consiliumtechnologies.schemas.mobile._2015._05.optimisemessages.DeleteJobRequest;
 import com.consiliumtechnologies.schemas.mobile._2015._05.optimisemessages.UpdateJobHeaderRequest;
-import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.*;
+import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.AddressDetailType;
+import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.ContactInfoType;
+import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.JobHeaderType;
+import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.JobIdentityType;
+import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.LocationType;
+import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.NameValueAttributeCollectionType;
+import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.ObjectFactory;
+import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.JobType;
+import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.ResourceIdentityType;
+import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.SkillCollectionType;
+import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.WorldIdentityType;
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessage;
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendDeleteJobRequestMessage;
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendMessageRequestInfo;
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateJobHeaderRequestMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.PropertyAccessor;
 import org.springframework.beans.PropertyAccessorFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.fwmt.job_service.data.annotation.JobAdditionalProperty;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
-import uk.gov.ons.fwmt.job_service.exceptions.types.UnknownUserException;
-import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
-import uk.gov.ons.fwmt.job_service.rest.UserResourceService;
-import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
-import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -38,20 +40,14 @@ import java.util.Optional;
 @Service
 public class TMJobConverterServiceImpl implements TMJobConverterService {
   protected static final String JOB_QUEUE = "\\OPTIMISE\\INPUT";
-  private static final String JOB_SKILL = "Survey";
-  private static final String JOB_WORK_TYPE = "SS";
-  private static final String JOB_WORLD = "Default";
+  protected static final String JOB_SKILL = "Survey";
+  protected static final String JOB_WORK_TYPE = "SS";
+  protected static final String JOB_WORLD = "Default";
 
-  private final JobResourceService jobResourceService;
-  private final UserResourceService userResourceService;
   private final DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
   private final ObjectFactory factory = new ObjectFactory();
 
-  @Autowired
-  public TMJobConverterServiceImpl(JobResourceService jobResourceService, UserResourceService userResourceService)
-      throws DatatypeConfigurationException {
-    this.jobResourceService = jobResourceService;
-    this.userResourceService = userResourceService;
+  public TMJobConverterServiceImpl() throws DatatypeConfigurationException {
   }
 
   protected static void addAdditionalProperty(CreateJobRequest request, String key, String value) {
@@ -85,13 +81,11 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   }
 
   protected CreateJobRequest createJobRequestFromIngest(LegacySampleIngest ingest, String username) {
-    // Setup the request object and all inner objects
     CreateJobRequest request = new CreateJobRequest();
     JobType job = new JobType();
     request.setJob(job);
     job.setLocation(new LocationType());
     job.setIdentity(new JobIdentityType());
-    // job.setMandatoryResource(new ResourceIdentityType());
     job.getLocation().setAddressDetail(new AddressDetailType());
     job.getLocation().getAddressDetail().setLines(new AddressDetailType.Lines());
     job.setContact(new ContactInfoType());
@@ -101,10 +95,8 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     job.setAdditionalProperties(new AdditionalPropertyCollectionType());
     job.setWorld(new WorldIdentityType());
 
-    // Set the job id
     request.getJob().getIdentity().setReference(ingest.getTmJobId());
 
-    // Set the job location
     LocationType location = request.getJob().getLocation();
     List<String> addressLines = location.getAddressDetail().getLines().getAddressLine();
     addressLines.add(ingest.getAddressLine1());
@@ -115,30 +107,16 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     addressLines.add(ingest.getPostTown());
     location.getAddressDetail().setPostCode(ingest.getPostcode());
     location.setReference(ingest.getSerNo());
-    //    request.getJob().getLocation().getAddressDetail().setGeoX(factory.createAddressDetailTypeGeoX(ingest.getGeoX()));
-    //    request.getJob().getLocation().getAddressDetail().setGeoY(factory.createAddressDetailTypeGeoY(ingest.getGeoY()));
 
-    // Set the job contact
     request.getJob().getContact().setName(ingest.getPostcode());
-
-    // Set the job skills
     request.getJob().getSkills().getSkill().add(JOB_SKILL);
-
-    // Set the job work type
     request.getJob().setWorkType(JOB_WORK_TYPE);
-
-    // Set the job world
     request.getJob().getWorld().setReference(JOB_WORLD);
 
-    // Set the job due date
-    GregorianCalendar dueDateCalendar = GregorianCalendar.from(ingest.getDueDate().atTime(23, 59, 59).atZone(ZoneId.of("UTC")));
+    GregorianCalendar dueDateCalendar = GregorianCalendar
+        .from(ingest.getDueDate().atTime(23, 59, 59).atZone(ZoneId.of("UTC")));
     request.getJob().setDueDate(datatypeFactory.newXMLGregorianCalendar(dueDateCalendar));
-    //    request.getJob().setDueDate("2018-05-31T00:00:00+01:00");
-
-    // Set the job description
     request.getJob().setDescription(ingest.getTla());
-
-    // Set the allocated interviewer
     request.getJob().getAllocatedTo().setUsername(username);
 
     // additional properties
@@ -151,11 +129,8 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     case LFS:
       setFromAdditionalPropertyAnnotations(ingest.getLfsData(), request);
       break;
-    default:
-      throw new IllegalArgumentException("Unknown survey type");
     }
 
-    // Set other required values
     request.getJob().setDuration(1);
     request.getJob().setVisitComplete(false);
     request.getJob().setDispatched(false);
@@ -184,94 +159,6 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     return info;
   }
 
-  @Deprecated
-  protected void reallocateJob(LegacySampleIngest job, String username) {
-    UpdateJobHeaderRequest request = makeUpdateJobHeaderRequest(job.getTmJobId(), username);
-
-    SendUpdateJobHeaderRequestMessage message = new SendUpdateJobHeaderRequestMessage();
-    message.setSendMessageRequestInfo(makeSendMessageRequestInfo(job.getTmJobId()));
-    message.setUpdateJobHeaderRequest(request);
-
-    //    tmService.send(message);
-
-    // save the job into our database
-    Optional<JobDto> jobDto = jobResourceService.findByTmJobId(job.getTmJobId());
-    jobDto.ifPresent(jobDto1 -> {jobDto1.setLastAuthNo(job.getAuth());
-      jobResourceService.updateJob(jobDto1);
-    });
-  }
-
-  @Deprecated
-  protected void newJob(LegacySampleIngest job, String username) {
-    CreateJobRequest request = createJobRequestFromIngest(job, username);
-
-    SendCreateJobRequestMessage message = new SendCreateJobRequestMessage();
-    message.setSendMessageRequestInfo(makeSendMessageRequestInfo(job.getTmJobId()));
-    message.setCreateJobRequest(request);
-
-    //    tmService.send(message);
-
-    // save the job into our database
-    JobDto jobDto = new JobDto(job.getTmJobId(),job.getAuth());
-    jobResourceService.createJob(jobDto);
-  }
-
-  @Deprecated
-  protected void publishJobToUser(LegacySampleIngest job, UserDto user) {
-    log.info("User was active");
-    // don't do anything if we've seen this job ID and authno before
-    // if we've seen the job ID but not the authno, it's a reallocation
-    if (jobResourceService.existsByTmJobIdAndLastAuthNo(job.getTmJobId(), user.getAuthNo())) {
-      log.info("Job has been sent previously");
-    } else if (jobResourceService.existsByTmJobId(job.getTmJobId())) {
-      log.info("Job is a reallocation");
-      // reallocate
-      reallocateJob(job, user.getTmUsername());
-    } else {
-      log.info("Job is not a reallocation");
-      switch (job.getLegacySampleSurveyType()) {
-      case GFF:
-        if (job.isGffReissue()) {
-          // reissue
-          // the date was modified within LegacySampleIngest
-          // the rest of this code is identical to creating a new job
-          log.info("Job is a GFF reissue");
-          newJob(job, user.getTmUsername());
-        } else {
-          // new job
-          log.info("Job is a new GFF job");
-          newJob(job, user.getTmUsername());
-        }
-        break;
-      case LFS:
-        // new job
-        log.info("Job is a new LFS job");
-        newJob(job, user.getTmUsername());
-        break;
-      default:
-        throw new IllegalArgumentException("Unknown survey type");
-      }
-    }
-  }
-
-  @Deprecated
-  public void publishJob(LegacySampleIngest job) throws UnknownUserException {
-    // only send if the user is active
-    if (userResourceService.existsByAuthNoAndActive(job.getAuth(), true)) {
-      Optional<UserDto> userDto = userResourceService.findByAuthNo(job.getAuth());
-      userDto.ifPresent(userDto1 ->publishJobToUser(job, userDto1));
-    } else if (userResourceService.existsByAlternateAuthNoAndActive(job.getAuth(), true)) {
-      Optional<UserDto> userDto = userResourceService.findByAlternateAuthNo(job.getAuth());
-      userDto.ifPresent(userDto1 -> publishJobToUser(job, userDto1));
-    } else if (userResourceService.existsByAuthNoAndActive(job.getAuth(), false) ||
-            userResourceService.existsByAlternateAuthNoAndActive(job.getAuth(), false)) {
-      log.info("User was not active");
-    } else {
-      log.error("User was not found");
-      throw new UnknownUserException(job.getAuth());
-    }
-  }
-
   public SendCreateJobRequestMessage createJob(LegacySampleIngest ingest, String username) {
     CreateJobRequest request = createJobRequestFromIngest(ingest, username);
 
@@ -298,17 +185,6 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
 
   public SendCreateJobRequestMessage createReissue(LegacySampleIngest ingest, String username) {
     return createJob(ingest, username);
-  }
-
-  public SendDeleteJobRequestMessage deleteJob(String tmJobId) {
-    DeleteJobRequest request = new DeleteJobRequest();
-    request.getIdentity().setReference(tmJobId);
-
-    SendDeleteJobRequestMessage message = new SendDeleteJobRequestMessage();
-    message.setSendMessageRequestInfo(makeSendMessageRequestInfo(tmJobId));
-    message.setDeleteJobRequest(request);
-
-    return message;
   }
 }
 
