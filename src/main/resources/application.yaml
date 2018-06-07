@@ -7,12 +7,15 @@ info:
   built: @timestamp@
 
 server:
+  contextPath: /jobs
   port: 9091
 
 project:
   basedir: ${basedir}
 
 spring:
+  application:
+    name: fwmt-job-service
   http.multipart:
     max-file-size: 12800MB
     max-request-size: 12800MB
