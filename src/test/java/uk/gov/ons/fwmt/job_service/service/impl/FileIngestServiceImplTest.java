@@ -64,25 +64,21 @@ public class FileIngestServiceImplTest {
     }
   }
 
-  @Test
-  public void checkInvalidSampleFileNames() {
+  @Test(expected = InvalidFileNameException.class)
+  public void checkInvalidSampleFileNames() throws InvalidFileNameException {
     for (String filename : invalidSampleFileNames) {
-      try {
         assertNotNull(fileIngestService.verifyCSVFilename(filename, "sample"));
         // we should throw an InvalidFileNameException before this point
         fail("False negative - filename '" + filename + "' should be invalid");
-      } catch (InvalidFileNameException e) {}
     }
   }
 
-  @Test
-  public void checkInvalidStaffFileNames() {
+  @Test(expected = InvalidFileNameException.class)
+  public void checkInvalidStaffFileNames() throws InvalidFileNameException {
     for (String filename : invalidStaffFileNames) {
-      try {
         assertNotNull(fileIngestService.verifyCSVFilename(filename, "staff"));
         // we should throw an InvalidFileNameException before this point
         fail("False negative - filename '" + filename + "' should be invalid");
-      } catch (InvalidFileNameException e) {}
     }
   }
 
