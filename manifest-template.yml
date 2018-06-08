@@ -4,8 +4,6 @@ applications:
   timeout: 180
   memory: 1024M
   path: 'build/libs/&{NAME}-&{VERSION}.jar'
-  services:
-  - 'fwmt-db'
   routes:
   - route: '&{INTERNAL_DOMAIN}/&{PATH}'
   - route: '&{EXTERNAL_DOMAIN}/&{PATH}'
