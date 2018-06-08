@@ -49,7 +49,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
    * @param <T> A class with fields annotated with CSVColumn
    */
 
-  private <T> void setFromCSVColumnAnnotations(T instance, CSVRecord record, String pivot) {
+  protected  <T> void setFromCSVColumnAnnotations(T instance, CSVRecord record, String pivot) {
     Class<?> tClass = instance.getClass();
     PropertyAccessor accessor = PropertyAccessorFactory.forBeanPropertyAccess(instance);
     for (Field field : tClass.getDeclaredFields()) {
