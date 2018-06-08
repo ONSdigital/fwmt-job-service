@@ -1,13 +1,11 @@
 package uk.gov.ons.fwmt.job_service.service.impl;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
-import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,10 +72,7 @@ public class FileIngestServiceImplTest {
         assertNotNull(fileIngestService.verifyCSVFilename(filename, "sample"));
         // we should throw an InvalidFileNameException before this point
         fail("False negative - filename '" + filename + "' should be invalid");
-      } catch (InvalidFileNameException e) {
-        // junk assertion - if we reach this point we have passed
-        assertTrue(true);
-      }
+      } catch (InvalidFileNameException e) {}
     }
   }
 
@@ -88,10 +83,7 @@ public class FileIngestServiceImplTest {
         assertNotNull(fileIngestService.verifyCSVFilename(filename, "staff"));
         // we should throw an InvalidFileNameException before this point
         fail("False negative - filename '" + filename + "' should be invalid");
-      } catch (InvalidFileNameException e) {
-        // junk assertion - if we reach this point we have passed
-        assertTrue(true);
-      }
+      } catch (InvalidFileNameException e) {}
     }
   }
 
