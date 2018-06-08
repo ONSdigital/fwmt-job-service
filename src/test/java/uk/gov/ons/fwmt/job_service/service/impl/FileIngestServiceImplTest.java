@@ -250,19 +250,20 @@ public class FileIngestServiceImplTest {
   @Test
   public void getLocalDateTime() throws InvalidFileNameException {
     //Given
-    String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.csv";;
+    String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.csv";
     String rawTimestamp = "2018-04-24T19:09:54Z";
 
     //When
     LocalDateTime result = fileIngestService.getLocalDateTime(rawFilename,rawTimestamp);
 
     //Then
+    assertNotNull(result);
   }
 
   @Test(expected = InvalidFileNameException.class)
   public void noEffortForACorrectDateTimeFormat() throws InvalidFileNameException {
     //Given
-    String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.csv";;
+    String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.csv";
     String rawTimestamp = "I am clearly not anything related to date or time";
     String validTime = "2018-04-24T19:09:54";
 
@@ -274,7 +275,7 @@ public class FileIngestServiceImplTest {
   }
 
   @Test
-  public void ingestSampleFile() throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
+  public void ingestGFFSampleFile() throws IOException, InvalidFileNameException {
     //Given
     MultipartFile testFile = new MockMultipartFile("sampleFile","sample_GFF_2018-04-24T19-09-54Z.csv","text/csv", (InputStream) null);
 
@@ -282,8 +283,22 @@ public class FileIngestServiceImplTest {
     FileIngest result = fileIngestService.ingestSampleFile(testFile);
 
     //Then
-    Assert.assertEquals("sample", result.getFilename().getEndpoint());
-    Assert.assertEquals(GFF, result.getFilename().getTla());
-    Assert.assertEquals("2018-04-24T19:09:54", result.getFilename().getTimestamp().toString());
+    assertEquals("sample", result.getFilename().getEndpoint());
+    assertEquals(GFF, result.getFilename().getTla());
+    assertEquals("2018-04-24T19:09:54", result.getFilename().getTimestamp().toString());
+  }
+
+  @Test
+  public void ingestLFSSampleFile() throws IOException, InvalidFileNameException {
+    //Given
+    MultipartFile testFile = new MockMultipartFile("sampleFile","sample_LFS_2018-04-24T19-09-54Z.csv","text/csv", (InputStream) null);
+
+    //When
+    FileIngest result = fileIngestService.ingestSampleFile(testFile);
+
+    //Then
+    assertEquals("sample", result.getFilename().getEndpoint());
+    assertEquals(LFS, result.getFilename().getTla());
+    assertEquals("2018-04-24T19:09:54", result.getFilename().getTimestamp().toString());
   }
 }
