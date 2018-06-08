@@ -7,7 +7,6 @@ import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.Filename;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
-import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 
 import java.io.IOException;
@@ -29,58 +28,66 @@ public class FileIngestServiceImpl implements FileIngestService {
   public static final DateTimeFormatter TIMESTAMP_FORMAT_WINDOWS = DateTimeFormatter
       .ofPattern("yyyy-MM-dd'T'HH-mm-ss'Z'");
 
-  @Deprecated
-  protected void verifyCSVFileMetadata(MultipartFile file) throws MediaTypeNotSupportedException {
-    log.info("Began a file metadata check for a file with content " + file.getContentType());
-
-    // // // Check metadata
-    if (!"text/csv".equals(file.getContentType())) {
-      throw new MediaTypeNotSupportedException("text/csv", file.getContentType());
-    }
-
-    log.info("Passed a file metadata check");
-  }
-
   protected Filename verifyCSVFilename(String rawFilename, String expectedEndpoint) throws InvalidFileNameException {
     log.info("Began a filename parse for " + rawFilename);
 
-    // // Check extension
-    String[] dotSplit = rawFilename.split("\\.");
-    if (dotSplit.length != 2 || !("csv".equals(dotSplit[1]))) {
-      throw new InvalidFileNameException(rawFilename, "No 'csv' extension");
-    }
+    // Check file extension
+    String[] filenameSplitByDot = checkFileExtension(rawFilename);
 
-    // // Split the filename
-    String[] underscoreSplit = dotSplit[0].split("_");
+    // Split the filename by underscore
+    String[] filenameSplitByUnderscore = filenameSplitByDot[0].split("_");
 
-    // // Extract the endpoint
-    String endpoint = underscoreSplit[0];
+    String endpoint = extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
+
+    // Detect survey type
+    LegacySampleSurveyType tla = getLegacySampleSurveyType(filenameSplitByUnderscore, endpoint);
+
+    // Timestamp validation
+    String rawTimestamp = filenameSplitByUnderscore[filenameSplitByUnderscore.length - 1];
+    log.debug("File timestamp detected as " + rawTimestamp);
+    LocalDateTime timestamp = getLocalDateTime(rawFilename, rawTimestamp);
+
+    log.info("Passed a filename check");
+
+    return new Filename(endpoint, tla, timestamp);
+  }
+
+  protected String extractEndpoint(String rawFilename, String expectedEndpoint, String[] filenameSplitByUnderscore)
+      throws InvalidFileNameException {
+    String endpoint = filenameSplitByUnderscore[0];
     log.debug("File endpoint detected as " + endpoint);
 
-    // // Check the endpoint against expectations
-    // Ensure that section 'B' matches our endpoint
     if (!expectedEndpoint.equals(endpoint)) {
       throw new InvalidFileNameException(rawFilename, "File had an incorrect endpoint of " + endpoint);
     }
 
     switch (endpoint) {
     case "staff":
-      if (underscoreSplit.length != 2)
+      if (filenameSplitByUnderscore.length != 2)
         throw new InvalidFileNameException(rawFilename, "File names for staff should contain one underscore");
       break;
     case "sample":
-      if (underscoreSplit.length != 3)
+      if (filenameSplitByUnderscore.length != 3)
         throw new InvalidFileNameException(rawFilename, "File names for samples should contain two underscores");
       break;
     default:
       throw new IllegalArgumentException("File had an unrecognized endpoint of " + endpoint);
     }
+    return endpoint;
+  }
 
-    // // Validate the TLA
-    // Only for the "sample" endpoint
+  protected String[] checkFileExtension(String rawFilename) throws InvalidFileNameException {
+    String[] filenameSplitByDot = rawFilename.split("\\.");
+    if (filenameSplitByDot.length != 2 || !("csv".equals(filenameSplitByDot[1]))) {
+      throw new InvalidFileNameException(rawFilename, "No 'csv' extension");
+    }
+    return filenameSplitByDot;
+  }
+
+  protected LegacySampleSurveyType getLegacySampleSurveyType(String[] filenameSplitByUnderscore, String endpoint) {
     LegacySampleSurveyType tla = null;
     if (endpoint.equals("sample")) {
-      String tlaString = underscoreSplit[1];
+      String tlaString = filenameSplitByUnderscore[1];
       log.debug("File TLA detected as " + tlaString);
       switch (tlaString) {
       case "LFS":
@@ -93,12 +100,11 @@ public class FileIngestServiceImpl implements FileIngestService {
         throw new IllegalArgumentException("File had an unrecognized TLA of " + tlaString);
       }
     }
+    return tla;
+  }
 
-    // // Validate the timestamp
-    // The timestamp is always the last part of the underscore-delimited section
-    String rawTimestamp = underscoreSplit[underscoreSplit.length - 1];
+  protected LocalDateTime getLocalDateTime(String rawFilename, String rawTimestamp) throws InvalidFileNameException {
     LocalDateTime timestamp;
-    log.debug("File timestamp detected as " + rawTimestamp);
     try {
       timestamp = LocalDateTime.parse(rawTimestamp, TIMESTAMP_FORMAT_WINDOWS);
     } catch (DateTimeParseException e) {
@@ -112,20 +118,14 @@ public class FileIngestServiceImpl implements FileIngestService {
         throw new InvalidFileNameException(rawFilename, "Invalid timestamp of " + rawTimestamp, e);
       }
     }
-
-    log.info("Passed a filename check");
-
-    return new Filename(endpoint, tla, timestamp);
+    return timestamp;
   }
 
-  public FileIngest ingestSampleFile(MultipartFile file)
-      throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
-    // check filename
+  public FileIngest ingestSampleFile(MultipartFile file) throws IOException, InvalidFileNameException {
     Filename filename = verifyCSVFilename(file.getOriginalFilename(), "sample");
 
     Reader reader = new InputStreamReader(file.getInputStream());
 
     return new FileIngest(filename, reader);
   }
-
 }
