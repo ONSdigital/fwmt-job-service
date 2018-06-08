@@ -257,7 +257,20 @@ public class FileIngestServiceImplTest {
     LocalDateTime result = fileIngestService.getLocalDateTime(rawFilename,rawTimestamp);
 
     //Then
+  }
 
+  @Test(expected = InvalidFileNameException.class)
+  public void noEffortForACorrectDateTimeFormat() throws InvalidFileNameException {
+    //Given
+    String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.csv";;
+    String rawTimestamp = "I am clearly not anything related to date or time";
+    String validTime = "2018-04-24T19:09:54";
+
+    //When
+    LocalDateTime result = fileIngestService.getLocalDateTime(rawFilename,rawTimestamp);
+
+    //Then
+    assertNotEquals(validTime,result);
   }
 
   @Test
