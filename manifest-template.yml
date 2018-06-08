@@ -3,7 +3,7 @@ applications:
   instances: &{INSTANCES}
   timeout: 180
   memory: 1024M
-  path: 'build/libs/&{NAME}.jar'
+  path: 'build/libs/&{NAME}-&{VERSION}.jar'
   services:
   - 'fwmt-db'
   routes:
