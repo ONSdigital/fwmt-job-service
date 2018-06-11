@@ -12,6 +12,7 @@ import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -63,12 +64,14 @@ public class FileIngestServiceImpl implements FileIngestService {
 
     switch (endpoint) {
     case "staff":
-      if (filenameSplitByUnderscore.length != 2)
+      if (filenameSplitByUnderscore.length != 2) {
         throw new InvalidFileNameException(rawFilename, "File names for staff should contain one underscore");
+      }
       break;
     case "sample":
-      if (filenameSplitByUnderscore.length != 3)
+      if (filenameSplitByUnderscore.length != 3) {
         throw new InvalidFileNameException(rawFilename, "File names for samples should contain two underscores");
+      }
       break;
     default:
       throw new IllegalArgumentException("File had an unrecognized endpoint of " + endpoint);
@@ -122,10 +125,8 @@ public class FileIngestServiceImpl implements FileIngestService {
   }
 
   public FileIngest ingestSampleFile(MultipartFile file) throws IOException, InvalidFileNameException {
-    Filename filename = verifyCSVFilename(file.getOriginalFilename(), "sample");
-
-    Reader reader = new InputStreamReader(file.getInputStream());
-
+    final Filename filename = verifyCSVFilename(file.getOriginalFilename(), "sample");
+    final Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
     return new FileIngest(filename, reader);
   }
 }
