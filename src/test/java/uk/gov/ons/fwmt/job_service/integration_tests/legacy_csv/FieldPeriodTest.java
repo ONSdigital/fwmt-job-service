@@ -7,14 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import cucumber.api.CucumberOptions;
-import cucumber.api.junit.Cucumber;
+import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.service.impl.CSVParsingServiceImpl;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,74 +21,136 @@ public class FieldPeriodTest {
 
   @Autowired
   private CSVParsingServiceImpl csvParsingServiceImpl;
-  
-  void testGFFDate(LocalDate expected, String fieldPeriod) {
+
+  @Test
+  public void fieldPeriodToDateGFFforMonthWith31Days() throws FWMTCommonException {
+    String fieldPeriod = "807";
+    int year = 2018;
+    int month = 7;
+    int day = 31;
+    LocalDate expected = LocalDate.of(year,month,day);
     LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
     assertEquals(expected, actual);
   }
 
-  void testLFSDate(LocalDate expected, String fieldPeriod) {
+  @Test
+  public void fieldPeriodToDateGFFforMonthWith30Days() throws FWMTCommonException {
+    String fieldPeriod = "806";
+    int year = 2018;
+    int month = 6;
+    int day = 30;
+    LocalDate expected = LocalDate.of(year,month,day);
+    LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
+    assertEquals(expected, actual);
+  }
+  
+  @Test
+  public void fieldPeriodToDateGFFforMonthWith31DaysReissue() throws FWMTCommonException {
+    String fieldPeriod = "824";
+    int year = 2018;
+    int month = 5;
+    int day = 31;
+    LocalDate expected = LocalDate.of(year,month,day);
+    LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void fieldPeriodToDateGFFforMonthWith30DaysReissue() throws FWMTCommonException {
+    String fieldPeriod = "825";
+    int year = 2018;
+    int month = 6;
+    int day = 30;
+    LocalDate expected = LocalDate.of(year,month,day);
+    LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
+    assertEquals(expected, actual);
+  }
+  
+  @Test
+  public void fieldPeriodToDateGFFforMonthWith31Days19() throws FWMTCommonException {
+    String fieldPeriod = "907";
+    int year = 2019;
+    int month = 7;
+    int day = 31;
+    LocalDate expected = LocalDate.of(year,month,day);
+    LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void fieldPeriodToDateGFFforMonthWith30Days19() throws FWMTCommonException {
+    String fieldPeriod = "906";
+    int year = 2018;
+    int month = 6;
+    int day = 30;
+    LocalDate expected = LocalDate.of(year,month,day);
+    LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
+    assertEquals(expected, actual);
+  }
+  
+  @Test
+  public void fieldPeriodToDateGFFforMonthWith31DaysReissue19() throws FWMTCommonException {
+    String fieldPeriod = "924";
+    int year = 2019;
+    int month = 5;
+    int day = 31;
+    LocalDate expected = LocalDate.of(year,month,day);
+    LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void fieldPeriodToDateGFFforMonthWith30DaysReissue19() throws FWMTCommonException {
+    String fieldPeriod = "925";
+    int year = 2019;
+    int month = 6;
+    int day = 30;
+    LocalDate expected = LocalDate.of(year,month,day);
+    LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void fieldPeriodToDateLFSforQuater4Week11() throws FWMTCommonException {
+    String fieldPeriod = "84K";
+    int year = 2018;
+    int month = 12;
+    int day = 19;
+    LocalDate expected = LocalDate.of(year,month,day);
     LocalDate actual = csvParsingServiceImpl.convertToLFSDate(fieldPeriod);
     assertEquals(expected, actual);
   }
 
   @Test
-  public void fieldPeriodToDateGFFforMonthWith31Days() {
-    testGFFDate(LocalDate.of(2018, 7, 31), "807");
-  }
-
-  @Test
-  public void fieldPeriodToDateGFFforMonthWith30Days() {
-    testGFFDate(LocalDate.of(2018, 6, 30), "806");
-  }
-  
-  @Test
-  public void fieldPeriodToDateGFFforMonthWith31DaysReissue() {
-    testGFFDate(LocalDate.of(2018, 5, 31), "824");
-  }
-
-  @Test
-  public void fieldPeriodToDateGFFforMonthWith30DaysReissue() {
-    testGFFDate(LocalDate.of(2018, 6, 30), "825");
+  public void fieldPeriodToDateLFSforQuater2Week2() throws FWMTCommonException {
+    String fieldPeriod = "82B";
+    int year = 2018;
+    int month = 4;
+    int day = 28;
+    LocalDate expected = LocalDate.of(year,month,day);
+    LocalDate actual = csvParsingServiceImpl.convertToLFSDate(fieldPeriod);
+    assertEquals(expected, actual);
   }
   
   @Test
-  public void fieldPeriodToDateGFFforMonthWith31Days19() {
-    testGFFDate(LocalDate.of(2019, 7, 31), "907");
+  public void fieldPeriodToDateLFSforQuater4Week112019() throws FWMTCommonException {
+    String fieldPeriod = "94K";
+    int year = 2019;
+    int month = 12;
+    int day = 28;
+    LocalDate expected = LocalDate.of(year,month,day);
+    LocalDate actual = csvParsingServiceImpl.convertToLFSDate(fieldPeriod);
+    assertEquals(expected, actual);
   }
 
   @Test
-  public void fieldPeriodToDateGFFforMonthWith30Days19() {
-    testGFFDate(LocalDate.of(2019, 6, 30), "906");
-  }
-  
-  @Test
-  public void fieldPeriodToDateGFFforMonthWith31DaysReissue19() {
-    testGFFDate(LocalDate.of(2019, 5, 31), "924");
-  }
-
-  @Test
-  public void fieldPeriodToDateGFFforMonthWith30DaysReissue19() {
-    testGFFDate(LocalDate.of(2019, 6, 30), "925");
-  }
-
-  @Test
-  public void fieldPeriodToDateLFSforQuater4Week11() {
-    testLFSDate(LocalDate.of(2018, 12, 29), "84K");
-  }
-
-  @Test
-  public void fieldPeriodToDateLFSforQuater2Week2() {
-    testLFSDate(LocalDate.of(2018, 4, 28), "82B");
-  }
-  
-  @Test
-  public void fieldPeriodToDateLFSforQuater4Week112019() {
-    testLFSDate(LocalDate.of(2019, 12, 28), "94K");
-  }
-
-  @Test
-  public void fieldPeriodToDateLFSforQuater2Week22019() {
-    testLFSDate(LocalDate.of(2019, 4, 27), "92B");
+  public void fieldPeriodToDateLFSforQuater2Week22019() throws FWMTCommonException {
+    String fieldPeriod = "92B";
+    int year = 2018;
+    int month = 7;
+    int day = 31;
+    LocalDate expected = LocalDate.of(year,month,day);
+    LocalDate actual = csvParsingServiceImpl.convertToLFSDate(fieldPeriod);
+    assertEquals(expected, actual);
   }
 }

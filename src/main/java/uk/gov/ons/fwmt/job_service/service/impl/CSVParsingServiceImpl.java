@@ -14,6 +14,8 @@ import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleGFFDataIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleLFSDataIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
+import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
+import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.FieldPeriodResourceService;
 import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
@@ -49,7 +51,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
    * @param <T> A class with fields annotated with CSVColumn
    */
 
-  private <T> void setFromCSVColumnAnnotations(T instance, CSVRecord record, String pivot) {
+  protected  <T> void setFromCSVColumnAnnotations(T instance, CSVRecord record, String pivot) {
     Class<?> tClass = instance.getClass();
     PropertyAccessor accessor = PropertyAccessorFactory.forBeanPropertyAccess(instance);
     for (Field field : tClass.getDeclaredFields()) {
@@ -102,46 +104,24 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     }
   }
 
-  public LocalDate convertToGFFDate(String stage) {
+  public LocalDate convertToGFFDate(String stage) throws FWMTCommonException {
     final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceService.findByFieldPeriod(stage);
     if (existsByFieldperiod.isPresent()) {
       final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
       return fieldPeriod.getEndDate();
     } else {
-      // BACKUP!!! THIS SHOULD NOT HAPPEN
-      int year = 2010 + Integer.parseInt(stage.substring(0, 1));
-      int month = Integer.parseInt(stage.substring(1, 3));
-      // if we are reissuing (month above 12), we minus 20 to get a normal month
-      if (month > 12) {
-        month = month - 20;
-        // add an extra month to the due date
-        month += 1;
-        // normalize the month in case we reached 13
-        month = ((month - 1) % 12) + 1;
-      }
-      assert month >= 1 && month < 12;
-      LocalDate initial = LocalDate.of(year, month, 1);
-      LocalDate endOfMonth = initial.withDayOfMonth(initial.lengthOfMonth());
-      return endOfMonth;
+      throw new FWMTCommonException(ExceptionCode.FWMT_JOB_SERVICE_0011);
     }
   }
 
   // technically, 'stage' here is the field period 'fp'
-  // TODO else block is not currently used, not currently required but will need to be fixed if used
-  public LocalDate convertToLFSDate(String stage) {
+  public LocalDate convertToLFSDate(String stage) throws FWMTCommonException {
     final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceService.findByFieldPeriod(stage);
     if (existsByFieldperiod.isPresent()) {
       final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
       return fieldPeriod.getEndDate();
     } else {
-      // BACKUP!!! THIS SHOULD NOT HAPPEN
-      int year = 2010 + Integer.parseInt(stage.substring(0, 1));
-      int quarter = Integer.parseInt(stage.substring(1, 2));
-      int week = stage.toLowerCase().charAt(2) - 'a' + 3;
-      int month = 1 + (3 * (quarter - 1));
-      int day = (7 * week) - 1;
-      LocalDate initial = LocalDate.of(year, month, day);
-      return initial;
+      throw new FWMTCommonException(ExceptionCode.FWMT_JOB_SERVICE_0011);
     }
   }
 
@@ -149,13 +129,14 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     return CSVFormat.DEFAULT.withHeader();
   }
 
+  // TODO possibly simplify this horribleness?
   @Override
   public Iterator<CSVParseResult<LegacySampleIngest>> parseLegacySample(Reader reader,
       LegacySampleSurveyType legacySampleSurveyType) throws IOException {
     CSVParser parser = getCSVFormat().parse(reader);
     return new CSVIterator<LegacySampleIngest>(parser) {
       @Override
-      public LegacySampleIngest ingest(CSVRecord record) {
+      public LegacySampleIngest ingest(CSVRecord record) throws FWMTCommonException {
         LegacySampleIngest instance = new LegacySampleIngest();
         switch (legacySampleSurveyType) {
         case LFS:
@@ -209,7 +190,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
       this.iter = parser.iterator();
     }
 
-    abstract public T ingest(CSVRecord record);
+    abstract public T ingest(CSVRecord record) throws FWMTCommonException;
 
     @Override
     public boolean hasNext() {
