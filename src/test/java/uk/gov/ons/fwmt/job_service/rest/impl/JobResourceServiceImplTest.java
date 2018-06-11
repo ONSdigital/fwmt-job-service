@@ -14,7 +14,6 @@ import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {ApplicationConfig.class})
-@Ignore
 public class JobResourceServiceImplTest {
 
     @Autowired
