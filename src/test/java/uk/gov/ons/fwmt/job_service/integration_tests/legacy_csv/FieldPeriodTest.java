@@ -16,18 +16,17 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@Ignore
 public class FieldPeriodTest {
 
   @Autowired
   private CSVParsingServiceImpl csvParsingServiceImpl;
   
-  void testGFFDate(LocalDate expected, String fieldPeriod) throws FWMTCommonException {
+  public void testGFFDate(LocalDate expected, String fieldPeriod) throws FWMTCommonException {
     LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
     assertEquals(expected, actual);
   }
 
-  void testLFSDate(LocalDate expected, String fieldPeriod) throws FWMTCommonException {
+  public void testLFSDate(LocalDate expected, String fieldPeriod) throws FWMTCommonException {
     LocalDate actual = csvParsingServiceImpl.convertToLFSDate(fieldPeriod);
     assertEquals(expected, actual);
   }

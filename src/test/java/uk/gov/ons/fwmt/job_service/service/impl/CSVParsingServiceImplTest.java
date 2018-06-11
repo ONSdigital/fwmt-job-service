@@ -36,9 +36,9 @@ import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyT
 @RunWith(MockitoJUnitRunner.class)
 public class CSVParsingServiceImplTest {
 
-  @InjectMocks CSVParsingServiceImpl csvParsingServiceImpl;
-  @Mock FieldPeriodResourceService fieldPeriodResourceService;
-  @Mock FieldPeriodDto fieldPeriodDto;
+  @InjectMocks private CSVParsingServiceImpl csvParsingServiceImpl;
+  @Mock private FieldPeriodResourceService fieldPeriodResourceService;
+  @Mock private FieldPeriodDto fieldPeriodDto;
   @Rule public ExpectedException expectedException = ExpectedException.none();
 
   @Test
@@ -200,7 +200,8 @@ public class CSVParsingServiceImplTest {
     Reader reader = new InputStreamReader(new FileInputStream(testFile));
 
     //When
-    csvParsingServiceImpl.parseLegacySample(reader,GFF);
+    //Then
+    assertNotNull(csvParsingServiceImpl.parseLegacySample(reader,GFF));
   }
 
   @Test
@@ -210,6 +211,7 @@ public class CSVParsingServiceImplTest {
     Reader reader = new InputStreamReader(new FileInputStream(testFile));
 
     //When
-    csvParsingServiceImpl.parseLegacySample(reader,LFS);
+    //Then
+    assertNotNull(csvParsingServiceImpl.parseLegacySample(reader,LFS));
   }
 }
