@@ -54,7 +54,7 @@ public class CSVParsingServiceImplTest {
     testIngestData.setLegacySampleSurveyType(GFF);
 
     //When
-    csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(),"GFF");
+    csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(), "GFF");
   }
 
   @Test(expected = NoSuchElementException.class)
