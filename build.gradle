@@ -5,6 +5,9 @@ apply plugin: 'idea'
 apply plugin: 'application'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'jacoco'
+apply plugin: "maven"
+apply plugin: "findbugs"
+apply plugin: "pmd"
 
 mainClassName = 'uk.gov.ons.fwmt.job_service.ApplicationConfig'
 
@@ -138,3 +141,25 @@ jacocoTestReport {
 }
 
 check.dependsOn jacocoTestReport
+
+findbugs {
+    ignoreFailures = false
+    sourceSets = [sourceSets.main]
+    reportsDir = file("$project.buildDir/reports/findbugs")
+    effort = "max"
+}
+
+pmd {
+    ignoreFailures = false
+    sourceSets = [sourceSets.main]
+    reportsDir = file("$project.buildDir/reports/pmd")
+    ruleSets = [
+            "java-basic", "java-braces"
+    ]
+}
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
+    }
+}
