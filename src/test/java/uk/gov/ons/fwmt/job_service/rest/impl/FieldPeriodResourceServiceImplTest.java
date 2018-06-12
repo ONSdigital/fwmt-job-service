@@ -13,25 +13,28 @@ import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
 
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 
 @RunWith(MockitoJUnitRunner.class)
 public class FieldPeriodResourceServiceImplTest {
 
   @InjectMocks private FieldPeriodResourceServiceImpl fieldPeriodResourceService;
-  @Mock RestTemplate restTemplate;
-  @Mock ResponseEntity<FieldPeriodDto> responseEntity;
+  @Mock private RestTemplate restTemplate;
+  @Mock private ResponseEntity<FieldPeriodDto> responseEntity;
 
   @Test
   public void findByFieldPeriod() {
     //Given
     String fieldPeriod = "807";
     FieldPeriodDto expectedFPDto = new FieldPeriodDto();
-    when(restTemplate.exchange(any(),any(),any(),eq(FieldPeriodDto.class),eq(fieldPeriod))).thenReturn(responseEntity);
+    when(restTemplate.exchange(any(), any(), any(), eq(FieldPeriodDto.class), eq(fieldPeriod)))
+        .thenReturn(responseEntity);
     when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
     when(responseEntity.getBody()).thenReturn(expectedFPDto);
 
@@ -40,15 +43,16 @@ public class FieldPeriodResourceServiceImplTest {
 
     //Then
     assertTrue(result.isPresent());
-    assertEquals(expectedFPDto,result.get());
+    assertEquals(expectedFPDto, result.get());
+    verify(restTemplate).exchange(any(), any(), any(), eq(FieldPeriodDto.class), eq(fieldPeriod));
   }
 
   @Test
   public void findByFieldPeriodAndThrowHttpClientErrorException() {
     //Given
     String fieldPeriod = "807";
-    FieldPeriodDto expectedFPDto = new FieldPeriodDto();
-    when(restTemplate.exchange(any(),any(),any(),eq(FieldPeriodDto.class),eq(fieldPeriod))).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+    when(restTemplate.exchange(any(), any(), any(), eq(FieldPeriodDto.class), eq(fieldPeriod)))
+        .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     //When
     Optional<FieldPeriodDto> result = fieldPeriodResourceService.findByFieldPeriod(fieldPeriod);
