@@ -33,7 +33,7 @@ public class UserResourceServiceImplTest {
     String testAuthNo = "1111";
     UserDto expectedUserDto = new UserDto();
 
-    when(restTemplate.exchange(any(), any(), any(), eq(UserDto.class), eq(testAuthNo))).thenReturn(responseEntity);
+    when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo))).thenReturn(responseEntity);
     when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
     when(responseEntity.getBody()).thenReturn(expectedUserDto);
 
@@ -42,14 +42,14 @@ public class UserResourceServiceImplTest {
 
     //Then
     assertTrue(result.isPresent());
-    verify(restTemplate).exchange(any(), any(), any(), eq(UserDto.class), eq(testAuthNo));
+    verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
   }
 
   @Test
   public void authNoNotFound() {
     //Given
     String testAuthNo = "1111";
-    when(restTemplate.exchange(any(), any(), any(), eq(UserDto.class), eq(testAuthNo)))
+    when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     //When
@@ -57,7 +57,7 @@ public class UserResourceServiceImplTest {
 
     //Then
     assertFalse(result.isPresent());
-    verify(restTemplate).exchange(any(), any(), any(), eq(UserDto.class), eq(testAuthNo));
+    verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
   }
 
   @Test
@@ -65,7 +65,7 @@ public class UserResourceServiceImplTest {
     //Given
     String testAltAuth = "2222";
     UserDto expectedUserDto = new UserDto();
-    when(restTemplate.exchange(any(), any(), any(), eq(UserDto.class), eq(testAltAuth))).thenReturn(responseEntity);
+    when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAltAuth))).thenReturn(responseEntity);
     when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
     when(responseEntity.getBody()).thenReturn(expectedUserDto);
 
@@ -74,14 +74,14 @@ public class UserResourceServiceImplTest {
 
     //Then
     assertTrue(result.isPresent());
-    verify(restTemplate).exchange(any(), any(), any(), eq(UserDto.class), eq(testAltAuth));
+    verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAltAuth));
   }
 
   @Test
   public void cannotFindByAlternateAuthNo() {
     //Given
     String testAltAuth = "2222";
-    when(restTemplate.exchange(any(), any(), any(), eq(UserDto.class), eq(testAltAuth)))
+    when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAltAuth)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     //When
@@ -89,7 +89,7 @@ public class UserResourceServiceImplTest {
 
     //Then
     assertFalse(result.isPresent());
-    verify(restTemplate).exchange(any(), any(), any(), eq(UserDto.class), eq(testAltAuth));
+    verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAltAuth));
   }
 
   @Test
@@ -99,7 +99,7 @@ public class UserResourceServiceImplTest {
     Boolean isActive = true;
     UserDto expectedUserDto = new UserDto();
     expectedUserDto.setActive(true);
-    when(restTemplate.exchange(any(), any(), any(), eq(UserDto.class), eq(testAuthNo))).thenReturn(responseEntity);
+    when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo))).thenReturn(responseEntity);
     when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
     when(responseEntity.getBody()).thenReturn(expectedUserDto);
 
@@ -108,7 +108,7 @@ public class UserResourceServiceImplTest {
 
     //Then
     assertTrue(result);
-    verify(restTemplate).exchange(any(), any(), any(), eq(UserDto.class), eq(testAuthNo));
+    verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
   }
 
   @Test
@@ -117,7 +117,7 @@ public class UserResourceServiceImplTest {
     //Given
     String testAuthNo = "1111";
     Boolean isActive = false;
-    when(restTemplate.exchange(any(), any(), any(), eq(UserDto.class), eq(testAuthNo)))
+    when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     //When
@@ -125,7 +125,7 @@ public class UserResourceServiceImplTest {
 
     //Then
     assertFalse(result);
-    verify(restTemplate).exchange(any(), any(), any(), eq(UserDto.class), eq(testAuthNo));
+    verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
   }
 
   @Test
@@ -133,7 +133,7 @@ public class UserResourceServiceImplTest {
     //Given
     String testAuthNo = "1111";
     Boolean isActive = true;
-    when(restTemplate.exchange(any(), any(), any(), eq(UserDto.class), eq(testAuthNo)))
+    when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     //When
@@ -141,7 +141,7 @@ public class UserResourceServiceImplTest {
 
     //Then
     assertFalse(result);
-    verify(restTemplate).exchange(any(), any(), any(), eq(UserDto.class), eq(testAuthNo));
+    verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
   }
 
   @Test
@@ -151,7 +151,7 @@ public class UserResourceServiceImplTest {
     Boolean isActive = true;
     UserDto expectedUserDto = new UserDto();
     expectedUserDto.setActive(true);
-    when(restTemplate.exchange(any(), any(), any(), eq(UserDto.class), eq(testAlthNo))).thenReturn(responseEntity);
+    when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAlthNo))).thenReturn(responseEntity);
     when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
     when(responseEntity.getBody()).thenReturn(expectedUserDto);
 
@@ -160,7 +160,7 @@ public class UserResourceServiceImplTest {
 
     //Then
     assertTrue(result);
-    verify(restTemplate).exchange(any(), any(), any(), eq(UserDto.class), eq(testAlthNo));
+    verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAlthNo));
   }
 
   @Test
@@ -168,7 +168,7 @@ public class UserResourceServiceImplTest {
     //Given
     String testAlthNo = "1111";
     Boolean isActive = false;
-    when(restTemplate.exchange(any(), any(), any(), eq(UserDto.class), eq(testAlthNo)))
+    when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAlthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     //When
@@ -176,7 +176,7 @@ public class UserResourceServiceImplTest {
 
     //Then
     assertFalse(result);
-    verify(restTemplate).exchange(any(), any(), any(), eq(UserDto.class), eq(testAlthNo));
+    verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAlthNo));
   }
 
   @Test
@@ -184,7 +184,7 @@ public class UserResourceServiceImplTest {
     //Given
     String testAlthNo = "1111";
     Boolean isActive = true;
-    when(restTemplate.exchange(any(), any(), any(), eq(UserDto.class), eq(testAlthNo)))
+    when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAlthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     //When
@@ -192,6 +192,6 @@ public class UserResourceServiceImplTest {
 
     //Then
     assertFalse(result);
-    verify(restTemplate).exchange(any(), any(), any(), eq(UserDto.class), eq(testAlthNo));
+    verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAlthNo));
   }
 }
