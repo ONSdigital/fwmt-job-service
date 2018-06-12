@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 @Ignore
 public class JobResourceServiceImplTest {
 
-    @InjectMocks JobResourceService jobResourceService;
+    @InjectMocks private JobResourceService jobResourceService;
 
     @Test
     public void findByTmJobId() {

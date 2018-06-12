@@ -128,7 +128,6 @@ public class UserResourceServiceImplTest {
     //Given
     String testAuthNo = "1111";
     Boolean isActive = true;
-    UserDto userDto = new UserDto();
     when(restTemplate.exchange(any(),any(),any(),eq(UserDto.class),eq(testAuthNo))).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     //When
