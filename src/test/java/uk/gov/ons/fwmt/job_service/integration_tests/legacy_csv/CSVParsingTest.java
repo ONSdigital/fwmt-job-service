@@ -22,7 +22,6 @@ import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
-import uk.gov.ons.fwmt.job_service.service.impl.CSVParsingServiceImpl;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

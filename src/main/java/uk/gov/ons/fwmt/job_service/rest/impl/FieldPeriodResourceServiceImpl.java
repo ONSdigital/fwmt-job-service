@@ -1,5 +1,6 @@
 package uk.gov.ons.fwmt.job_service.rest.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
@@ -15,6 +16,7 @@ import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
 import javax.annotation.PostConstruct;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class FieldPeriodResourceServiceImpl implements FieldPeriodResourceService {
 

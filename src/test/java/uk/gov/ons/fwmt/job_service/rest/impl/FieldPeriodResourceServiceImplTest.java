@@ -16,15 +16,15 @@ import java.util.Optional;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 
 @RunWith(MockitoJUnitRunner.class)
 public class FieldPeriodResourceServiceImplTest {
 
   @InjectMocks private FieldPeriodResourceServiceImpl fieldPeriodResourceService;
-  @Mock RestTemplate restTemplate;
-  @Mock ResponseEntity<FieldPeriodDto> responseEntity;
+  @Mock private RestTemplate restTemplate;
+  @Mock private ResponseEntity<FieldPeriodDto> responseEntity;
 
   @Test
   public void findByFieldPeriod() {
@@ -41,13 +41,13 @@ public class FieldPeriodResourceServiceImplTest {
     //Then
     assertTrue(result.isPresent());
     assertEquals(expectedFPDto,result.get());
+    verify(restTemplate).exchange(any(),any(),any(),eq(FieldPeriodDto.class),eq(fieldPeriod));
   }
 
   @Test
   public void findByFieldPeriodAndThrowHttpClientErrorException() {
     //Given
     String fieldPeriod = "807";
-    FieldPeriodDto expectedFPDto = new FieldPeriodDto();
     when(restTemplate.exchange(any(),any(),any(),eq(FieldPeriodDto.class),eq(fieldPeriod))).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     //When
