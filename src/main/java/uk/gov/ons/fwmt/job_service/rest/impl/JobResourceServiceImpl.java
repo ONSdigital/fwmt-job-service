@@ -7,7 +7,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.support.BasicAuthorizationInterceptor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -19,15 +18,22 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class JobResourceServiceImpl implements JobResourceService {
-
   @Autowired
   private transient RestTemplate restTemplate;
-  @Value("${service.resource.jobs.operation.find.jobUrl}")
-  private transient String findURL;
-  @Value("${service.resource.jobs.operation.create.url}")
-  private transient String createURL;
-  @Value("${service.resource.jobs.operation.update.url}")
+
+  private transient String findUrl;
+  private transient String createUrl;
   private transient String updateUrl;
+
+  public JobResourceServiceImpl(
+      @Value("${service.resource.baseUrl}") String baseUrl,
+      @Value("${service.resource.operation.jobs.find.path}") String findPath,
+      @Value("${service.resource.operation.jobs.create.path}") String createPath,
+      @Value("${service.resource.operation.jobs.update.path}") String updatePath) {
+    findUrl = baseUrl + findPath;
+    createUrl = baseUrl + createPath;
+    updateUrl = baseUrl + updatePath;
+  }
 
   @Override
   public boolean existsByTmJobId(String tmJobId) {
@@ -38,52 +44,46 @@ public class JobResourceServiceImpl implements JobResourceService {
   @Override
   public boolean existsByTmJobIdAndLastAuthNo(String tmJobId, String lastAuthNo) {
     final Optional<JobDto> jobDto = findByTmJobId(tmJobId);
-    if (jobDto.isPresent()) {
-      return jobDto.get().getLastAuthNo().equals(lastAuthNo);
-    }
-    return false;
+    return jobDto.map(jobDto1 -> jobDto1.getLastAuthNo().equals(lastAuthNo)).orElse(false);
   }
 
   @Override
   public Optional<JobDto> findByTmJobId(String tmJobId) {
+    log.info("findByTmJobId: {}", tmJobId);
     try {
-      final ResponseEntity<JobDto> jobDtoResponseEntity = restTemplate
-          .exchange(findURL, HttpMethod.GET, null, JobDto.class, tmJobId);
-      if (jobDtoResponseEntity != null && jobDtoResponseEntity.getStatusCode().equals(HttpStatus.OK)) {
+      final ResponseEntity<JobDto> jobDtoResponseEntity = restTemplate.getForEntity(findUrl, JobDto.class, tmJobId);
+      if (jobDtoResponseEntity.getStatusCode().equals(HttpStatus.OK)) {
         return Optional.ofNullable(jobDtoResponseEntity.getBody());
       }
     } catch (HttpClientErrorException httpClientErrorException) {
-      //TODO log error correctly
-      log.error("findByTmJobId failed with error code: {}", httpClientErrorException.getMessage());
+      log.error("An error occurred while communicating with the resource service", httpClientErrorException);
     }
     return Optional.empty();
   }
 
   @Override
   public boolean createJob(JobDto jobDto) {
+    log.info("CreateJob: {}", jobDto.toString());
     try {
       final HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
-      log.info("CreateJob :{}", jobDto.toString());
-      final ResponseEntity jobDtoResponseEntity = restTemplate
-          .exchange(createURL, HttpMethod.POST, request, Void.class, jobDto);
-      return jobDtoResponseEntity.getStatusCode().equals(HttpStatus.CREATED);
+      final ResponseEntity responseEntity = restTemplate.postForEntity(createUrl, request, Void.class, jobDto);
+      return responseEntity.getStatusCode().equals(HttpStatus.CREATED);
     } catch (HttpClientErrorException httpClientErrorException) {
-      //TODO log error correctly
-      log.error("createJob failed with error code: {}", httpClientErrorException.getMessage());
+      log.error("An error occurred while communicating with the resource service", httpClientErrorException);
     }
     return false;
   }
 
+  // TODO can we use the restTemplate.put method?
   @Override
   public boolean updateJob(JobDto jobDto) {
+    log.info("UpdateJob: {}", jobDto.toString());
     try {
       final HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
-      log.info("UpdateJob :{}", jobDto.toString());
       final ResponseEntity jobDtoResponseEntity = restTemplate.exchange(updateUrl, HttpMethod.PUT, request, Void.class);
       return jobDtoResponseEntity.getStatusCode().equals(HttpStatus.OK);
     } catch (HttpClientErrorException httpClientErrorException) {
-      //TODO log error
-      log.error("updateJob failed with error code: {}", httpClientErrorException.getMessage());
+      log.error("An error occurred while communicating with the resource service", httpClientErrorException);
     }
     return false;
   }

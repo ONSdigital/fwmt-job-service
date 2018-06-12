@@ -10,9 +10,6 @@ server:
   contextPath: /jobs
   port: 9091
 
-project:
-  basedir: ${basedir}
-
 spring:
   application:
     name: fwmt-job-service
@@ -39,13 +36,13 @@ logging:
     file: "%d{yyyy-MMM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{100} - %msg%n"
 
 security.user:
-  name: user
-  password: password
+  name: "user"
+  password: "password"
 
 totalmobile:
-  username: "..."
-  password: "..."
-  url: "https://ons.totalmobile.co.uk/Live"
+  username: ""
+  password: ""
+  url: ""
   message-queue-path: "/Services/TM/v20/Messaging/MessageQueueWs.asmx"
   message-queue-wsdl-path: "src/main/resources/wsdl/Messaging_MessageQueueWs.wsdl"
   message-queue-namespace: "http://schemas.consiliumtechnologies.com/wsdl/mobile/2007/07/messaging/"
@@ -59,20 +56,20 @@ service:
   resource:
     username: "user"
     password: "password"
-    users:
-      operation:
+    baseUrl: "http://localhost:9093/resources"
+    operation:
+      users:
         find:
-          authUrl: "http://localhost:9095/users/auth/{authNo}"
-          altAuthUrl: "http://localhost:9095/users/alternative/{altAuthNo}"
-    jobs:
-      operation:
+          path: "/users/auth/{authNo}"
+        findAlt:
+          path: "/users/alternative/{altAuthNo}"
+      jobs:
         find:
-          jobUrl: "http://localhost:9095/jobs/{authNo}"
+          path: "/jobs/{authNo}"
         create:
-          url: "http://localhost:9095/jobs/"
+          path: "/jobs/"
         update:
-          url: "http://localhost:9095/jobs/"
-    fieldPeriod:
-      operation:
+          path: "/jobs/"
+      fieldPeriods:
         find:
-          fieldPeriodUrl: "http://localhost:9095/fieldperiods/{fieldPeriod}"
+          path: "/fieldPeriods/{fieldPeriod}"
