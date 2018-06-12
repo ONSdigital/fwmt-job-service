@@ -5,9 +5,7 @@ apply plugin: 'idea'
 apply plugin: 'application'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'jacoco'
-apply plugin: "maven"
 apply plugin: "findbugs"
-apply plugin: "pmd"
 
 mainClassName = 'uk.gov.ons.fwmt.job_service.ApplicationConfig'
 
@@ -149,14 +147,7 @@ findbugs {
     effort = "max"
 }
 
-pmd {
-    ignoreFailures = true
-    sourceSets = [sourceSets.main]
-    reportsDir = file("$project.buildDir/reports/pmd")
-    ruleSets = [
-            "java-clone","java-codesize","java-coupling","java-design","java-empty","java-finalizers","java-imports","java-optimizations","java-strictexception","java-strings","java-typeresolution","java-unnecessary","java-unusedcode"
-    ]
-}
+
 tasks.withType(FindBugs) {
     reports {
         xml.enabled = false

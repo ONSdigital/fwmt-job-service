@@ -22,15 +22,8 @@ public class FieldPeriodResourceServiceImpl implements FieldPeriodResourceServic
 
   @Autowired
   private transient RestTemplate restTemplate;
-  @Autowired
-  private transient BasicAuthorizationInterceptor basicInterceptor;
   @Value("${service.resource.fieldPeriod.operation.find.fieldPeriodUrl}")
   private transient String findURL;
-
-  @PostConstruct
-  private void initialize() {
-    restTemplate.getInterceptors().add(basicInterceptor);
-  }
 
   @Override
   public Optional<FieldPeriodDto> findByFieldPeriod(final String fieldPeriod) {

@@ -53,12 +53,7 @@ public class ApplicationConfig {
 
   @Bean
   public RestTemplate restTemplate(RestTemplateBuilder builder) {
-    return builder.build();
-  }
-
-  @Bean
-  public BasicAuthorizationInterceptor basicInterceptor(){
-    return new BasicAuthorizationInterceptor(userName, password);
+    return builder.basicAuthorization(userName, password).build();
   }
 
 }
