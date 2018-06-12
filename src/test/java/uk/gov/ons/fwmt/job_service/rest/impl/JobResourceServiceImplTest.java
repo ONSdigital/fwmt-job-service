@@ -2,30 +2,188 @@ package uk.gov.ons.fwmt.job_service.rest.impl;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import java.util.Optional;
 
-@Ignore
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@RunWith(MockitoJUnitRunner.class)
 public class JobResourceServiceImplTest {
 
-  @InjectMocks private JobResourceService jobResourceService;
+  @InjectMocks private JobResourceServiceImpl jobResourceService;
+  @Mock private RestTemplate restTemplate;
+  @Mock private ResponseEntity responseEntity;
+
+  @Test
+  public void existsByTmJobId() {
+    //Given
+    String tmJobId = "testID";
+    JobDto expectedJobDto = new JobDto(tmJobId, null);
+    when(restTemplate.exchange(any(), any(), any(), eq(JobDto.class), eq(tmJobId))).thenReturn(responseEntity);
+    when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+    when(responseEntity.getBody()).thenReturn(expectedJobDto);
+
+    //When
+    Boolean result = jobResourceService.existsByTmJobId(tmJobId);
+
+    //Then
+    assertTrue(result);
+  }
+
+  @Test
+  public void tmJobIDExists() {
+    //Given
+    String tmJobId = "testID";
+    JobDto expectedJobDto = new JobDto(tmJobId, null);
+    when(restTemplate.exchange(any(), any(), any(), eq(JobDto.class), eq(tmJobId))).thenReturn(responseEntity);
+    when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+    when(responseEntity.getBody()).thenReturn(expectedJobDto);
+
+    //When
+    Optional<JobDto> jobDto = jobResourceService.findByTmJobId(tmJobId);
+
+    //Then
+    assertTrue(jobDto.isPresent());
+  }
+
+  // TODO tmJobIDNotExists -- Possibly already tested lower down
+
+  @Test
+  public void existsByTmJobIdAndLastAuthNo() {
+    //Given
+    String tmJobId = "testID";
+    String lastAuthNo = "lastAuth";
+    JobDto expectedJobDto = new JobDto(tmJobId, lastAuthNo);
+    when(restTemplate.exchange(any(), any(), any(), eq(JobDto.class), eq(tmJobId))).thenReturn(responseEntity);
+    when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+    when(responseEntity.getBody()).thenReturn(expectedJobDto);
+
+    //When
+    boolean result = jobResourceService.existsByTmJobIdAndLastAuthNo(tmJobId, lastAuthNo);
+
+    //Then
+    assertTrue(result);
+  }
+
+  @Test
+  public void doesNotExistsByTmJobIdAndLastAuthNo() {
+    //Given
+    String tmJobId = "testID";
+    String lastAuthNo = "lastAuth";
+    JobDto expectedJobDto = new JobDto(tmJobId, lastAuthNo);
+    when(restTemplate.exchange(any(), any(), any(), eq(JobDto.class), eq(tmJobId))).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+
+    //When
+    boolean result = jobResourceService.existsByTmJobIdAndLastAuthNo(tmJobId, lastAuthNo);
+
+    //Then
+    assertFalse(result);
+    verify(restTemplate).exchange(any(),any(), any(), eq(JobDto.class), eq(tmJobId));
+  }
 
   @Test
   public void findByTmJobId() {
-    assertEquals("1122", jobResourceService.findByTmJobId("quota_1-addressno_1-801").get().getTmJobId());
+    //Given
+    String tmJobId = "testID";
+    JobDto expectedJobDto = new JobDto(tmJobId, null);
+    when(restTemplate.exchange(any(), any(), any(), eq(JobDto.class), eq(tmJobId))).thenThrow(
+        new HttpClientErrorException(
+            HttpStatus.BAD_REQUEST));
+
+    //When
+    Optional<JobDto> result = jobResourceService.findByTmJobId(tmJobId);
+
+    //Then
+    assertFalse(result.isPresent());
+    verify(restTemplate).exchange(any(),any(), any(), eq(JobDto.class), eq(tmJobId));
   }
 
   @Test
   public void createJob() {
-    assertTrue(jobResourceService.createJob(new JobDto("quota_1-addressno_1-801", "testUser")));
+    //Given
+    String tmJobId = "testID";
+    String lastAuthNo = "lastAuth";
+    JobDto jobDto = new JobDto(tmJobId, lastAuthNo);
+    HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
+    when(restTemplate.exchange(any(), any(), eq(request), eq(Void.class), eq(jobDto))).thenReturn(responseEntity);
+    when(responseEntity.getStatusCode()).thenReturn(HttpStatus.CREATED);
+
+    //When
+    Boolean result = jobResourceService.createJob(jobDto);
+
+    //Then
+    verify(restTemplate).exchange(any(), any(), eq(request), eq(Void.class), eq(jobDto));
+    assertTrue(result);
   }
 
   @Test
+  public void shouldFailToCreatJobAndThrowHttpClientErrorException() {
+    //Given
+    String tmJobId = "testID";
+    String lastAuthNo = "lastAuth";
+    JobDto jobDto = new JobDto(tmJobId, lastAuthNo);
+    HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
+    when(restTemplate.exchange(any(), any(), eq(request), eq(Void.class), eq(jobDto)))
+        .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+
+    //When
+    Boolean result = jobResourceService.createJob(jobDto);
+
+    //Then
+    verify(restTemplate).exchange(any(), any(), eq(request), eq(Void.class), eq(jobDto));
+    assertFalse(result);
+  }
+
+  @Ignore("Test fails - NullPointerException")
+  @Test
   public void updateJob() {
-    assertEquals(true, jobResourceService.updateJob(new JobDto("testA2", "2235")));
+    //Given
+    String tmJobId = "testID";
+    String lastAuthNo = "lastAuth";
+    JobDto jobDto = new JobDto(tmJobId, lastAuthNo);
+    HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
+    when(restTemplate.exchange(any(), any(), any(), eq(Void.class))).thenReturn(responseEntity);
+    when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+
+    //When
+    Boolean result = jobResourceService.updateJob(jobDto);
+
+    //Then
+    verify(restTemplate).exchange(any(), any(), eq(request), eq(Void.class));
+    assertTrue(result);
+  }
+
+  @Ignore("Test fails - NullPointerException")
+  @Test
+  public void shouldFailToUpdateJobAndThrowHttpClientErrorException() {
+    //Given
+    String tmJobId = "testID";
+    String lastAuthNo = "lastAuth";
+    JobDto jobDto = new JobDto(tmJobId, lastAuthNo);
+    HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
+    when(restTemplate.exchange(any(), any(), eq(request), eq(Void.class)))
+        .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+
+    //When
+    Boolean result = jobResourceService.updateJob(jobDto);
+
+    //Then
+    verify(restTemplate).exchange(any(), any(), eq(request), eq(Void.class));
+    assertFalse(result);
   }
 }
