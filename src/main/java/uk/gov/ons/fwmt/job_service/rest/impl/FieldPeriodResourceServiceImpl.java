@@ -16,15 +16,17 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class FieldPeriodResourceServiceImpl implements FieldPeriodResourceService {
-  @Autowired
   private transient RestTemplate restTemplate;
 
   private transient String findUrl;
 
+  @Autowired
   public FieldPeriodResourceServiceImpl(
+      RestTemplate restTemplate,
       @Value("${service.resource.baseUrl}") String baseUrl,
       @Value("${service.resource.operation.fieldPeriods.find.path}") String findPath) {
-    findUrl = baseUrl + findPath;
+    this.restTemplate = restTemplate;
+    this.findUrl = baseUrl + findPath;
   }
 
   @Override

@@ -16,18 +16,20 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class UserResourceServiceImpl implements UserResourceService {
-  @Autowired
   private transient RestTemplate restTemplate;
 
   private transient String findUrl;
   private transient String findAltUrl;
 
+  @Autowired
   public UserResourceServiceImpl(
+      RestTemplate restTemplate,
       @Value("${service.resource.baseUrl}") String baseUrl,
       @Value("${service.resource.operation.users.find.path}") String findPath,
       @Value("${service.resource.operation.users.findAlt.path}") String findAltPath) {
-    findUrl = baseUrl + findPath;
-    findAltUrl = baseUrl + findAltPath;
+    this.restTemplate = restTemplate;
+    this.findUrl = baseUrl + findPath;
+    this.findAltUrl = baseUrl + findAltPath;
   }
 
   @Override
