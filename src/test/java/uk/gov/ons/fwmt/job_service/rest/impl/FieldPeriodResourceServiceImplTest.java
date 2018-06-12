@@ -13,7 +13,9 @@ import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
 
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -31,7 +33,8 @@ public class FieldPeriodResourceServiceImplTest {
     //Given
     String fieldPeriod = "807";
     FieldPeriodDto expectedFPDto = new FieldPeriodDto();
-    when(restTemplate.exchange(any(),any(),any(),eq(FieldPeriodDto.class),eq(fieldPeriod))).thenReturn(responseEntity);
+    when(restTemplate.exchange(any(), any(), any(), eq(FieldPeriodDto.class), eq(fieldPeriod)))
+        .thenReturn(responseEntity);
     when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
     when(responseEntity.getBody()).thenReturn(expectedFPDto);
 
@@ -40,15 +43,16 @@ public class FieldPeriodResourceServiceImplTest {
 
     //Then
     assertTrue(result.isPresent());
-    assertEquals(expectedFPDto,result.get());
-    verify(restTemplate).exchange(any(),any(),any(),eq(FieldPeriodDto.class),eq(fieldPeriod));
+    assertEquals(expectedFPDto, result.get());
+    verify(restTemplate).exchange(any(), any(), any(), eq(FieldPeriodDto.class), eq(fieldPeriod));
   }
 
   @Test
   public void findByFieldPeriodAndThrowHttpClientErrorException() {
     //Given
     String fieldPeriod = "807";
-    when(restTemplate.exchange(any(),any(),any(),eq(FieldPeriodDto.class),eq(fieldPeriod))).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+    when(restTemplate.exchange(any(), any(), any(), eq(FieldPeriodDto.class), eq(fieldPeriod)))
+        .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     //When
     Optional<FieldPeriodDto> result = fieldPeriodResourceService.findByFieldPeriod(fieldPeriod);
