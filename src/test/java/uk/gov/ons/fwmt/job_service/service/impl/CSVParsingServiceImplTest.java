@@ -26,7 +26,8 @@ import java.time.LocalDate;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
@@ -36,10 +37,10 @@ import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyT
 @RunWith(MockitoJUnitRunner.class)
 public class CSVParsingServiceImplTest {
 
+  @Rule public ExpectedException expectedException = ExpectedException.none();
   @InjectMocks private CSVParsingServiceImpl csvParsingServiceImpl;
   @Mock private FieldPeriodResourceService fieldPeriodResourceService;
   @Mock private FieldPeriodDto fieldPeriodDto;
-  @Rule public ExpectedException expectedException = ExpectedException.none();
 
   @Test
   public void setFromCSVColumnAnnotations() throws IOException {
@@ -58,7 +59,7 @@ public class CSVParsingServiceImplTest {
     csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(), "GFF");
 
     //Then
-    assertEquals(expected,testIngestData.getTla());
+    assertEquals(expected, testIngestData.getTla());
   }
 
   @Test(expected = NoSuchElementException.class)
@@ -74,7 +75,7 @@ public class CSVParsingServiceImplTest {
     testIngestData.setLegacySampleSurveyType(GFF);
 
     //When
-    csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(),"GFF");
+    csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(), "GFF");
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -90,7 +91,7 @@ public class CSVParsingServiceImplTest {
     testIngestData.setLegacySampleSurveyType(GFF);
 
     //When
-    csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(),"hdsjf");
+    csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(), "hdsjf");
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -106,7 +107,7 @@ public class CSVParsingServiceImplTest {
     testIngestData.setLegacySampleSurveyType(GFF);
 
     //When
-    csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(),"GFF");
+    csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(), "GFF");
   }
 
   @Test
@@ -118,7 +119,7 @@ public class CSVParsingServiceImplTest {
     CSVParser csvParser = CSVFormat.DEFAULT.withHeader().parse(reader);
 
     //When
-    String result = csvParsingServiceImpl.constructTmJobId(csvParser.iterator().next(),GFF);
+    String result = csvParsingServiceImpl.constructTmJobId(csvParser.iterator().next(), GFF);
 
     //Then
     assertNotNull(result);
@@ -133,7 +134,7 @@ public class CSVParsingServiceImplTest {
     CSVParser csvParser = CSVFormat.DEFAULT.withHeader().parse(reader);
 
     //When
-    String result = csvParsingServiceImpl.constructTmJobId(csvParser.iterator().next(),LFS);
+    String result = csvParsingServiceImpl.constructTmJobId(csvParser.iterator().next(), LFS);
 
     //Then
     assertNotNull(result);
@@ -146,7 +147,7 @@ public class CSVParsingServiceImplTest {
     int year = 2018;
     int month = 7;
     int day = 1;
-    LocalDate date = LocalDate.of(year,month,day);
+    LocalDate date = LocalDate.of(year, month, day);
     when(fieldPeriodResourceService.findByFieldPeriod(any())).thenReturn(Optional.of(fieldPeriodDto));
     when(fieldPeriodDto.getEndDate()).thenReturn(date);
 
@@ -154,7 +155,7 @@ public class CSVParsingServiceImplTest {
     LocalDate result = csvParsingServiceImpl.convertToGFFDate(stage);
 
     //Then
-    assertEquals(date,result);
+    assertEquals(date, result);
   }
 
   @Test
@@ -175,7 +176,7 @@ public class CSVParsingServiceImplTest {
     int year = 2018;
     int month = 7;
     int day = 1;
-    LocalDate date = LocalDate.of(year,month,day);
+    LocalDate date = LocalDate.of(year, month, day);
     when(fieldPeriodResourceService.findByFieldPeriod(any())).thenReturn(Optional.of(fieldPeriodDto));
     when(fieldPeriodDto.getEndDate()).thenReturn(date);
 
@@ -183,7 +184,7 @@ public class CSVParsingServiceImplTest {
     LocalDate result = csvParsingServiceImpl.convertToLFSDate(fieldPeriod);
 
     //Then
-    assertEquals(date,result);
+    assertEquals(date, result);
   }
 
   @Test
@@ -205,7 +206,7 @@ public class CSVParsingServiceImplTest {
 
     //When
     //Then
-    assertNotNull(csvParsingServiceImpl.parseLegacySample(reader,GFF));
+    assertNotNull(csvParsingServiceImpl.parseLegacySample(reader, GFF));
   }
 
   @Test
@@ -216,6 +217,6 @@ public class CSVParsingServiceImplTest {
 
     //When
     //Then
-    assertNotNull(csvParsingServiceImpl.parseLegacySample(reader,LFS));
+    assertNotNull(csvParsingServiceImpl.parseLegacySample(reader, LFS));
   }
 }

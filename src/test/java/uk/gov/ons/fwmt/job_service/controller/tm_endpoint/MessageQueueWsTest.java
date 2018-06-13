@@ -1,11 +1,36 @@
 package uk.gov.ons.fwmt.job_service.controller.tm_endpoint;
 
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.*;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.DeleteMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.GetMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.QueryMessagesResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.ResetMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.RetryMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendAddFolioContentRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendAddJobTasksRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendAddVisitTasksRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateAppointmentRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateBulletinRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreatePatientRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateReferralRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateVisitRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendDeleteBulletinRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendDeleteJobRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendDischargeReferralRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendForceRecallVisitRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendGenerateFolioContentRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendSaveAvailabilityRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateJobHeaderRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateReferralRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateVisitHeaderRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateVisitScheduleRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.TransformAndSendResponse;
 import org.junit.Test;
 
 import javax.xml.bind.JAXBElement;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 public class MessageQueueWsTest {
 

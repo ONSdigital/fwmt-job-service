@@ -12,14 +12,15 @@ import org.junit.Test;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class OutgoingWsTest {
 
   OutgoingWs outgoingWs = new OutgoingWs();
 
-  public <T> JAXBElement<T> getElement(Class<T> inputClass){
-    JAXBElement<T> result = new JAXBElement(QName.valueOf(""), inputClass,null,null);
+  public <T> JAXBElement<T> getElement(Class<T> inputClass) {
+    JAXBElement<T> result = new JAXBElement(QName.valueOf(""), inputClass, null, null);
     return result;
   }
 
@@ -108,7 +109,6 @@ public class OutgoingWsTest {
     //When
     JAXBElement<SubmitLocationRequest> result = outgoingWs.sendSubmitLocationRequestOutput(
         getElement(SubmitLocationRequest.class));
-
 
     //Then
     assertNotNull(result);
