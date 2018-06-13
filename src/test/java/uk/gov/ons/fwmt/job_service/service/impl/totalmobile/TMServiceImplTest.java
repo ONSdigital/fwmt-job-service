@@ -1,12 +1,12 @@
 package uk.gov.ons.fwmt.job_service.service.impl.totalmobile;
 
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.DeleteMessageRequest;
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.ObjectFactory;
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.QueryMessagesRequest;
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendAddJobTasksRequestMessage;
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendMessageRequest;
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.DeleteMessageRequest;
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessageResponse;
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.QueryMessagesResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendAddJobTasksRequestMessage;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendMessageRequest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class TMServiceImplTest {
     MockitoAnnotations.initMocks(this);
   }
 
-  @Test(expected=IllegalArgumentException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void sOAPLookupReceivesAMessageThatDoesNotMatchTM() {
     //When
     tmServiceImpl.lookupSOAPAction(Object.class);
@@ -58,7 +58,7 @@ public class TMServiceImplTest {
   }
 
   @Test
-  public void sOAPLookupReceivesNonMappedRequestMessage(){
+  public void sOAPLookupReceivesNonMappedRequestMessage() {
     //Given
     String expectedResult = "expectedNamespaceSendAddJobTasksRequestMessage";
 
@@ -66,7 +66,7 @@ public class TMServiceImplTest {
     String result = tmServiceImpl.lookupSOAPAction(SendAddJobTasksRequestMessage.class);
 
     //Then
-    assertEquals(expectedResult,result);
+    assertEquals(expectedResult, result);
   }
 
   @Test
@@ -114,7 +114,7 @@ public class TMServiceImplTest {
     Object result = tmServiceImpl.jaxbUnwrap(response);
 
     //Then
-    assertEquals(response,result);
+    assertEquals(response, result);
   }
 
   @Test
@@ -127,14 +127,14 @@ public class TMServiceImplTest {
     Object result = tmServiceImpl.jaxbUnwrap(jaxbElement);
 
     //Then
-    assertEquals(response,result);
+    assertEquals(response, result);
   }
 
   @Test
   public void shouldReturnSuccessfulResponseWhenReceivesPermittedResponse() {
     //Given
     QueryMessagesRequest queryMessagesRequest = new QueryMessagesRequest();
-    when(webServiceTemplate.marshalSendAndReceive(any(),any(),any())).thenReturn(jaxbElement);
+    when(webServiceTemplate.marshalSendAndReceive(any(), any(), any())).thenReturn(jaxbElement);
     QueryMessagesResponse queryMessagesResponse = new QueryMessagesResponse();
     when(jaxbElement.getValue()).thenReturn(queryMessagesResponse);
 
@@ -145,11 +145,11 @@ public class TMServiceImplTest {
     assertEquals(queryMessagesResponse, result);
   }
 
-  @Test(expected=IllegalArgumentException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void shouldThrowExceptionWhenReceivedResponseWIsNotInPermittedResponses() {
     //Given
     QueryMessagesRequest queryMessagesRequest = new QueryMessagesRequest();
-    when(webServiceTemplate.marshalSendAndReceive(any(),any(),any())).thenReturn(jaxbElement);
+    when(webServiceTemplate.marshalSendAndReceive(any(), any(), any())).thenReturn(jaxbElement);
     when(jaxbElement.getValue()).thenReturn(new Object());
 
     //When

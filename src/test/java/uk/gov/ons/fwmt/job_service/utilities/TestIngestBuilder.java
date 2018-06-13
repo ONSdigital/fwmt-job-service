@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 public class TestIngestBuilder extends LegacySampleIngest {
 
-  public LegacySampleIngest ingestBuild(){
+  public LegacySampleIngest ingestBuild() {
     LegacySampleIngest ingest = new LegacySampleIngest();
     ingest.setTimestamp("testTimestamp");
     ingest.setSerNo("testSerNo");

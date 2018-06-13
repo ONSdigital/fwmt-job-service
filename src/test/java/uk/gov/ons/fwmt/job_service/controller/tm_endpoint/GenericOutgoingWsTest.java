@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import javax.xml.bind.JAXBElement;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 public class GenericOutgoingWsTest {
 
@@ -14,7 +14,6 @@ public class GenericOutgoingWsTest {
   @Test
   public void sendAdapterOutput() {
     //Given
-
 
     //When
     JAXBElement<SendMessageResponse> result = genericOutgoingWs.sendAdapterOutput(null);

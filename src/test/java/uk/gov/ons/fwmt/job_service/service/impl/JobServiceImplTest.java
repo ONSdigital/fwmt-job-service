@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
@@ -39,18 +39,18 @@ public class JobServiceImplTest {
   @Mock private Filename filename;
 
   @Test
-  public void shouldReturnUnprocessedRowWhenErrorMessageInCSVParsing() throws InvalidFileNameException, MediaTypeNotSupportedException, IOException {
+  public void shouldReturnUnprocessedRowWhenErrorMessageInCSVParsing()
+      throws InvalidFileNameException, MediaTypeNotSupportedException, IOException {
     int expectedProcessedRows = 0;
     int expectedUnprocessedRows = 1;
-    String expectedErrorMessage= "Row could not be parsed: TestError";
+    String expectedErrorMessage = "Row could not be parsed: TestError";
     String expectedFileName = "TestFile";
-
 
     //given
     when(multipartFile.getOriginalFilename()).thenReturn("TestFile");
     when(fileIngestService.ingestSampleFile(any())).thenReturn(fileIngest);
     when(fileIngest.getFilename()).thenReturn(filename);
-    when(csvParsingService.parseLegacySample(any(),any())).thenReturn(csvExpectedResult());
+    when(csvParsingService.parseLegacySample(any(), any())).thenReturn(csvExpectedResult());
 
     //When
     SampleSummaryDTO result = jobServiceImpl.processSampleFile(multipartFile);
@@ -64,18 +64,18 @@ public class JobServiceImplTest {
   }
 
   @Test
-  public void shouldReturnAuthNoWhenUserDoesNotExistInTM() throws InvalidFileNameException, MediaTypeNotSupportedException, IOException {
+  public void shouldReturnAuthNoWhenUserDoesNotExistInTM()
+      throws InvalidFileNameException, MediaTypeNotSupportedException, IOException {
     int expectedProcessedRows = 0;
     int expectedUnprocessedRows = 1;
-    String expectedErrorMessage= "User did not exist in the gateway: expectedAuth";
+    String expectedErrorMessage = "User did not exist in the gateway: expectedAuth";
     String expectedFileName = "TestFile";
-
 
     //given
     when(multipartFile.getOriginalFilename()).thenReturn("TestFile");
     when(fileIngestService.ingestSampleFile(any())).thenReturn(fileIngest);
     when(fileIngest.getFilename()).thenReturn(filename);
-    when(csvParsingService.parseLegacySample(any(),any())).thenReturn(csvExpectedResultSuccess());
+    when(csvParsingService.parseLegacySample(any(), any())).thenReturn(csvExpectedResultSuccess());
     when(userResourceService.findByAuthNo(any())).thenReturn(Optional.empty());
     when(userResourceService.findByAlternateAuthNo(any())).thenReturn(Optional.empty());
 
@@ -83,11 +83,11 @@ public class JobServiceImplTest {
     SampleSummaryDTO result = jobServiceImpl.processSampleFile(multipartFile);
 
     //Then
-    assertEquals(expectedProcessedRows,result.getProcessedRows());
-    assertEquals(expectedUnprocessedRows,result.getUnprocessedRows().size());
-    assertEquals(expectedFileName,result.getFilename());
-    assertEquals(expectedErrorMessage,result.getUnprocessedRows().get(0).getMessage());
-    assertEquals(expectedUnprocessedRows,result.getUnprocessedRows().get(0).getRow());
+    assertEquals(expectedProcessedRows, result.getProcessedRows());
+    assertEquals(expectedUnprocessedRows, result.getUnprocessedRows().size());
+    assertEquals(expectedFileName, result.getFilename());
+    assertEquals(expectedErrorMessage, result.getUnprocessedRows().get(0).getMessage());
+    assertEquals(expectedUnprocessedRows, result.getUnprocessedRows().get(0).getRow());
   }
 
   private Iterator<CSVParseResult<LegacySampleIngest>> csvExpectedResult() {
@@ -99,7 +99,7 @@ public class JobServiceImplTest {
     return csvParseResults.iterator();
   }
 
-  private Iterator<CSVParseResult<LegacySampleIngest>> csvExpectedResultSuccess () {
+  private Iterator<CSVParseResult<LegacySampleIngest>> csvExpectedResultSuccess() {
     int testRows = 1;
 
     final List<CSVParseResult<LegacySampleIngest>> csvParseResults = new ArrayList<>();

@@ -43,10 +43,11 @@ public class TMJobConverterServiceImplTest {
     TMJobConverterServiceImpl.addAdditionalProperty(createJobRequest, expectedKey, expectedValue);
 
     //Then
-    assertEquals(expectedKey,createJobRequest.getJob().getAdditionalProperties().getAdditionalProperty().get(0).getName());
-    assertEquals(expectedValue,createJobRequest.getJob().getAdditionalProperties().getAdditionalProperty().get(0).getValue());
+    assertEquals(expectedKey,
+        createJobRequest.getJob().getAdditionalProperties().getAdditionalProperty().get(0).getName());
+    assertEquals(expectedValue,
+        createJobRequest.getJob().getAdditionalProperties().getAdditionalProperty().get(0).getValue());
   }
-
 
   @Test
   public void createGFFJobRequestFromIngest() {
@@ -57,7 +58,7 @@ public class TMJobConverterServiceImplTest {
     testIngestData.setLegacySampleSurveyType(GFF);
 
     //When
-    CreateJobRequest result = tmJobConverterService.createJobRequestFromIngest(testIngestData,username);
+    CreateJobRequest result = tmJobConverterService.createJobRequestFromIngest(testIngestData, username);
 
     //Then
     assertNotNull(result.getJob());
@@ -66,15 +67,21 @@ public class TMJobConverterServiceImplTest {
     assertNotNull(result.getJob().getSkills());
     assertNotNull(result.getJob().getWorld());
     assertEquals(JOB_WORK_TYPE, result.getJob().getWorkType());
-    assertEquals(JOB_WORK_TYPE,result.getJob().getWorkType());
-    assertEquals(testIngestData.getAddressLine1(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(0));
-    assertEquals(testIngestData.getAddressLine2(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(1));
-    assertEquals(testIngestData.getAddressLine3(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(2));
-    assertEquals(testIngestData.getAddressLine4(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(3));
-    assertEquals(testIngestData.getDistrict(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(4));
-    assertEquals(testIngestData.getPostTown(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(5));
-    assertEquals(testIngestData.getPostcode(),result.getJob().getLocation().getAddressDetail().getPostCode());
-    assertEquals(testIngestData.getSerNo(),result.getJob().getLocation().getReference());
+    assertEquals(JOB_WORK_TYPE, result.getJob().getWorkType());
+    assertEquals(testIngestData.getAddressLine1(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(0));
+    assertEquals(testIngestData.getAddressLine2(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(1));
+    assertEquals(testIngestData.getAddressLine3(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(2));
+    assertEquals(testIngestData.getAddressLine4(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(3));
+    assertEquals(testIngestData.getDistrict(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(4));
+    assertEquals(testIngestData.getPostTown(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(5));
+    assertEquals(testIngestData.getPostcode(), result.getJob().getLocation().getAddressDetail().getPostCode());
+    assertEquals(testIngestData.getSerNo(), result.getJob().getLocation().getReference());
   }
 
   @Test
@@ -87,7 +94,7 @@ public class TMJobConverterServiceImplTest {
     testIngestData.setLegacySampleSurveyType(LFS);
 
     //When
-    CreateJobRequest result = tmJobConverterService.createJobRequestFromIngest(testIngestData,username);
+    CreateJobRequest result = tmJobConverterService.createJobRequestFromIngest(testIngestData, username);
 
     //Then
     assertNotNull(result.getJob());
@@ -96,15 +103,21 @@ public class TMJobConverterServiceImplTest {
     assertNotNull(result.getJob().getSkills());
     assertNotNull(result.getJob().getWorld());
     assertEquals(JOB_WORK_TYPE, result.getJob().getWorkType());
-    assertEquals(JOB_WORK_TYPE,result.getJob().getWorkType());
-    assertEquals(testIngestData.getAddressLine1(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(0));
-    assertEquals(testIngestData.getAddressLine2(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(1));
-    assertEquals(testIngestData.getAddressLine3(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(2));
-    assertEquals(testIngestData.getAddressLine4(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(3));
-    assertEquals(testIngestData.getDistrict(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(4));
-    assertEquals(testIngestData.getPostTown(),result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(5));
-    assertEquals(testIngestData.getPostcode(),result.getJob().getLocation().getAddressDetail().getPostCode());
-    assertEquals(testIngestData.getSerNo(),result.getJob().getLocation().getReference());
+    assertEquals(JOB_WORK_TYPE, result.getJob().getWorkType());
+    assertEquals(testIngestData.getAddressLine1(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(0));
+    assertEquals(testIngestData.getAddressLine2(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(1));
+    assertEquals(testIngestData.getAddressLine3(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(2));
+    assertEquals(testIngestData.getAddressLine4(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(3));
+    assertEquals(testIngestData.getDistrict(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(4));
+    assertEquals(testIngestData.getPostTown(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(5));
+    assertEquals(testIngestData.getPostcode(), result.getJob().getLocation().getAddressDetail().getPostCode());
+    assertEquals(testIngestData.getSerNo(), result.getJob().getLocation().getReference());
   }
 
   @Test
@@ -114,12 +127,12 @@ public class TMJobConverterServiceImplTest {
     String username = "testUsername";
 
     //When
-    UpdateJobHeaderRequest result = tmJobConverterService.makeUpdateJobHeaderRequest(tmJobId,username);
+    UpdateJobHeaderRequest result = tmJobConverterService.makeUpdateJobHeaderRequest(tmJobId, username);
 
     //Then
     assertNotNull(result.getJobHeader());
-    assertEquals(username,result.getJobHeader().getAllocatedTo().getUsername());
-    assertEquals(tmJobId,result.getJobHeader().getJobIdentity().getReference());
+    assertEquals(username, result.getJobHeader().getAllocatedTo().getUsername());
+    assertEquals(tmJobId, result.getJobHeader().getJobIdentity().getReference());
   }
 
   @Test
@@ -131,8 +144,8 @@ public class TMJobConverterServiceImplTest {
     SendMessageRequestInfo result = tmJobConverterService.makeSendMessageRequestInfo(expectedKey);
 
     //Then
-    assertEquals(expectedKey,result.getKey());
-    assertEquals(JOB_QUEUE,result.getQueueName());
+    assertEquals(expectedKey, result.getKey());
+    assertEquals(JOB_QUEUE, result.getQueueName());
   }
 
   @Test
@@ -144,7 +157,7 @@ public class TMJobConverterServiceImplTest {
     testIngestData.setLegacySampleSurveyType(GFF);
 
     //When
-    SendCreateJobRequestMessage result = tmJobConverterService.createJob(testIngestData,username);
+    SendCreateJobRequestMessage result = tmJobConverterService.createJob(testIngestData, username);
 
     //Then
     assertNotNull(result);
@@ -157,12 +170,12 @@ public class TMJobConverterServiceImplTest {
     String username = "testUsername";
 
     //When
-    SendUpdateJobHeaderRequestMessage result = tmJobConverterService.updateJob(tmJobId,username);
+    SendUpdateJobHeaderRequestMessage result = tmJobConverterService.updateJob(tmJobId, username);
 
     //Then
-    assertEquals(tmJobId,result.getSendMessageRequestInfo().getKey());
-    assertEquals(JOB_QUEUE,result.getSendMessageRequestInfo().getQueueName());
-    assertEquals(tmJobId,result.getUpdateJobHeaderRequest().getJobHeader().getJobIdentity().getReference());
+    assertEquals(tmJobId, result.getSendMessageRequestInfo().getKey());
+    assertEquals(JOB_QUEUE, result.getSendMessageRequestInfo().getQueueName());
+    assertEquals(tmJobId, result.getUpdateJobHeaderRequest().getJobHeader().getJobIdentity().getReference());
   }
 
   @Test
@@ -174,7 +187,7 @@ public class TMJobConverterServiceImplTest {
     testIngestData.setLegacySampleSurveyType(GFF);
 
     //When
-    SendUpdateJobHeaderRequestMessage result = tmJobConverterService.updateJob(testIngestData,username);
+    SendUpdateJobHeaderRequestMessage result = tmJobConverterService.updateJob(testIngestData, username);
 
     //Then
     assertNotNull(result);
@@ -189,7 +202,7 @@ public class TMJobConverterServiceImplTest {
     testIngestData.setLegacySampleSurveyType(GFF);
 
     //When
-    SendCreateJobRequestMessage result = tmJobConverterService.createReissue(testIngestData,username);
+    SendCreateJobRequestMessage result = tmJobConverterService.createReissue(testIngestData, username);
 
     //Then
     assertNotNull(result);
