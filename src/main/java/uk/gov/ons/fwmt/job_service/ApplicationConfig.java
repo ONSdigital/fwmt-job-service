@@ -52,7 +52,7 @@ public class ApplicationConfig {
   }
 
   @Bean
-  public RestTemplate restTemplate(RestTemplateBuilder builder) {
+  public RestTemplate resourcesRestTemplate(RestTemplateBuilder builder) {
     return builder.basicAuthorization(userName, password).build();
   }
 

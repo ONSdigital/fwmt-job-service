@@ -33,7 +33,7 @@ public class FieldPeriodResourceServiceImplTest {
     //Given
     String fieldPeriod = "807";
     FieldPeriodDto expectedFPDto = new FieldPeriodDto();
-    when(restTemplate.exchange(any(), any(), any(), eq(FieldPeriodDto.class), eq(fieldPeriod)))
+    when(restTemplate.getForEntity(any(), eq(FieldPeriodDto.class), eq(fieldPeriod)))
         .thenReturn(responseEntity);
     when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
     when(responseEntity.getBody()).thenReturn(expectedFPDto);
@@ -44,14 +44,14 @@ public class FieldPeriodResourceServiceImplTest {
     //Then
     assertTrue(result.isPresent());
     assertEquals(expectedFPDto, result.get());
-    verify(restTemplate).exchange(any(), any(), any(), eq(FieldPeriodDto.class), eq(fieldPeriod));
+    verify(restTemplate).getForEntity(any(), eq(FieldPeriodDto.class), eq(fieldPeriod));
   }
 
   @Test
   public void findByFieldPeriodAndThrowHttpClientErrorException() {
     //Given
     String fieldPeriod = "807";
-    when(restTemplate.exchange(any(), any(), any(), eq(FieldPeriodDto.class), eq(fieldPeriod)))
+    when(restTemplate.getForEntity(any(), eq(FieldPeriodDto.class), eq(fieldPeriod)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     //When
