@@ -18,21 +18,23 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class JobResourceServiceImpl implements JobResourceService {
-  @Autowired
   private transient RestTemplate restTemplate;
 
   private transient String findUrl;
   private transient String createUrl;
   private transient String updateUrl;
 
+  @Autowired
   public JobResourceServiceImpl(
+      RestTemplate restTemplate,
       @Value("${service.resource.baseUrl}") String baseUrl,
       @Value("${service.resource.operation.jobs.find.path}") String findPath,
       @Value("${service.resource.operation.jobs.create.path}") String createPath,
       @Value("${service.resource.operation.jobs.update.path}") String updatePath) {
-    findUrl = baseUrl + findPath;
-    createUrl = baseUrl + createPath;
-    updateUrl = baseUrl + updatePath;
+    this.restTemplate = restTemplate;
+    this.findUrl = baseUrl + findPath;
+    this.createUrl = baseUrl + createPath;
+    this.updateUrl = baseUrl + updatePath;
   }
 
   @Override

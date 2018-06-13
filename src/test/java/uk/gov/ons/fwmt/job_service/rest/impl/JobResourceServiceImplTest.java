@@ -31,7 +31,6 @@ public class JobResourceServiceImplTest {
 
   @Before
   public void setup() {
-    jobResourceService = new JobResourceServiceImpl("", "", "", "");
     MockitoAnnotations.initMocks(this);
   }
 
