@@ -52,7 +52,7 @@ public class RestExceptionHandler {
   }
 
   @ExceptionHandler(UnknownUserException.class)
-  public ResponseEntity<GatewayCommonErrorDTO> handleInvalidFileNameException(HttpServletRequest request,
+  public ResponseEntity<GatewayCommonErrorDTO> handleInternalServerError(HttpServletRequest request,
       UnknownUserException exception) {
     log.error(ExceptionCode.FWMT_JOB_SERVICE_0010.toString()+" "+ExceptionCode.FWMT_JOB_SERVICE_0010.getError(), exception);
     return makeCommonError(request, exception, HttpStatus.INTERNAL_SERVER_ERROR, "Unknown user", exception.toString());
