@@ -54,7 +54,5 @@ public class JobServiceController {
     SampleSummaryDTO summary = jobService.processSampleFile(file);
     log.info("Exited sample endpoint");
     return ResponseEntity.ok(summary);
-
   }
-
 }

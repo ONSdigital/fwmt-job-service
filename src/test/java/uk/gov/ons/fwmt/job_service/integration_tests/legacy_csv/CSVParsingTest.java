@@ -147,7 +147,6 @@ public class CSVParsingTest {
   }
 
   @Test
-  @Ignore
   public void parseLFSSampleCSV() throws IOException {
     File testFile = new File("src/test/resources/sampledata/unit_tests/sample_LFS_2018-05-17T15-34-00Z.csv");
     Reader reader = new InputStreamReader(new FileInputStream(testFile));
