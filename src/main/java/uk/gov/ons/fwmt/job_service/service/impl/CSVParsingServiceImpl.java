@@ -95,10 +95,19 @@ public class CSVParsingServiceImpl implements CSVParsingService {
       return record.get("Quota") + "-" + record.get("AddressNo") + "-" + record.get("Stage");
     case LFS:
       // quota week w1yr qrtr addr wavfnd hhld chklet
-      return record.get("QUOTA") + " " + record.get("WEEK") + " " + record.get("W1YR") + " " + record.get("QRTR") + " "
-          + record.get("ADDR")
-          + " " + record.get("WAVFND") + " " + record.get("HHLD") + " " + record.get("CHKLET") + " - "
-          + record.get("FP");
+      if (!record.get("Issue_No").equals("1")) {
+        return record.get("QUOTA") + " " + record.get("WEEK") + " " + record.get("W1YR") + " " + record.get("QRTR")
+            + " "
+            + record.get("ADDR")
+            + " " + record.get("WAVFND") + " " + record.get("HHLD") + " " + record.get("CHKLET") + " - "
+            + record.get("FP") + " [R" + record.get("Issue_No") + "]";
+      } else {
+        return record.get("QUOTA") + " " + record.get("WEEK") + " " + record.get("W1YR") + " " + record.get("QRTR")
+            + " "
+            + record.get("ADDR")
+            + " " + record.get("WAVFND") + " " + record.get("HHLD") + " " + record.get("CHKLET") + " - "
+            + record.get("FP");
+      }
     default:
       throw new IllegalArgumentException("Invalid survey type");
     }
