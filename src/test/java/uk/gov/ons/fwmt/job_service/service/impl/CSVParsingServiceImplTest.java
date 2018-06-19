@@ -223,6 +223,7 @@ public class CSVParsingServiceImplTest {
   @Test
   public void constructTmLFSReIssueJobId() throws IOException {
     //Given
+    String expectedResult = "quota_1 week_1 w1yr_1 qrtr_1 addr_1 wavfnd_1 hhld_1 chklet_1 - 81K [R2]";
     File testFile = new File("src/test/resources/sampledata/unit_tests/reissueTest.csv");
     Reader reader = new InputStreamReader(new FileInputStream(testFile));
 
@@ -230,9 +231,9 @@ public class CSVParsingServiceImplTest {
 
     //When
     String result = csvParsingServiceImpl.constructTmJobId(csvParser.iterator().next(), LFS);
-    System.out.println(result);
 
     //Then
     assertNotNull(result);
+    assertEquals(expectedResult,result);
   }
 }
