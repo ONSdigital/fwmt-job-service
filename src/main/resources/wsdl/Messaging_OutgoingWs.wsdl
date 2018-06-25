@@ -1007,10 +1007,10 @@
   </wsdl:binding>
   <wsdl:service name="OutgoingWs">
     <wsdl:port name="OutgoingWsSoap" binding="tns:OutgoingWsSoap">
-      <soap:address location="http://localhost/live/Services/taskmobileserver/v20/messaging/outgoingws.asmx" />
+      <soap:address location="http://localhost:9091/tm" />
     </wsdl:port>
     <wsdl:port name="OutgoingWsSoap12" binding="tns:OutgoingWsSoap12">
-      <soap12:address location="http://localhost/live/Services/taskmobileserver/v20/messaging/outgoingws.asmx" />
+      <soap12:address location="http://localhost:9091/tm" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>
