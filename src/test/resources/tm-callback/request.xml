@@ -1,0 +1,10 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mes="http://schemas.consiliumtechnologies.com/services/mobile/2009/03/messaging">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <mes:request>
+         <mes:Id>dd</mes:Id>
+         <mes:Content>ff</mes:Content>
+         <mes:Format>44</mes:Format>
+      </mes:request>
+   </soapenv:Body>
+</soapenv:Envelope>

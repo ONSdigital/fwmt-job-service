@@ -49,10 +49,10 @@
   </wsdl:binding>
   <wsdl:service name="GenericOutgoingWs">
     <wsdl:port name="GenericOutgoingWsSoap" binding="tns:GenericOutgoingWsSoap">
-      <soap:address location="http://localhost/live/Services/taskmobileserver/v20/messaging/genericoutgoingws.asmx" />
+      <soap:address location="http://localhost:9091/tm" />
     </wsdl:port>
     <wsdl:port name="GenericOutgoingWsSoap12" binding="tns:GenericOutgoingWsSoap12">
-      <soap12:address location="http://localhost/live/Services/taskmobileserver/v20/messaging/genericoutgoingws.asmx" />
+      <soap12:address location="http://localhost:9091/tm" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

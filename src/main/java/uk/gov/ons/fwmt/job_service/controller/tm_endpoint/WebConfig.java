@@ -19,11 +19,11 @@ public class WebConfig extends WsConfigurerAdapter {
         MessageDispatcherServlet servlet = new MessageDispatcherServlet();
         servlet.setApplicationContext(applicationContext);
         servlet.setTransformWsdlLocations(true);
-        return new ServletRegistrationBean(servlet, "/tm/*");
+        return new ServletRegistrationBean(servlet, "/ws/*");
     }
 
     // creates a /tm/GenericOutgoingWs.wsdl
-    @Bean(name = "GenericOutgoingWs")
+    @Bean(name = "GenericOutgoingWsSoap")
     public Wsdl11Definition defaultGenericOutgoingWsWsdl11Definition() {
         SimpleWsdl11Definition wsdl11Definition = new SimpleWsdl11Definition();
         wsdl11Definition.setWsdl(new ClassPathResource("/wsdl/Messaging_GenericOutgoingWs.wsdl"));

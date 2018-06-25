@@ -1,0 +1,1 @@
+curl --header "content-type: text/xml" -d @request.xml http://localhost:9091/jobs/ws -u user:password
