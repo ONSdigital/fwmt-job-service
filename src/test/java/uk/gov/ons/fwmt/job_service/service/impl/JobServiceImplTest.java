@@ -43,7 +43,7 @@ public class JobServiceImplTest {
       throws InvalidFileNameException, MediaTypeNotSupportedException, IOException {
     int expectedProcessedRows = 0;
     int expectedUnprocessedRows = 1;
-    String expectedErrorMessage = "Row could not be parsed: TestError";
+    String expectedErrorMessage = "Row could not be parsed: row=1, message=TestError";
     String expectedFileName = "TestFile";
 
     //given
@@ -68,7 +68,7 @@ public class JobServiceImplTest {
       throws InvalidFileNameException, MediaTypeNotSupportedException, IOException {
     int expectedProcessedRows = 0;
     int expectedUnprocessedRows = 1;
-    String expectedErrorMessage = "User did not exist in the gateway: expectedAuth";
+    String expectedErrorMessage = "User did not exist in the gateway: authno=expectedAuth";
     String expectedFileName = "TestFile";
 
     //given

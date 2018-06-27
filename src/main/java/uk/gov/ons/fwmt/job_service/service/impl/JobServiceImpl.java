@@ -145,25 +145,30 @@ public class JobServiceImpl implements JobService {
     while (csvRowIterator.hasNext()) {
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
       if (row.isError()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0001 + " - Entry could not be processed");
-        unprocessed.add(new UnprocessedCSVRow(row.getRow(), "Row could not be parsed: " + row.getErrorMessage()));
+        String message = String.format("Row could not be parsed: row=%d, message=%s", row.getRow(), row.getErrorMessage());
+        log.error(ExceptionCode.FWMT_JOB_SERVICE_0001 + " - " + message);
+        unprocessed.add(new UnprocessedCSVRow(row.getRow(), message));
         continue;
       }
       final LegacySampleIngest ingest = row.getResult();
       final Optional<UserDto> user = findUser(ingest);
       if (!user.isPresent()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0005 + " - User did not exist in the gateway");
-        unprocessed.add(new UnprocessedCSVRow(row.getRow(), "User did not exist in the gateway: " + ingest.getAuth()));
+        String message = String.format("User did not exist in the gateway: authno=%s", ingest.getAuth());
+        log.error(ExceptionCode.FWMT_JOB_SERVICE_0005 + " - " + message);
+        unprocessed.add(new UnprocessedCSVRow(row.getRow(), message));
         continue;
       }
       if (!user.get().isActive()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0005 + " - User was not active");
-        unprocessed.add(new UnprocessedCSVRow(row.getRow(), "User was not active: " + ingest.getAuth()));
+        String message = String
+            .format("User was not active: auth=%s, username=%s", ingest.getAuth(), user.get().getTmUsername());
+        log.error(ExceptionCode.FWMT_JOB_SERVICE_0005 + " - " + message);
+        unprocessed.add(new UnprocessedCSVRow(row.getRow(), message));
         continue;
       }
       final Optional<UnprocessedCSVRow> unprocessedCSVRow = sendJobToUser(row.getRow(), ingest, user.get());
       if (unprocessedCSVRow.isPresent()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0004 + " - Job could not be sent");
+        String message = String.format("Job could not be sent: tmJobId=%s", ingest.getTmJobId());
+        log.error(ExceptionCode.FWMT_JOB_SERVICE_0004 + " - " + message);
         unprocessed.add(unprocessedCSVRow.get());
         continue;
       }
