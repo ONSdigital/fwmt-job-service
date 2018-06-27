@@ -4,6 +4,7 @@ import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.Sen
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateJobHeaderRequestMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
@@ -132,15 +133,46 @@ public class JobServiceImpl implements JobService {
     }
   }
 
+  @Async
+  protected void processSampleFile(MultipartFile file)
+          throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
+    FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
+    Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService.parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
+
+
+    //List<UnprocessedCSVRow> unprocessed = new ArrayList<>();
+    while (csvRowIterator.hasNext()) {
+      CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
+      final LegacySampleIngest ingest = row.getResult();
+      final Optional<UserDto> user = findUser(ingest);
+      if (!user.isPresent()) {
+        log.error(ExceptionCode.FWMT_JOB_SERVICE_0005 + " - User did not exist in the gateway");
+        //unprocessed.add(new UnprocessedCSVRow(row.getRow(), "User did not exist in the gateway: " + ingest.getAuth()));
+        continue;
+      }
+      if (!user.get().isActive()) {
+        log.error(ExceptionCode.FWMT_JOB_SERVICE_0005 + " - User was not active");
+        //unprocessed.add(new UnprocessedCSVRow(row.getRow(), "User was not active: " + ingest.getAuth()));
+        continue;
+      }
+      final Optional<UnprocessedCSVRow> unprocessedCSVRow = sendJobToUser(row.getRow(), ingest, user.get());
+      if (unprocessedCSVRow.isPresent()) {
+        log.error(ExceptionCode.FWMT_JOB_SERVICE_0004 + " - Job could not be sent");
+        //unprocessed.add(unprocessedCSVRow.get());
+        continue;
+      }
+    }
+  }
+
   @Override
-  public SampleSummaryDTO processSampleFile(MultipartFile file)
+  public SampleSummaryDTO validateSampleFile(MultipartFile file)
       throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
     FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
-    Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService
-        .parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
+    Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService.parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
 
     int parsed = 0;
     List<UnprocessedCSVRow> unprocessed = new ArrayList<>();
+
 
     while (csvRowIterator.hasNext()) {
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
@@ -149,26 +181,10 @@ public class JobServiceImpl implements JobService {
         unprocessed.add(new UnprocessedCSVRow(row.getRow(), "Row could not be parsed: " + row.getErrorMessage()));
         continue;
       }
-      final LegacySampleIngest ingest = row.getResult();
-      final Optional<UserDto> user = findUser(ingest);
-      if (!user.isPresent()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0005 + " - User did not exist in the gateway");
-        unprocessed.add(new UnprocessedCSVRow(row.getRow(), "User did not exist in the gateway: " + ingest.getAuth()));
-        continue;
-      }
-      if (!user.get().isActive()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0005 + " - User was not active");
-        unprocessed.add(new UnprocessedCSVRow(row.getRow(), "User was not active: " + ingest.getAuth()));
-        continue;
-      }
-      final Optional<UnprocessedCSVRow> unprocessedCSVRow = sendJobToUser(row.getRow(), ingest, user.get());
-      if (unprocessedCSVRow.isPresent()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0004 + " - Job could not be sent");
-        unprocessed.add(unprocessedCSVRow.get());
-        continue;
-      }
       parsed++;
     }
+
+    processSampleFile(file);
 
     // construct reply
     return new SampleSummaryDTO(file.getOriginalFilename(), parsed, unprocessed);
