@@ -20,6 +20,7 @@ import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
 import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
+import uk.gov.ons.fwmt.job_service.service.JobProcessService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 
@@ -29,7 +30,7 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class JobProcessServiceImpl {
+public class JobProcessServiceImpl implements JobProcessService {
 
 
     @Autowired
