@@ -135,7 +135,13 @@ public class JobServiceImpl implements JobService {
 
   @Async
   protected void processSampleFile(MultipartFile file)
-          throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
+          throws IOException, InvalidFileNameException, MediaTypeNotSupportedException{
+
+    try {
+      Thread.sleep(10000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
     FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
     Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService.parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
 
@@ -166,7 +172,7 @@ public class JobServiceImpl implements JobService {
 
   @Override
   public SampleSummaryDTO validateSampleFile(MultipartFile file)
-      throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
+          throws IOException, InvalidFileNameException, MediaTypeNotSupportedException{
     FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
     Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService.parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
 
@@ -184,7 +190,17 @@ public class JobServiceImpl implements JobService {
       parsed++;
     }
 
-    processSampleFile(file);
+    try {
+      processSampleFile(file);
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (InvalidFileNameException e) {
+      e.printStackTrace();
+    } catch (MediaTypeNotSupportedException e) {
+      e.printStackTrace();
+    }
+
+    System.out.println("sending message");
 
     // construct reply
     return new SampleSummaryDTO(file.getOriginalFilename(), parsed, unprocessed);
