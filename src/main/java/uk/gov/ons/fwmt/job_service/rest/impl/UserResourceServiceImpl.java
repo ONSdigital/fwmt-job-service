@@ -38,22 +38,23 @@ public class UserResourceServiceImpl implements UserResourceService {
     try {
       final ResponseEntity<UserDto> userDto = restTemplate.getForEntity(findUrl, UserDto.class, authNo);
       if (userDto.getStatusCode().equals(HttpStatus.OK)) {
+        // return a successful result
         return Optional.ofNullable(userDto.getBody());
-      } else {
-        // any success that doesn't have a 200 is an unexpected error
-        log.warn("findByAuthNo: returned with a non-200 code: authNo={}, code={}", authNo, userDto.getStatusCodeValue());
-        return Optional.empty();
       }
+      // any success that doesn't have a 200 is an unexpected error
+      log.warn("findByAuthNo: returned with a non-200 code: authNo={}, code={}", authNo,
+          userDto.getStatusCodeValue());
+      return Optional.empty();
     } catch (HttpClientErrorException httpException) {
-      if (httpException.getStatusCode() != HttpStatus.NOT_FOUND) {
-        // any other unexpected error
-        log.warn(String.format("findByAuthNo: error communicating with the resource service: authNo=%s", authNo), httpException);
-        return Optional.empty();
-      } else {
+      if (httpException.getStatusCode() == HttpStatus.NOT_FOUND) {
         // a 404, which occurs when we can't find an authNo
         log.info("findByAuthNo: authNo not found", httpException);
         return Optional.empty();
       }
+      // any other unexpected error
+      log.warn(String.format("findByAuthNo: error communicating with the resource service: authNo=%s", authNo),
+          httpException);
+      return Optional.empty();
     }
   }
 
@@ -63,22 +64,23 @@ public class UserResourceServiceImpl implements UserResourceService {
     try {
       final ResponseEntity<UserDto> userDto = restTemplate.getForEntity(findAltUrl, UserDto.class, authNo);
       if (userDto.getStatusCode().equals(HttpStatus.OK)) {
+        // return a successful result
         return Optional.ofNullable(userDto.getBody());
-      } else {
-        // any success that doesn't have a 200 is an unexpected error
-        log.warn("findByAlternateAuthNo: returned with a non-200 code: authNo={}, code={}", authNo, userDto.getStatusCodeValue());
-        return Optional.empty();
       }
+      // any success that doesn't have a 200 is an unexpected error
+      log.warn("findByAlternateAuthNo: returned with a non-200 code: authNo={}, code={}", authNo,
+          userDto.getStatusCodeValue());
+      return Optional.empty();
     } catch (HttpClientErrorException httpException) {
-      if (httpException.getStatusCode() != HttpStatus.NOT_FOUND) {
-        // any other unexpected error
-        log.warn(String.format("findByAlternateAuthNo: error communicating with the resource service: authNo=%s", authNo), httpException);
-        return Optional.empty();
-      } else {
+      if (httpException.getStatusCode() == HttpStatus.NOT_FOUND) {
         // a 404, which occurs when we can't find an authNo
         log.info("findByAlternateAuthNo: authNo not found", httpException);
         return Optional.empty();
       }
+      // any other unexpected error
+      log.warn(String.format("findByAlternateAuthNo: error communicating with the resource service: authNo=%s", authNo),
+          httpException);
+      return Optional.empty();
     }
   }
 
