@@ -52,7 +52,7 @@ public class JobServiceController {
       RedirectAttributes redirectAttributes)
       throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
     log.info("Entered sample endpoint");
-    SampleSummaryDTO summary = jobService.validateSampleFile(file);
+    SampleSummaryDTO summary = jobService.processSampleFile(file);
     log.info("Exited sample endpoint");
     return ResponseEntity.ok(summary);
   }

@@ -53,7 +53,7 @@ public class JobServiceImplTest {
     when(csvParsingService.parseLegacySample(any(), any())).thenReturn(csvExpectedResult());
 
     //When
-    SampleSummaryDTO result = jobServiceImpl.validateSampleFile(multipartFile);
+    SampleSummaryDTO result = jobServiceImpl.processSampleFile(multipartFile);
 
     //Then
     assertEquals(expectedProcessedRows, result.getProcessedRows(), 0);
@@ -80,7 +80,7 @@ public class JobServiceImplTest {
     when(userResourceService.findByAlternateAuthNo(any())).thenReturn(Optional.empty());
 
     //When
-    SampleSummaryDTO result = jobServiceImpl.validateSampleFile(multipartFile);
+    SampleSummaryDTO result = jobServiceImpl.processSampleFile(multipartFile);
 
     //Then
     assertEquals(expectedProcessedRows, result.getProcessedRows());

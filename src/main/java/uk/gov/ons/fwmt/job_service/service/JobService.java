@@ -8,6 +8,6 @@ import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedExcepti
 import java.io.IOException;
 
 public interface JobService {
-  SampleSummaryDTO validateSampleFile(MultipartFile file)
+  SampleSummaryDTO processSampleFile(MultipartFile file)
           throws IOException, InvalidFileNameException, MediaTypeNotSupportedException;
 }

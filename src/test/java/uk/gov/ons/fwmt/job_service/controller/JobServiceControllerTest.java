@@ -31,7 +31,7 @@ public class JobServiceControllerTest {
   @Test
   public void sampleREST() throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
     //Given
-    when(jobService.validateSampleFile(any())).thenReturn(expectedSampleSummaryDTO);
+    when(jobService.processSampleFile(any())).thenReturn(expectedSampleSummaryDTO);
     //When
     ResponseEntity<SampleSummaryDTO> result = jobServiceController.sampleREST(multipartFile, redirectAttributes);
     //
@@ -42,7 +42,7 @@ public class JobServiceControllerTest {
   public void shouldThrowMediaTypeException()
       throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
     //Given
-    when(jobService.validateSampleFile(any())).thenThrow(new MediaTypeNotSupportedException("", ""));
+    when(jobService.processSampleFile(any())).thenThrow(new MediaTypeNotSupportedException("", ""));
     //When
     ResponseEntity<SampleSummaryDTO> result = jobServiceController.sampleREST(multipartFile, redirectAttributes);
     //
@@ -52,7 +52,7 @@ public class JobServiceControllerTest {
   @Test(expected = IOException.class)
   public void shouldThrowIOException() throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
     //Given
-    when(jobService.validateSampleFile(any())).thenThrow(new IOException());
+    when(jobService.processSampleFile(any())).thenThrow(new IOException());
     //When
     ResponseEntity<SampleSummaryDTO> result = jobServiceController.sampleREST(multipartFile, redirectAttributes);
     //
@@ -63,7 +63,7 @@ public class JobServiceControllerTest {
   public void shouldThrowInvalidFilenameException()
       throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
     //Given
-    when(jobService.validateSampleFile(any())).thenThrow(new InvalidFileNameException("", ""));
+    when(jobService.processSampleFile(any())).thenThrow(new InvalidFileNameException("", ""));
     //When
     ResponseEntity<SampleSummaryDTO> result = jobServiceController.sampleREST(multipartFile, redirectAttributes);
     //

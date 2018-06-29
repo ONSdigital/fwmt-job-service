@@ -6,7 +6,7 @@ import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedExcepti
 
 import java.io.IOException;
 
-public interface JobProcessService {
+public interface JobProcessorService {
     void processSampleFile (MultipartFile file)
             throws IOException, InvalidFileNameException, MediaTypeNotSupportedException;
 }
