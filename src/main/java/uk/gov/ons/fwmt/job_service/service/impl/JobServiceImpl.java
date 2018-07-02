@@ -27,13 +27,13 @@ import uk.gov.ons.fwmt.job_service.service.JobService;
 public class JobServiceImpl implements JobService {
   private FileIngestService fileIngestService;
   private CSVParsingService csvParsingService;
-  private JobProcessorServiceImpl jobProcessService;
+  private JobProcessor jobProcessService;
 
   @Autowired
   public JobServiceImpl(
       FileIngestService fileIngestService,
       CSVParsingService csvParsingService,
-      JobProcessorServiceImpl jobProcessService) {
+      JobProcessor jobProcessService) {
     this.fileIngestService = fileIngestService;
     this.csvParsingService = csvParsingService;
     this.jobProcessService = jobProcessService;

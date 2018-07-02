@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessage;
@@ -26,13 +26,12 @@ import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
 import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
-import uk.gov.ons.fwmt.job_service.service.JobProcessorService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 
 @Slf4j
-@Service
-public class JobProcessorServiceImpl implements JobProcessorService {
+@Component
+public class JobProcessor { 
 
   @Autowired
   private FileIngestService fileIngestService;
@@ -52,7 +51,7 @@ public class JobProcessorServiceImpl implements JobProcessorService {
   @Autowired
   private TMService tmService;
   
-  public JobProcessorServiceImpl(FileIngestService fileIngestService,
+  public JobProcessor(FileIngestService fileIngestService,
       CSVParsingService csvParsingService,
       UserResourceService userResourceService,
       TMJobConverterService tmJobConverterService,
