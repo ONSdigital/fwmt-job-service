@@ -27,7 +27,7 @@ import uk.gov.ons.fwmt.job_service.service.JobService;
 public class JobServiceImpl implements JobService {
   private FileIngestService fileIngestService;
   private CSVParsingService csvParsingService;
-  private JobProcessor jobProcessService;
+  private JobProcessor jobProcessor;
 
   @Autowired
   public JobServiceImpl(
@@ -36,7 +36,7 @@ public class JobServiceImpl implements JobService {
       JobProcessor jobProcessService) {
     this.fileIngestService = fileIngestService;
     this.csvParsingService = csvParsingService;
-    this.jobProcessService = jobProcessService;
+    this.jobProcessor = jobProcessService;
   }
 
   @Override
@@ -45,7 +45,7 @@ public class JobServiceImpl implements JobService {
     SampleSummaryDTO sampleSummaryDTO = validateSampleFile(file);
 
     // This is an async call
-    jobProcessService.processSampleFile(file);
+    jobProcessor.processSampleFile(file);
 
     return sampleSummaryDTO;
   }

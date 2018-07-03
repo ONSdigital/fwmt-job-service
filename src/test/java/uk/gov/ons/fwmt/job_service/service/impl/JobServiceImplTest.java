@@ -37,6 +37,7 @@ public class JobServiceImplTest {
   @Mock private FileIngest fileIngest;
   @Mock private MultipartFile multipartFile;
   @Mock private Filename filename;
+  @Mock private JobProcessor jobProcessor;
 
   @Test
   public void shouldReturnUnprocessedRowWhenErrorMessageInCSVParsing()
