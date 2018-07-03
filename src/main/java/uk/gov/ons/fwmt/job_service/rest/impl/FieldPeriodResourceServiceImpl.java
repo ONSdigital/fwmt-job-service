@@ -38,9 +38,21 @@ public class FieldPeriodResourceServiceImpl implements FieldPeriodResourceServic
       if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
         return Optional.ofNullable(responseEntity.getBody());
       }
+      // any success that doesn't have a 200 is an unexpected error
+      log.warn("findByFieldPeriod: returned with a non-200 code: fieldPeriod={}, code={}", fieldPeriod,
+          responseEntity.getStatusCodeValue());
+      return Optional.empty();
     } catch (HttpClientErrorException httpException) {
-      log.error("An error occurred while communicating with the resource service", httpException);
+      if (httpException.getStatusCode() == HttpStatus.NOT_FOUND) {
+        // a 404, which occurs when we can't find a field period
+        log.debug("findByFieldPeriod: fieldPeriod not found", httpException);
+        return Optional.empty();
+      }
+      // any other unexpected error
+      log.error(String
+              .format("findByFieldPeriod: error communicating with the resource service: fieldPeriod=%s", fieldPeriod),
+          httpException);
+      return Optional.empty();
     }
-    return Optional.empty();
   }
 }

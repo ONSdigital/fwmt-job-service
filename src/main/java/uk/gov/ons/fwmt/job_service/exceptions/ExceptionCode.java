@@ -1,5 +1,7 @@
 package uk.gov.ons.fwmt.job_service.exceptions;
 
+import lombok.Getter;
+
 public enum ExceptionCode {
   FWMT_JOB_SERVICE_0001("UNKNOWN"),
   FWMT_JOB_SERVICE_0002("INVALID_FILE_NAME"),
@@ -13,13 +15,14 @@ public enum ExceptionCode {
   FWMT_JOB_SERVICE_0010("TM_INACCESSIBLE"),
   FWMT_JOB_SERVICE_0011("UNKNOWN_FIELD_PERIOD");
 
-  private final String error;
+  @Getter
+  private final String description;
   
-  ExceptionCode(String error) {
-    this.error = error;
+  ExceptionCode(String description) {
+    this.description = description;
   }
-  
-  public String getError() {
-    return error;
+
+  public String toString() {
+    return this.name() + " " + this.description;
   }
 }

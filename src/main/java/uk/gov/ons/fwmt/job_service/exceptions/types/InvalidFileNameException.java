@@ -6,8 +6,11 @@ public class InvalidFileNameException extends FWMTCommonException {
   static final long serialVersionUID = 0L;
 
   private static String makeMessage(String name, String reason) {
-    return "'" + name + "' is not a valid file name" +
-        ((reason == null) ? "." : ": " + reason + ".");
+    if (reason != null) {
+      return "'" + name + "' is not a valid file name: " + reason;
+    } else {
+      return "'" + name + "' is not a valid file name";
+    }
   }
 
   public InvalidFileNameException(String name) {

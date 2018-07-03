@@ -57,10 +57,11 @@ public class JobResourceServiceImpl implements JobResourceService {
       if (jobDtoResponseEntity.getStatusCode().equals(HttpStatus.OK)) {
         return Optional.ofNullable(jobDtoResponseEntity.getBody());
       }
+      return Optional.empty();
     } catch (HttpClientErrorException httpClientErrorException) {
       log.error("An error occurred while communicating with the resource service", httpClientErrorException);
+      return Optional.empty();
     }
-    return Optional.empty();
   }
 
   @Override
@@ -72,8 +73,8 @@ public class JobResourceServiceImpl implements JobResourceService {
       return responseEntity.getStatusCode().equals(HttpStatus.CREATED);
     } catch (HttpClientErrorException httpClientErrorException) {
       log.error("An error occurred while communicating with the resource service", httpClientErrorException);
+      return false;
     }
-    return false;
   }
 
   // TODO can we use the restTemplate.put method?

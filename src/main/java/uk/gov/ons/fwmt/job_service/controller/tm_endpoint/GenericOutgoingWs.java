@@ -23,13 +23,12 @@ public class GenericOutgoingWs {
   public JAXBElement<SendMessageResponse> request(@RequestPayload JAXBElement<WebServiceAdapterOutputRequest> request) {
     SendMessageResponse smr = new SendMessageResponse();
     QName qname = new QName("request");
-    JAXBElement<SendMessageResponse> jaxbElement = new JAXBElement<SendMessageResponse>(qname,
-        SendMessageResponse.class, smr);
+    JAXBElement<SendMessageResponse> jaxbElement = new JAXBElement<SendMessageResponse>(qname, SendMessageResponse.class, smr);
     SendMessageResponse msg = new SendMessageResponse();
     WebServiceAdapterOutputRequest value = request.getValue();
     msg.setId(value.getId());
     jaxbElement.setValue(msg);
-    log.info("Incoming message from TM received. Id:" + value.getId());
+    log.info("GenericOutgoingWs: Incoming message received. Id:" + value.getId());
     return jaxbElement;
   }
 }

@@ -38,26 +38,50 @@ public class UserResourceServiceImpl implements UserResourceService {
     try {
       final ResponseEntity<UserDto> responseEntity = restTemplate.getForEntity(findUrl, UserDto.class, authNo);
       if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+        // return a successful result
         return Optional.ofNullable(responseEntity.getBody());
       }
+      // any success that doesn't have a 200 is an unexpected error
+      log.error("findByAuthNo: returned with a non-200 code: authNo={}, code={}", authNo,
+          responseEntity.getStatusCodeValue());
+      return Optional.empty();
     } catch (HttpClientErrorException httpException) {
-      log.error("An error occurred while communicating with the resource service", httpException);
+      if (httpException.getStatusCode() == HttpStatus.NOT_FOUND) {
+        // a 404, which occurs when we can't find an authNo
+        log.debug("findByAuthNo: authNo not found", httpException);
+        return Optional.empty();
+      }
+      // any other unexpected error
+      log.error(String.format("findByAuthNo: error communicating with the resource service: authNo=%s", authNo),
+          httpException);
+      return Optional.empty();
     }
-    return Optional.empty();
   }
 
   @Override
   public Optional<UserDto> findByAlternateAuthNo(String authNo) {
     log.info("findByAlternateAuthNo: {}", authNo);
     try {
-      final ResponseEntity<UserDto> userDto = restTemplate.getForEntity(findAltUrl, UserDto.class, authNo);
-      if (userDto != null && userDto.getStatusCode().equals(HttpStatus.OK)) {
-        return Optional.ofNullable(userDto.getBody());
+      final ResponseEntity<UserDto> responseEntity = restTemplate.getForEntity(findAltUrl, UserDto.class, authNo);
+      if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+        // return a successful result
+        return Optional.ofNullable(responseEntity.getBody());
       }
+      // any success that doesn't have a 200 is an unexpected error
+      log.error("findByAlternateAuthNo: returned with a non-200 code: authNo={}, code={}", authNo,
+          responseEntity.getStatusCodeValue());
+      return Optional.empty();
     } catch (HttpClientErrorException httpException) {
-      log.error("An error occurred while communicating with the resource service", httpException);
+      if (httpException.getStatusCode() == HttpStatus.NOT_FOUND) {
+        // a 404, which occurs when we can't find an authNo
+        log.debug("findByAlternateAuthNo: authNo not found", httpException);
+        return Optional.empty();
+      }
+      // any other unexpected error
+      log.error(String.format("findByAlternateAuthNo: error communicating with the resource service: authNo=%s", authNo),
+          httpException);
+      return Optional.empty();
     }
-    return Optional.empty();
   }
 
   @Override

@@ -5,8 +5,12 @@ import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 public class FWMTCommonException extends Exception {
   static final long serialVersionUID = 0L;
 
-  protected String makePrefix(ExceptionCode code) {
-    return code.toString();
+  protected static String makeMessage(ExceptionCode code, String message) {
+    if (message != null) {
+      return code.toString() + message;
+    } else {
+      return code.toString();
+    }
   }
 
   public FWMTCommonException(ExceptionCode code) {
@@ -14,19 +18,15 @@ public class FWMTCommonException extends Exception {
   }
 
   public FWMTCommonException(ExceptionCode code, String message) {
-    super(code.toString() + " " + message);
+    super(makeMessage(code, message));
   }
 
   public FWMTCommonException(ExceptionCode code, String message, Throwable cause) {
-    super(code.toString() + " " + message, cause);
+    super(makeMessage(code, message), cause);
   }
 
   protected FWMTCommonException(ExceptionCode code, String message, Throwable cause, boolean enableSuppression,
       boolean writableStackTrace) {
-    super(code.toString() + " " + message, cause, enableSuppression, writableStackTrace);
-  }
-
-  public FWMTCommonException(ExceptionCode code, Throwable cause) {
-    super(code.toString() + " " + cause);
+    super(makeMessage(code, message), cause, enableSuppression, writableStackTrace);
   }
 }

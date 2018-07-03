@@ -17,7 +17,7 @@ public class MessageQueueWs {
   private ObjectFactory objectFactory = new ObjectFactory();
 
   private void stub(String messageType) {
-    log.debug("Found message type > " + messageType);
+    log.debug(String.format("MessageQueueWs: Found message of type %s", messageType));
   }
 
   @PayloadRoot(namespace = NAMESPACE_URI, localPart = "SendMessageRequest")

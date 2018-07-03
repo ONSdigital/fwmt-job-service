@@ -15,7 +15,7 @@ public class SwaggerConfig {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis( RequestHandlerSelectors.basePackage( "uk.gov.ons.fwmt.job_service" ))
+                .apis( RequestHandlerSelectors.basePackage("uk.gov.ons.fwmt.job_service"))
                 .paths(PathSelectors.any())
                 .build();
     }
