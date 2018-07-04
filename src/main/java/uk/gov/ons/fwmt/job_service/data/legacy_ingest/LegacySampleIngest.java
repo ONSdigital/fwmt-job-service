@@ -157,6 +157,9 @@ public class LegacySampleIngest {
   @JobAdditionalProperty("geoY")
   private Float geoY;
 
+  @JobAdditionalProperty("dueDate")
+  private String calculatedDueDate;
+
   public boolean isGffReissue() {
     return (this.getLegacySampleSurveyType() == LegacySampleSurveyType.GFF) &&
         (Integer.parseInt(this.getStage().substring(1, 3)) > 12);
