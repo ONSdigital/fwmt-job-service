@@ -1,5 +1,6 @@
 package uk.gov.ons.fwmt.job_service.rest;
 
+import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
 
 import java.util.Optional;
@@ -10,5 +11,7 @@ public interface JobResourceService {
     Optional<JobDto> findByTmJobId(final String tmJobId);
     boolean createJob(final JobDto jobDto);
     boolean updateJob(final JobDto jobDto);
+    boolean sendCSV(final MultipartFile file);
+
 
 }

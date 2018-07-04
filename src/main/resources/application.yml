@@ -70,6 +70,8 @@ service:
           path: "/jobs/"
         update:
           path: "/jobs/"
+        sendcsv:
+          path: "/jobFile/upload"
       fieldPeriods:
         find:
           path: "/fieldPeriods/{fieldPeriod}"
