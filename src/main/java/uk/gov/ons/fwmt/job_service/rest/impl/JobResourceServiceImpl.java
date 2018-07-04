@@ -105,12 +105,7 @@ public class JobResourceServiceImpl implements JobResourceService {
     log.info("SendCSV");
     try {
 
-      File convFile = new File (file.getOriginalFilename());
-      convFile.createNewFile();
-      FileOutputStream fos = new FileOutputStream(convFile);
-      fos.write(file.getBytes());
-      fos.close();
-
+      File convFile = convertFile(file);
       Resource fileConvert = new FileSystemResource(convFile);
 
       MultiValueMap<String,Object> bodyMap = new LinkedMultiValueMap<>();
@@ -136,16 +131,16 @@ public class JobResourceServiceImpl implements JobResourceService {
   private File convertFile(MultipartFile file) throws IOException{
 
     File convFile = new File (file.getOriginalFilename());
+    FileOutputStream fos = new FileOutputStream(convFile);
     try {
       convFile.createNewFile();
-      FileOutputStream fos = new FileOutputStream(convFile);
       fos.write(file.getBytes());
-      fos.close();
     } catch (IOException e) {
       e.printStackTrace();
       throw e;
+    } finally {
+      fos.close();
     }
-
     return convFile;
   }
 }
