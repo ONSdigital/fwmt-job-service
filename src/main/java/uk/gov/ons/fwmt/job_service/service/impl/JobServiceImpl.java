@@ -1,9 +1,15 @@
 package uk.gov.ons.fwmt.job_service.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.UnprocessedCSVRow;
 import uk.gov.ons.fwmt.job_service.data.dto.SampleSummaryDTO;
@@ -27,8 +33,8 @@ import java.util.List;
 public class JobServiceImpl implements JobService {
   private FileIngestService fileIngestService;
   private CSVParsingService csvParsingService;
-  private JobProcessor jobProcessService;
   private JobResourceService jobResourceService;
+  private JobProcessor jobProcessor;
 
   @Autowired
   public JobServiceImpl(
@@ -38,8 +44,8 @@ public class JobServiceImpl implements JobService {
       JobResourceService jobResourceService) {
     this.fileIngestService = fileIngestService;
     this.csvParsingService = csvParsingService;
-    this.jobProcessService = jobProcessService;
     this.jobResourceService = jobResourceService;
+    this.jobProcessor = jobProcessService;
   }
 
   @Override
@@ -51,7 +57,7 @@ public class JobServiceImpl implements JobService {
     SampleSummaryDTO sampleSummaryDTO = validateSampleFile(file);
 
     // This is an async call
-    jobProcessService.processSampleFile(file);
+    jobProcessor.processSampleFile(file);
 
     return sampleSummaryDTO;
   }
