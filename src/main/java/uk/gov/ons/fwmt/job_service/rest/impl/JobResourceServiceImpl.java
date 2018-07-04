@@ -100,7 +100,7 @@ public class JobResourceServiceImpl implements JobResourceService {
   }
 
   @Override
-  public boolean sendCSV(MultipartFile file) {
+  public void sendCSV(MultipartFile file) {
 
     log.info("SendCSV");
     try {
@@ -116,7 +116,7 @@ public class JobResourceServiceImpl implements JobResourceService {
       final HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(bodyMap, headers);
       //final HttpEntity<File> request = new HttpEntity<File>(convFile);
       final ResponseEntity<String> sendCSVResponseEntity = restTemplate.exchange(sendCSVUrl, HttpMethod.POST, request, String.class);
-      return sendCSVResponseEntity.getStatusCode().equals(HttpStatus.OK);
+      sendCSVResponseEntity.getStatusCode().equals(HttpStatus.OK);
     } catch (HttpClientErrorException httpClientErrorException) {
       log.error("An error occurred while communicating with the resource service", httpClientErrorException);
     } catch (FileNotFoundException e) {
@@ -124,7 +124,6 @@ public class JobResourceServiceImpl implements JobResourceService {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    return false;
   }
 
 
