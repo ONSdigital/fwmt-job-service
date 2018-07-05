@@ -19,6 +19,7 @@ import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.Sen
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendMessageRequestInfo;
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateJobHeaderRequestMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.PropertyAccessor;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.stereotype.Service;
@@ -99,10 +100,12 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
 
     LocationType location = request.getJob().getLocation();
     List<String> addressLines = location.getAddressDetail().getLines().getAddressLine();
-    addressLines.add(ingest.getAddressLine1());
-    addressLines.add(ingest.getAddressLine2());
-    addressLines.add(ingest.getAddressLine3());
-    addressLines.add(ingest.getAddressLine4());
+
+    addAddressLines(addressLines, ingest.getAddressLine1());
+    addAddressLines(addressLines, ingest.getAddressLine2());
+    addAddressLines(addressLines, ingest.getAddressLine3());
+    addAddressLines(addressLines, ingest.getAddressLine4());
+
     addressLines.add(ingest.getDistrict());
     addressLines.add(ingest.getPostTown());
     location.getAddressDetail().setPostCode(ingest.getPostcode());
@@ -138,6 +141,12 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     request.getJob().setEmergency(false);
 
     return request;
+  }
+
+  private void addAddressLines(List<String> addressLines, String addressLine) {
+    if (StringUtils.isNotBlank((addressLine))) {
+      addressLines.add(addressLine);
+    }
   }
 
   protected UpdateJobHeaderRequest makeUpdateJobHeaderRequest(String tmJobId, String username) {
