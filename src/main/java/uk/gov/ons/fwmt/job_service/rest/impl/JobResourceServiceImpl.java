@@ -119,7 +119,6 @@ public class JobResourceServiceImpl implements JobResourceService {
       headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
       final HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(bodyMap, headers);
-      //final HttpEntity<File> request = new HttpEntity<File>(convFile);
       final ResponseEntity<String> sendCSVResponseEntity = restTemplate.exchange(sendCSVUrl, HttpMethod.POST, request, String.class);
       sendCSVResponseEntity.getStatusCode().equals(HttpStatus.OK);
     } catch (HttpClientErrorException httpClientErrorException) {
@@ -137,11 +136,11 @@ public class JobResourceServiceImpl implements JobResourceService {
     File convFile = new File (file.getOriginalFilename());
     FileOutputStream fos = new FileOutputStream(convFile);
     try {
-      convFile.createNewFile();
-      fos.write(file.getBytes());
-    } catch (IOException e) {
-      e.printStackTrace();
-      throw e;
+      if(convFile.createNewFile()) {
+        fos.write(file.getBytes());
+      }else {
+        return null;
+      }
     } finally {
       fos.close();
     }
