@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.fwmt.job_service.exceptions.types.ResourceServiceInaccessibleException;
 import uk.gov.ons.fwmt.job_service.rest.FieldPeriodResourceService;
 import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
 
@@ -49,10 +50,9 @@ public class FieldPeriodResourceServiceImpl implements FieldPeriodResourceServic
         return Optional.empty();
       }
       // any other unexpected error
-      log.error(String
-              .format("findByFieldPeriod: error communicating with the resource service: fieldPeriod=%s", fieldPeriod),
-          httpException);
-      return Optional.empty();
+      ResourceServiceInaccessibleException exception = new ResourceServiceInaccessibleException(
+          String.format("in findByFieldPeriod: fieldPeriod=%s", fieldPeriod), httpException);
+      throw exception;
     }
   }
 }

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.fwmt.job_service.exceptions.types.ResourceServiceMalfunctionException;
 import uk.gov.ons.fwmt.job_service.rest.UserResourceService;
 import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
 
@@ -34,33 +35,42 @@ public class UserResourceServiceImpl implements UserResourceService {
 
   @Override
   public Optional<UserDto> findByAuthNo(String authNo) {
-    log.info("findByAuthNo: {}", authNo);
+    log.info("UserResourceService.findByAuthNo: {}", authNo);
+//    Optional<UserDto> userDto = RestCommon.get(restTemplate, findUrl, UserDto.class, authNo);
+//    return userDto;
     try {
       final ResponseEntity<UserDto> responseEntity = restTemplate.getForEntity(findUrl, UserDto.class, authNo);
       if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
         // return a successful result
+        log.info("UserResourceService.findByAuthNo: authNo found");
         return Optional.ofNullable(responseEntity.getBody());
       }
       // any success that doesn't have a 200 is an unexpected error
-      log.error("findByAuthNo: returned with a non-200 code: authNo={}, code={}", authNo,
-          responseEntity.getStatusCodeValue());
-      return Optional.empty();
+      ResourceServiceMalfunctionException malfunctionException = new ResourceServiceMalfunctionException(
+          String.format("Unexpected HTTP code: %d", responseEntity.getStatusCode().value()));
+      log.error(malfunctionException.toString(), malfunctionException);
+      // TODO do we throw?
+      // throw malfunctionException;
+      return Optional.ofNullable(responseEntity.getBody());
     } catch (HttpClientErrorException httpException) {
       if (httpException.getStatusCode() == HttpStatus.NOT_FOUND) {
         // a 404, which occurs when we can't find an authNo
-        log.debug("findByAuthNo: authNo not found", httpException);
+        log.info("UserResourceService.findByAuthNo: authNo not found");
         return Optional.empty();
       }
       // any other unexpected error
-      log.error(String.format("findByAuthNo: error communicating with the resource service: authNo=%s", authNo),
-          httpException);
+      ResourceServiceMalfunctionException malfunctionException = new ResourceServiceMalfunctionException(
+          String.format("Unexpected HTTP code: %d", httpException.getStatusCode().value()), httpException);
+      log.error(malfunctionException.toString(), malfunctionException);
+      // TODO do we throw?
+      // throw malfunctionException;
       return Optional.empty();
     }
   }
 
   @Override
   public Optional<UserDto> findByAlternateAuthNo(String authNo) {
-    log.info("findByAlternateAuthNo: {}", authNo);
+    log.info("UserResourceService.findByAlternateAuthNo: {}", authNo);
     try {
       final ResponseEntity<UserDto> responseEntity = restTemplate.getForEntity(findAltUrl, UserDto.class, authNo);
       if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
@@ -68,32 +78,35 @@ public class UserResourceServiceImpl implements UserResourceService {
         return Optional.ofNullable(responseEntity.getBody());
       }
       // any success that doesn't have a 200 is an unexpected error
-      log.error("findByAlternateAuthNo: returned with a non-200 code: authNo={}, code={}", authNo,
+      log.error("UserResourceService.findByAlternateAuthNo: returned with a non-200 code: authNo={}, code={}", authNo,
           responseEntity.getStatusCodeValue());
       return Optional.empty();
     } catch (HttpClientErrorException httpException) {
       if (httpException.getStatusCode() == HttpStatus.NOT_FOUND) {
         // a 404, which occurs when we can't find an authNo
-        log.debug("findByAlternateAuthNo: authNo not found", httpException);
+        log.info("UserResourceService.findByAlternateAuthNo: authNo not found");
         return Optional.empty();
       }
       // any other unexpected error
-      log.error(String.format("findByAlternateAuthNo: error communicating with the resource service: authNo=%s", authNo),
-          httpException);
+      ResourceServiceMalfunctionException malfunctionException = new ResourceServiceMalfunctionException(
+          String.format("Unexpected HTTP code: %d", httpException.getStatusCode().value()), httpException);
+      log.error(malfunctionException.toString(), malfunctionException);
+      // TODO do we throw?
+      // throw malfunctionException;
       return Optional.empty();
     }
   }
 
   @Override
   public boolean existsByAuthNoAndActive(String authNo, boolean active) {
-    log.info("existsByAuthNoAndActive: {}, {}", authNo, active);
+    log.info("UserResourceService.existsByAuthNoAndActive: {}, {}", authNo, active);
     final Optional<UserDto> userDto = findByAuthNo(authNo);
     return userDto.filter(userDto1 -> userDto1.isActive() == active).isPresent();
   }
 
   @Override
   public boolean existsByAlternateAuthNoAndActive(String authNo, boolean active) {
-    log.info("existsByAlternativeAuthNoAndActive: {}, {}", authNo, active);
+    log.info("UserResourceService.existsByAlternativeAuthNoAndActive: {}, {}", authNo, active);
     final Optional<UserDto> userDto = findByAlternateAuthNo(authNo);
     return userDto.filter(userDto1 -> userDto1.isActive() == active).isPresent();
   }

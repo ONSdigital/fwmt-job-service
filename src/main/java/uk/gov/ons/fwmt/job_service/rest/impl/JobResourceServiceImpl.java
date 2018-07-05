@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.fwmt.job_service.exceptions.types.ResourceServiceInaccessibleException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.ResourceServiceMalfunctionException;
 import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
 import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
 
@@ -51,15 +53,30 @@ public class JobResourceServiceImpl implements JobResourceService {
 
   @Override
   public Optional<JobDto> findByTmJobId(String tmJobId) {
-    log.info("findByTmJobId: {}", tmJobId);
+    log.info("JobResourceService.findByTmJobId: {}", tmJobId);
     try {
-      final ResponseEntity<JobDto> jobDtoResponseEntity = restTemplate.getForEntity(findUrl, JobDto.class, tmJobId);
-      if (jobDtoResponseEntity.getStatusCode().equals(HttpStatus.OK)) {
-        return Optional.ofNullable(jobDtoResponseEntity.getBody());
+      final ResponseEntity<JobDto> responseEntity = restTemplate.getForEntity(findUrl, JobDto.class, tmJobId);
+      if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+        return Optional.ofNullable(responseEntity.getBody());
       }
-      return Optional.empty();
-    } catch (HttpClientErrorException httpClientErrorException) {
-      log.error("An error occurred while communicating with the resource service", httpClientErrorException);
+      // any success that doesn't have a 200 is an unexpected error
+      ResourceServiceMalfunctionException malfunctionException = new ResourceServiceMalfunctionException(
+          String.format("Unexpected HTTP code: %d", responseEntity.getStatusCode().value()));
+      log.error(malfunctionException.toString(), malfunctionException);
+      // TODO do we throw?
+      // throw malfunctionException;
+      return Optional.ofNullable(responseEntity.getBody());
+    } catch (HttpClientErrorException httpException) {
+      if (httpException.getStatusCode() == HttpStatus.NOT_FOUND) {
+        // a 404, which occurs when we can't find an authNo
+        log.info("UserResourceService.findByAlternateAuthNo: authNo not found");
+        return Optional.empty();
+      }
+      // log.error("An error occurred while communicating with the resource service", httpClientErrorException);
+      ResourceServiceInaccessibleException exception = new ResourceServiceInaccessibleException(
+          String.format("in JobResourceService.findByTmJobId: tmJobId=%s", tmJobId), httpException);
+      // TODO do we throw?
+      // throw exception;
       return Optional.empty();
     }
   }
