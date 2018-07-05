@@ -157,7 +157,7 @@ public class LegacySampleIngest {
   @JobAdditionalProperty("geoY")
   private Float geoY;
 
-  @JobAdditionalProperty("dueDate")
+  @JobAdditionalProperty("calculatedDueDate")
   private String calculatedDueDate;
 
   public boolean isGffReissue() {
