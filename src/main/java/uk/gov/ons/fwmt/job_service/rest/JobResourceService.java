@@ -11,7 +11,7 @@ public interface JobResourceService {
     Optional<JobDto> findByTmJobId(final String tmJobId);
     boolean createJob(final JobDto jobDto);
     boolean updateJob(final JobDto jobDto);
-    void sendCSV(final MultipartFile file);
+    boolean sendCSV(final MultipartFile file);
 
 
 }

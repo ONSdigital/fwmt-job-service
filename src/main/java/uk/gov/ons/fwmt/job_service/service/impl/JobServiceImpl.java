@@ -46,7 +46,10 @@ public class JobServiceImpl implements JobService {
   public SampleSummaryDTO processSampleFile(MultipartFile file)
           throws IOException, InvalidFileNameException, MediaTypeNotSupportedException{
 
-    jobResourceService.sendCSV(file);
+    if(!jobResourceService.sendCSV(file))
+    {
+      log.error("Failed to send CSV to resource service");
+    }
 
     SampleSummaryDTO sampleSummaryDTO = validateSampleFile(file);
 

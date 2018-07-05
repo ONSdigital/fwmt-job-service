@@ -5,12 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.MediaType;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -105,7 +100,7 @@ public class JobResourceServiceImpl implements JobResourceService {
   }
 
   @Override
-  public void sendCSV(MultipartFile file) {
+  public boolean sendCSV(MultipartFile file) {
 
     log.info("SendCSV");
     try {
@@ -120,14 +115,15 @@ public class JobResourceServiceImpl implements JobResourceService {
 
       final HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(bodyMap, headers);
       final ResponseEntity<String> sendCSVResponseEntity = restTemplate.exchange(sendCSVUrl, HttpMethod.POST, request, String.class);
-      sendCSVResponseEntity.getStatusCode().equals(HttpStatus.OK);
+      return sendCSVResponseEntity.getStatusCode().equals(HttpStatus.OK);
     } catch (HttpClientErrorException httpClientErrorException) {
       log.error("An error occurred while communicating with the resource service", httpClientErrorException);
     } catch (FileNotFoundException e) {
-      e.printStackTrace();
+      log.error("File cannot be found", e);
     } catch (IOException e) {
-      e.printStackTrace();
+      log.error("File could not be converted", e);
     }
+    return false;
   }
 
 
