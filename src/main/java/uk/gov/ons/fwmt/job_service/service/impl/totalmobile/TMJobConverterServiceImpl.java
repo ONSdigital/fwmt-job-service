@@ -143,7 +143,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     return request;
   }
 
-  private void addAddressLines(List<String> addressLines, String addressLine) {
+  protected void addAddressLines(List<String> addressLines, String addressLine) {
     if (StringUtils.isNotBlank((addressLine))) {
       addressLines.add(addressLine);
     }

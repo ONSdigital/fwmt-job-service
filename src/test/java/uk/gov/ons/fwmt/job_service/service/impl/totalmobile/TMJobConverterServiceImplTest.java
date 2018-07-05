@@ -15,8 +15,14 @@ import uk.gov.ons.fwmt.job_service.utilities.TestIngestBuilder;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType.GFF;
 import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType.LFS;
 import static uk.gov.ons.fwmt.job_service.service.impl.totalmobile.TMJobConverterServiceImpl.JOB_QUEUE;
@@ -191,6 +197,38 @@ public class TMJobConverterServiceImplTest {
 
     //Then
     assertNotNull(result);
+  }
+
+  @Test
+  public void checkIfAddressLineIsNotBlank() {
+    //Given
+    List<String> testAddressLines = new ArrayList<>();
+    String testLine = "testLine";
+
+    List<String> expectedArray = new ArrayList<>();
+    expectedArray.add("testLine");
+
+    //When
+    tmJobConverterService.addAddressLines(testAddressLines,testLine);
+
+    //Then
+    assertEquals(testAddressLines, expectedArray);
+  }
+
+  @Test
+  public void checkIfAddressLineIsBlank() {
+    //Given
+    List<String> testAddressLines = new ArrayList<>();
+    String testLine = "";
+
+    List<String> expectedArray = new ArrayList<>();
+    expectedArray.add("testLine");
+
+    //When
+    tmJobConverterService.addAddressLines(testAddressLines,testLine);
+
+    //Then
+    assertNotEquals(testAddressLines, expectedArray);
   }
 
   @Test
