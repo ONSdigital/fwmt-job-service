@@ -132,7 +132,7 @@ public class JobResourceServiceImpl implements JobResourceService {
     File convFile = new File (file.getOriginalFilename());
     FileOutputStream fos = new FileOutputStream(convFile);
     try {
-      if(convFile.createNewFile()) {
+      if(!convFile.createNewFile()) {
         fos.write(file.getBytes());
       }else {
         return null;
