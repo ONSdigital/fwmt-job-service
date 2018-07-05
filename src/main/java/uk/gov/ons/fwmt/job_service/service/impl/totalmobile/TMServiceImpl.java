@@ -79,8 +79,7 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
       @Value("${totalmobile.message-queue-namespace}") String namespace,
       @Value("${totalmobile.username}") String username,
       @Value("${totalmobile.password}") String password) throws Exception {
-//    this.messageQueueUrl = url + messageQueuePath;
-    this.messageQueueUrl = "http://localhost:7070";
+    this.messageQueueUrl = url + messageQueuePath;
     this.namespace = namespace;
     Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
     marshaller.setContextPath(messageQueuePackage);
