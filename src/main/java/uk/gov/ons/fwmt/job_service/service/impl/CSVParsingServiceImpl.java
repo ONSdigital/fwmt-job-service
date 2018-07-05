@@ -153,6 +153,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
           setFromCSVColumnAnnotations(instance, record, "LFS");
           // set derived due date
           instance.setDueDate(convertToLFSDate(instance.getStage()));
+          instance.setCalculatedDueDate(String.valueOf(convertToGFFDate(instance.getStage())));
           // set survey type and extra data
           instance.setLegacySampleSurveyType(LegacySampleSurveyType.LFS);
           instance.setGffData(null);
@@ -164,6 +165,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
           setFromCSVColumnAnnotations(instance, record, "GFF");
           // set derived due date
           instance.setDueDate(convertToGFFDate(instance.getStage()));
+          instance.setCalculatedDueDate(String.valueOf(convertToGFFDate(instance.getStage())));
           // set survey type and extra data
           instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
           instance.setGffData(new LegacySampleGFFDataIngest());
