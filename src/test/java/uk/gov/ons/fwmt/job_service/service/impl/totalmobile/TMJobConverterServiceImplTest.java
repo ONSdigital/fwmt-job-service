@@ -228,7 +228,7 @@ public class TMJobConverterServiceImplTest {
     tmJobConverterService.addAddressLines(testAddressLines,testLine);
 
     //Then
-    assertNotEquals(testAddressLines, expectedArray);
+    assertNotEquals(expectedArray, testAddressLines);
     int expectedArraySize = 0;
     assertEquals(expectedArraySize, testAddressLines.size());
   }
