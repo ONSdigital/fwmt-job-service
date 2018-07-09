@@ -9,11 +9,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.fwmt.job_service.exceptions.types.ResourceServiceMalfunctionException;
 import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
 
 import java.util.Optional;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -52,12 +54,19 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    ResourceServiceMalfunctionException exception = null;
+
     //When
-    Optional<UserDto> result = userResourceService.findByAuthNo(testAuthNo);
+    try {
+      Optional<UserDto> result = userResourceService.findByAuthNo(testAuthNo);
+    } catch (ResourceServiceMalfunctionException e) {
+      exception = e;
+    }
 
     //Then
-    assertFalse(result.isPresent());
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
+    assertNotNull(exception);
+    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 
   @Test
@@ -84,12 +93,19 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAltAuth)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    ResourceServiceMalfunctionException exception = null;
+
     //When
-    Optional<UserDto> result = userResourceService.findByAlternateAuthNo(testAltAuth);
+    try {
+      Optional<UserDto> result = userResourceService.findByAlternateAuthNo(testAltAuth);
+    } catch (ResourceServiceMalfunctionException e) {
+      exception = e;
+    }
 
     //Then
-    assertFalse(result.isPresent());
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAltAuth));
+    assertNotNull(exception);
+    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 
   @Test
@@ -112,7 +128,6 @@ public class UserResourceServiceImplTest {
   }
 
   @Test
-
   public void userIsNotActive() {
     //Given
     String testAuthNo = "1111";
@@ -120,12 +135,19 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    ResourceServiceMalfunctionException exception = null;
+
     //When
-    Boolean result = userResourceService.existsByAuthNoAndActive(testAuthNo, isActive);
+    try {
+      userResourceService.existsByAuthNoAndActive(testAuthNo, isActive);
+    } catch (ResourceServiceMalfunctionException e) {
+      exception = e;
+    }
 
     //Then
-    assertFalse(result);
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
+    assertNotNull(exception);
+    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 
   @Test
@@ -136,12 +158,19 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    ResourceServiceMalfunctionException exception = null;
+
     //When
-    Boolean result = userResourceService.existsByAuthNoAndActive(testAuthNo, isActive);
+    try {
+      Boolean result = userResourceService.existsByAuthNoAndActive(testAuthNo, isActive);
+    } catch (ResourceServiceMalfunctionException e) {
+      exception = e;
+    }
 
     //Then
-    assertFalse(result);
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
+    assertNotNull(exception);
+    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 
   @Test
@@ -171,12 +200,19 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAlthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    ResourceServiceMalfunctionException exception = null;
+
     //When
-    Boolean result = userResourceService.existsByAlternateAuthNoAndActive(testAlthNo, isActive);
+    try {
+      Boolean result = userResourceService.existsByAlternateAuthNoAndActive(testAlthNo, isActive);
+    } catch (ResourceServiceMalfunctionException e) {
+      exception = e;
+    }
 
     //Then
-    assertFalse(result);
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAlthNo));
+    assertNotNull(exception);
+    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 
   @Test
@@ -187,11 +223,18 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAlthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    ResourceServiceMalfunctionException exception = null;
+
     //When
-    Boolean result = userResourceService.existsByAlternateAuthNoAndActive(testAlthNo, isActive);
+    try {
+      userResourceService.existsByAlternateAuthNoAndActive(testAlthNo, isActive);
+    } catch (ResourceServiceMalfunctionException e) {
+      exception = e;
+    }
 
     //Then
-    assertFalse(result);
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAlthNo));
+    assertNotNull(exception);
+    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 }

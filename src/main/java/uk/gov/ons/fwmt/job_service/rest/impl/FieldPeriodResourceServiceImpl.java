@@ -32,27 +32,13 @@ public class FieldPeriodResourceServiceImpl implements FieldPeriodResourceServic
 
   @Override
   public Optional<FieldPeriodDto> findByFieldPeriod(final String fieldPeriod) {
-    log.info("findByFieldPeriod: {}", fieldPeriod);
-    try {
-      final ResponseEntity<FieldPeriodDto> responseEntity = restTemplate
-          .getForEntity(findUrl, FieldPeriodDto.class, fieldPeriod);
-      if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-        return Optional.ofNullable(responseEntity.getBody());
-      }
-      // any success that doesn't have a 200 is an unexpected error
-      log.warn("findByFieldPeriod: returned with a non-200 code: fieldPeriod={}, code={}", fieldPeriod,
-          responseEntity.getStatusCodeValue());
-      return Optional.empty();
-    } catch (HttpClientErrorException httpException) {
-      if (httpException.getStatusCode() == HttpStatus.NOT_FOUND) {
-        // a 404, which occurs when we can't find a field period
-        log.debug("findByFieldPeriod: fieldPeriod not found", httpException);
-        return Optional.empty();
-      }
-      // any other unexpected error
-      ResourceServiceInaccessibleException exception = new ResourceServiceInaccessibleException(
-          String.format("in findByFieldPeriod: fieldPeriod=%s", fieldPeriod), httpException);
-      throw exception;
+    log.debug("findByFieldPeriod entered: fieldPeriod={}", fieldPeriod);
+    final Optional<FieldPeriodDto> jobDto = RestCommon.get(restTemplate, findUrl, FieldPeriodDto.class, fieldPeriod);
+    if (jobDto.isPresent()) {
+      log.debug("findByFieldPeriod found: {}", jobDto.get());
+    } else {
+      log.debug("findByFieldPeriod not found");
     }
+    return jobDto;
   }
 }

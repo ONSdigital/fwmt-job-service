@@ -6,20 +6,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.fwmt.job_service.exceptions.types.ResourceServiceMalfunctionException;
 import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
 
 import java.util.Optional;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,7 +30,8 @@ public class JobResourceServiceImplTest {
 
   @InjectMocks private JobResourceServiceImpl jobResourceService;
   @Mock private RestTemplate restTemplate;
-  @Mock private ResponseEntity responseEntity;
+  @Mock private ResponseEntity<JobDto> jobDtoResponseEntity;
+  @Mock private ResponseEntity<Void> voidResponseEntity;
 
   @Before
   public void setup() {
@@ -39,9 +43,9 @@ public class JobResourceServiceImplTest {
     //Given
     String tmJobId = "testID";
     JobDto expectedJobDto = new JobDto(tmJobId, null);
-    when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId))).thenReturn(responseEntity);
-    when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
-    when(responseEntity.getBody()).thenReturn(expectedJobDto);
+    when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId))).thenReturn(jobDtoResponseEntity);
+    when(jobDtoResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+    when(jobDtoResponseEntity.getBody()).thenReturn(expectedJobDto);
 
     //When
     Boolean result = jobResourceService.existsByTmJobId(tmJobId);
@@ -55,9 +59,9 @@ public class JobResourceServiceImplTest {
     //Given
     String tmJobId = "testID";
     JobDto expectedJobDto = new JobDto(tmJobId, null);
-    when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId))).thenReturn(responseEntity);
-    when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
-    when(responseEntity.getBody()).thenReturn(expectedJobDto);
+    when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId))).thenReturn(jobDtoResponseEntity);
+    when(jobDtoResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+    when(jobDtoResponseEntity.getBody()).thenReturn(expectedJobDto);
 
     //When
     Optional<JobDto> jobDto = jobResourceService.findByTmJobId(tmJobId);
@@ -72,9 +76,9 @@ public class JobResourceServiceImplTest {
     String tmJobId = "testID";
     String lastAuthNo = "lastAuth";
     JobDto expectedJobDto = new JobDto(tmJobId, lastAuthNo);
-    when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId))).thenReturn(responseEntity);
-    when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
-    when(responseEntity.getBody()).thenReturn(expectedJobDto);
+    when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId))).thenReturn(jobDtoResponseEntity);
+    when(jobDtoResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+    when(jobDtoResponseEntity.getBody()).thenReturn(expectedJobDto);
 
     //When
     boolean result = jobResourceService.existsByTmJobIdAndLastAuthNo(tmJobId, lastAuthNo);
@@ -92,12 +96,19 @@ public class JobResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    ResourceServiceMalfunctionException exception = null;
+
     //When
-    boolean result = jobResourceService.existsByTmJobIdAndLastAuthNo(tmJobId, lastAuthNo);
+    try {
+      jobResourceService.existsByTmJobIdAndLastAuthNo(tmJobId, lastAuthNo);
+    } catch (ResourceServiceMalfunctionException e) {
+      exception = e;
+    }
 
     //Then
-    assertFalse(result);
     verify(restTemplate).getForEntity(any(), eq(JobDto.class), eq(tmJobId));
+    assertNotNull(exception);
+    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 
   @Test
@@ -108,12 +119,19 @@ public class JobResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    ResourceServiceMalfunctionException exception = null;
+
     //When
-    Optional<JobDto> result = jobResourceService.findByTmJobId(tmJobId);
+    try {
+      Optional<JobDto> result = jobResourceService.findByTmJobId(tmJobId);
+    } catch (ResourceServiceMalfunctionException e) {
+      exception = e;
+    }
 
     //Then
-    assertFalse(result.isPresent());
     verify(restTemplate).getForEntity(any(), eq(JobDto.class), eq(tmJobId));
+    assertNotNull(exception);
+    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 
   @Test
@@ -123,19 +141,18 @@ public class JobResourceServiceImplTest {
     String lastAuthNo = "lastAuth";
     JobDto jobDto = new JobDto(tmJobId, lastAuthNo);
     HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
-    when(restTemplate.postForEntity(any(), eq(request), eq(Void.class), eq(jobDto))).thenReturn(responseEntity);
-    when(responseEntity.getStatusCode()).thenReturn(HttpStatus.CREATED);
+    when(restTemplate.postForEntity(any(), eq(request), eq(Void.class), eq(jobDto))).thenReturn(voidResponseEntity);
+    when(voidResponseEntity.getStatusCode()).thenReturn(HttpStatus.CREATED);
 
     //When
-    Boolean result = jobResourceService.createJob(jobDto);
+    jobResourceService.createJob(jobDto);
 
     //Then
     verify(restTemplate).postForEntity(any(), eq(request), eq(Void.class), eq(jobDto));
-    assertTrue(result);
   }
 
   @Test
-  public void shouldFailToCreatJobAndThrowHttpClientErrorException() {
+  public void shouldFailToCreateJobAndThrowHttpClientErrorException() {
     //Given
     String tmJobId = "testID";
     String lastAuthNo = "lastAuth";
@@ -144,12 +161,19 @@ public class JobResourceServiceImplTest {
     when(restTemplate.postForEntity(any(), eq(request), eq(Void.class), eq(jobDto)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    ResourceServiceMalfunctionException exception = null;
+
     //When
-    Boolean result = jobResourceService.createJob(jobDto);
+    try {
+      jobResourceService.createJob(jobDto);
+    } catch (ResourceServiceMalfunctionException e) {
+      exception = e;
+    }
 
     //Then
     verify(restTemplate).postForEntity(any(), eq(request), eq(Void.class), eq(jobDto));
-    assertFalse(result);
+    assertNotNull(exception);
+    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 
   @Test
@@ -159,15 +183,13 @@ public class JobResourceServiceImplTest {
     String lastAuthNo = "lastAuth";
     JobDto jobDto = new JobDto(tmJobId, lastAuthNo);
     HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
-    when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(), eq(Void.class))).thenReturn(responseEntity);
-    when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+    doNothing().when(restTemplate).put(anyString(), any());
 
     //When
-    Boolean result = jobResourceService.updateJob(jobDto);
+    jobResourceService.updateJob(jobDto);
 
     //Then
-    verify(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), eq(request), eq(Void.class));
-    assertTrue(result);
+    verify(restTemplate).put(anyString(), any());
   }
 
   @Test
@@ -177,14 +199,20 @@ public class JobResourceServiceImplTest {
     String lastAuthNo = "lastAuth";
     JobDto jobDto = new JobDto(tmJobId, lastAuthNo);
     HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
-    when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), eq(request), eq(Void.class)))
-        .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+    doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST)).when(restTemplate).put(anyString(), any());
+
+    ResourceServiceMalfunctionException exception = null;
 
     //When
-    Boolean result = jobResourceService.updateJob(jobDto);
+    try {
+      jobResourceService.updateJob(jobDto);
+    } catch (ResourceServiceMalfunctionException e) {
+      exception = e;
+    }
 
     //Then
-    verify(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), eq(request), eq(Void.class));
-    assertFalse(result);
+    verify(restTemplate).put(anyString(), any());
+    assertNotNull(exception);
+    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 }

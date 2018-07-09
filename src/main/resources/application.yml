@@ -65,7 +65,7 @@ service:
           path: "/users/alternative/{altAuthNo}"
       jobs:
         find:
-          path: "/jobs/{authNo}"
+          path: "/jobs/{tmJobId}"
         create:
           path: "/jobs/"
         update:
