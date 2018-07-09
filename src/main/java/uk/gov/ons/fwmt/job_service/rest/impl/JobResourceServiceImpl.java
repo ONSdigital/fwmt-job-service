@@ -101,8 +101,7 @@ public class JobResourceServiceImpl implements JobResourceService {
 
   @Override
   public boolean sendCSV(MultipartFile file) throws HttpClientErrorException, FileNotFoundException, IOException{
-
-    log.info("SendCSV");
+    log.debug("SendCSV");
     try {
 
       File convFile = convertFile(file);
@@ -130,15 +129,11 @@ public class JobResourceServiceImpl implements JobResourceService {
 
 
   private File convertFile(MultipartFile file) throws IOException{
-
     File convFile = new File (file.getOriginalFilename());
     FileOutputStream fos = new FileOutputStream(convFile);
     try {
-      if(!convFile.createNewFile()) {
-        fos.write(file.getBytes());
-      }else {
-        return null;
-      }
+      convFile.createNewFile(); 
+      fos.write(file.getBytes());
     } finally {
       fos.close();
     }
