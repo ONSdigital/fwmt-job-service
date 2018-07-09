@@ -258,32 +258,4 @@ public class FileIngestServiceImplTest {
     //Then
     assertNotEquals(validTime, result);
   }
-
-  @Test
-  public void ingestGFFSampleFile() throws IOException, InvalidFileNameException {
-    //Given
-    File testFile = new File("sample_GFF_2018-04-24T19-09-54Z.csv");
-
-    //When
-    FileIngest result = fileIngestService.ingestSampleFile(testFile);
-
-    //Then
-    assertEquals("sample", result.getFilename().getEndpoint());
-    assertEquals(GFF, result.getFilename().getTla());
-    assertEquals("2018-04-24T19:09:54", result.getFilename().getTimestamp().toString());
-  }
-
-  @Test
-  public void ingestLFSSampleFile() throws IOException, InvalidFileNameException {
-    //Given
-    File testFile = new File("sample_LFS_2018-04-24T19-09-54Z.csv");
-
-    //When
-    FileIngest result = fileIngestService.ingestSampleFile(testFile);
-
-    //Then
-    assertEquals("sample", result.getFilename().getEndpoint());
-    assertEquals(LFS, result.getFilename().getTla());
-    assertEquals("2018-04-24T19:09:54", result.getFilename().getTimestamp().toString());
-  }
 }
