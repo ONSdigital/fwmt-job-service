@@ -53,37 +53,20 @@ public class JobResourceServiceImpl implements JobResourceService {
 
   @Override
   public Optional<JobDto> findByTmJobId(String tmJobId) {
-    log.info("JobResourceService.findByTmJobId: {}", tmJobId);
-    try {
-      final ResponseEntity<JobDto> responseEntity = restTemplate.getForEntity(findUrl, JobDto.class, tmJobId);
-      if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-        return Optional.ofNullable(responseEntity.getBody());
-      }
-      // any success that doesn't have a 200 is an unexpected error
-      ResourceServiceMalfunctionException malfunctionException = new ResourceServiceMalfunctionException(
-          String.format("Unexpected HTTP code: %d", responseEntity.getStatusCode().value()));
-      log.error(malfunctionException.toString(), malfunctionException);
-      // TODO do we throw?
-      // throw malfunctionException;
-      return Optional.ofNullable(responseEntity.getBody());
-    } catch (HttpClientErrorException httpException) {
-      if (httpException.getStatusCode() == HttpStatus.NOT_FOUND) {
-        // a 404, which occurs when we can't find an authNo
-        log.info("UserResourceService.findByAlternateAuthNo: authNo not found");
-        return Optional.empty();
-      }
-      // log.error("An error occurred while communicating with the resource service", httpClientErrorException);
-      ResourceServiceInaccessibleException exception = new ResourceServiceInaccessibleException(
-          String.format("in JobResourceService.findByTmJobId: tmJobId=%s", tmJobId), httpException);
-      // TODO do we throw?
-      // throw exception;
-      return Optional.empty();
+    log.info("JobResourceService.findByTmJobId entered: tmJobId={}", tmJobId);
+    Optional<JobDto> jobDto = RestCommon.get(restTemplate, findUrl, JobDto.class, tmJobId);
+    if (jobDto.isPresent()) {
+      log.info("JobResourceService.findByTmJobId found: {}", jobDto.get());
+    } else {
+      log.info("JobResourceService.findByTmJobId not found");
     }
+    return jobDto;
   }
 
   @Override
   public boolean createJob(JobDto jobDto) {
     log.info("CreateJob: {}", jobDto.toString());
+//    RestCommon.post(restTemplate, createUrl, new HttpEntity<>(jobDto), Void.class, jobDto);
     try {
       final HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
       final ResponseEntity responseEntity = restTemplate.postForEntity(createUrl, request, Void.class, jobDto);
@@ -98,6 +81,7 @@ public class JobResourceServiceImpl implements JobResourceService {
   @Override
   public boolean updateJob(JobDto jobDto) {
     log.info("UpdateJob: {}", jobDto.toString());
+    //    RestCommon.update(restTemplate, createUrl, new HttpEntity<>(jobDto), Void.class, jobDto);
     try {
       final HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
       final ResponseEntity jobDtoResponseEntity = restTemplate.exchange(updateUrl, HttpMethod.PUT, request, Void.class);
