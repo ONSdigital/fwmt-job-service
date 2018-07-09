@@ -17,6 +17,8 @@ import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 import uk.gov.ons.fwmt.job_service.service.JobService;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -48,15 +50,18 @@ public class JobServiceImpl implements JobService {
 
     jobResourceService.sendCSV(file);
 
-    SampleSummaryDTO sampleSummaryDTO = validateSampleFile(file);
+    File f = convertFile(file);
+
+
+    SampleSummaryDTO sampleSummaryDTO = validateSampleFile(f);
 
     // This is an async call
-    jobProcessor.processSampleFile(file);
+    jobProcessor.processSampleFile(f);
 
     return sampleSummaryDTO;
   }
   
-  private SampleSummaryDTO validateSampleFile(MultipartFile file) throws InvalidFileNameException, MediaTypeNotSupportedException, IOException{
+  private SampleSummaryDTO validateSampleFile(File file) throws InvalidFileNameException, MediaTypeNotSupportedException, IOException{
     FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
     Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService.parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
 
@@ -73,6 +78,14 @@ public class JobServiceImpl implements JobService {
       parsed++;
     }
 
-    return new SampleSummaryDTO(file.getOriginalFilename(), parsed, unprocessed);
+    return new SampleSummaryDTO(file.getName(), parsed, unprocessed);
+  }
+
+  private File convertFile(MultipartFile file) throws IOException{
+    File convFile = new File (file.getOriginalFilename());
+    try (FileOutputStream fos = new FileOutputStream(convFile)) {
+      fos.write(file.getBytes());
+    }
+    return convFile;
   }
 }
