@@ -1,9 +1,18 @@
 package uk.gov.ons.fwmt.job_service.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.UnprocessedCSVRow;
 import uk.gov.ons.fwmt.job_service.data.dto.SampleSummaryDTO;
@@ -16,13 +25,6 @@ import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 import uk.gov.ons.fwmt.job_service.service.JobService;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 @Slf4j
 @Service
@@ -47,17 +49,12 @@ public class JobServiceImpl implements JobService {
   @Override
   public SampleSummaryDTO processSampleFile(MultipartFile file)
           throws IOException, InvalidFileNameException, MediaTypeNotSupportedException{
-
     jobResourceService.sendCSV(file);
-
     File f = convertFile(file);
-
-
     SampleSummaryDTO sampleSummaryDTO = validateSampleFile(f);
 
     // This is an async call
     jobProcessor.processSampleFile(f);
-
     return sampleSummaryDTO;
   }
   
@@ -83,9 +80,7 @@ public class JobServiceImpl implements JobService {
 
   private File convertFile(MultipartFile file) throws IOException{
     File convFile = new File (file.getOriginalFilename());
-    try (FileOutputStream fos = new FileOutputStream(convFile)) {
-      fos.write(file.getBytes());
-    }
+    FileCopyUtils.copy(file.getInputStream(), new FileOutputStream(convFile));
     return convFile;
   }
 }

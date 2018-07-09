@@ -1,22 +1,24 @@
 package uk.gov.ons.fwmt.job_service.service.impl;
 
-import org.junit.Test;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
-import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
-import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
-import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.time.LocalDateTime;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType.GFF;
 import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType.LFS;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.LocalDateTime;
+
+import org.junit.Test;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
+
+import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
+import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
 
 public class FileIngestServiceImplTest {
 
@@ -260,8 +262,7 @@ public class FileIngestServiceImplTest {
   @Test
   public void ingestGFFSampleFile() throws IOException, InvalidFileNameException {
     //Given
-    MultipartFile testFile = new MockMultipartFile("sampleFile", "sample_GFF_2018-04-24T19-09-54Z.csv", "text/csv",
-        (InputStream) null);
+    File testFile = new File("sample_GFF_2018-04-24T19-09-54Z.csv");
 
     //When
     FileIngest result = fileIngestService.ingestSampleFile(testFile);
@@ -275,8 +276,7 @@ public class FileIngestServiceImplTest {
   @Test
   public void ingestLFSSampleFile() throws IOException, InvalidFileNameException {
     //Given
-    MultipartFile testFile = new MockMultipartFile("sampleFile", "sample_LFS_2018-04-24T19-09-54Z.csv", "text/csv",
-        (InputStream) null);
+    File testFile = new File("sample_LFS_2018-04-24T19-09-54Z.csv");
 
     //When
     FileIngest result = fileIngestService.ingestSampleFile(testFile);
