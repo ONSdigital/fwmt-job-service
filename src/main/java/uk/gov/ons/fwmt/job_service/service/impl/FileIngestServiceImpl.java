@@ -2,13 +2,14 @@ package uk.gov.ons.fwmt.job_service.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.Filename;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -124,9 +125,9 @@ public class FileIngestServiceImpl implements FileIngestService {
     return timestamp;
   }
 
-  public FileIngest ingestSampleFile(MultipartFile file) throws IOException, InvalidFileNameException {
-    final Filename filename = verifyCSVFilename(file.getOriginalFilename(), "sample");
-    final Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
+  public FileIngest ingestSampleFile(File file) throws IOException, InvalidFileNameException {
+    final Filename filename = verifyCSVFilename(file.getName(), "sample");
+    final Reader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
     return new FileIngest(filename, reader);
   }
 }

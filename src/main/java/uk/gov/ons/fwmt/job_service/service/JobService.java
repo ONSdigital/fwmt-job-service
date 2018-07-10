@@ -9,5 +9,5 @@ import java.io.IOException;
 
 public interface JobService {
   SampleSummaryDTO processSampleFile(MultipartFile file)
-      throws IOException, InvalidFileNameException, MediaTypeNotSupportedException;
+          throws IOException, InvalidFileNameException, MediaTypeNotSupportedException;
 }
