@@ -73,3 +73,5 @@ service:
       fieldPeriods:
         find:
           path: "/fieldPeriods/{fieldPeriod}"
+
+endpoints.env.keys-to-sanitize:
