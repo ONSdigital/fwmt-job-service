@@ -30,7 +30,7 @@ public class FileIngestServiceImpl implements FileIngestService {
       .ofPattern("yyyy-MM-dd'T'HH-mm-ss'Z'");
 
   protected Filename verifyCSVFilename(String rawFilename, String expectedEndpoint) throws InvalidFileNameException {
-    log.info("Began a filename parse for " + rawFilename);
+    log.debug("verifyCSVFilename: Began a filename parse for " + rawFilename);
 
     // Check file extension
     String[] filenameSplitByDot = checkFileExtension(rawFilename);
@@ -39,24 +39,25 @@ public class FileIngestServiceImpl implements FileIngestService {
     String[] filenameSplitByUnderscore = filenameSplitByDot[0].split("_");
 
     String endpoint = extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
+    log.debug("endpoint detected as {}", endpoint);
 
     // Detect survey type
     LegacySampleSurveyType tla = getLegacySampleSurveyType(filenameSplitByUnderscore, endpoint);
+    log.debug("tla detected as {}", tla);
 
     // Timestamp validation
     String rawTimestamp = filenameSplitByUnderscore[filenameSplitByUnderscore.length - 1];
-    log.debug("File timestamp detected as " + rawTimestamp);
     LocalDateTime timestamp = getLocalDateTime(rawFilename, rawTimestamp);
+    log.debug("timestamp detected as {}", timestamp);
 
-    log.info("Passed a filename check");
-
-    return new Filename(endpoint, tla, timestamp);
+    Filename filename = new Filename(endpoint, tla, timestamp);
+    log.debug("Passed a filename check with {}", filename);
+    return filename;
   }
 
   protected String extractEndpoint(String rawFilename, String expectedEndpoint, String[] filenameSplitByUnderscore)
       throws InvalidFileNameException {
     String endpoint = filenameSplitByUnderscore[0];
-    log.debug("File endpoint detected as " + endpoint);
 
     if (!expectedEndpoint.equals(endpoint)) {
       throw new InvalidFileNameException(rawFilename, "File had an incorrect endpoint of " + endpoint);
@@ -125,8 +126,11 @@ public class FileIngestServiceImpl implements FileIngestService {
   }
 
   public FileIngest ingestSampleFile(MultipartFile file) throws IOException, InvalidFileNameException {
+    log.debug("ingestSampleFile began with filename {}", file.getOriginalFilename());
     final Filename filename = verifyCSVFilename(file.getOriginalFilename(), "sample");
     final Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
-    return new FileIngest(filename, reader);
+    FileIngest fileIngest = new FileIngest(filename, reader);
+    log.debug("ingestSampleFile passed with {}", fileIngest);
+    return fileIngest;
   }
 }

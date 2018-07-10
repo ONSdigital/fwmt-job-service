@@ -32,7 +32,11 @@ public enum ExceptionCode {
 
   // indicates that the resource service could be accessed, but did not behave as expected
   // this includes strange HTTP responses
-  FWMT_JOB_SERVICE_0013("RESOURCE_SERVICE_MALFUNCTION");
+  FWMT_JOB_SERVICE_0013("RESOURCE_SERVICE_MALFUNCTION"),
+
+  // indicates that TM could be accessed, but did not behave as expected
+  // this includes strange HTTP responses
+  FWMT_JOB_SERVICE_0014("TM_MALFUNCTION");
 
   @Getter
   private final String description;

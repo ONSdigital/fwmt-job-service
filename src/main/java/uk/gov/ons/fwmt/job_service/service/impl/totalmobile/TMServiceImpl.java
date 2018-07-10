@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
 import org.springframework.ws.soap.client.core.SoapActionCallback;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
+import uk.gov.ons.fwmt.job_service.exceptions.types.TMMalfunctionException;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 
 import javax.xml.bind.JAXBElement;
@@ -103,11 +104,9 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
       throw new IllegalArgumentException("Message passed that does not match any TotalMobile message");
     }
     String className = cl.getSimpleName();
-    if (messageActionMap.containsKey(cl)) {
-      return namespace + messageActionMap.get(cl);
-    } else {
-      return namespace + className;
-    }
+    String action = namespace + messageActionMap.getOrDefault(cl, className);
+    log.debug("lookupSOAPAction found action: {}", action);
+    return action;
   }
 
   // TODO can we assert that we return 'JAXBElement<?> or T'?
@@ -133,6 +132,7 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
   }
 
   public <I, O> O send(I message) {
+    log.debug("send: Began sending message of class {}", message.getClass().getSimpleName());
     String soapAction = lookupSOAPAction(message.getClass());
     Object wrapped = jaxbWrap(message);
     @SuppressWarnings("unchecked")
@@ -140,8 +140,9 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
         .marshalSendAndReceive(messageQueueUrl, wrapped, new SoapActionCallback(soapAction)));
     if (!Arrays.asList(knownResponseTypes).contains(response.getClass())) {
       log.error("Message received from TM that does not match any TotalMobile message", response);
-      throw new IllegalArgumentException("Message received from TM that does not match any TotalMobile message");
+      throw new TMMalfunctionException("Message received from TM that does not match any TotalMobile message");
     }
+    log.debug("send: successfully sent message and received a response of class {}", response.getClass().getSimpleName());
     return response;
   }
 

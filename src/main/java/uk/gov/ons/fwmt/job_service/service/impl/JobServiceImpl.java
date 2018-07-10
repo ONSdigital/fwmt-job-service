@@ -59,14 +59,15 @@ public class JobServiceImpl implements JobService {
   }
 
   protected Optional<UnprocessedCSVRow> sendJobToUser(int row, LegacySampleIngest ingest, UserDto userDto) {
+    log.debug("sendJobToUser: handling job {} for user {}", ingest.getTmJobId(), userDto.getTmUsername());
     String authno = userDto.getAuthNo();
     String username = userDto.getTmUsername();
     try {
       if (jobResourceService.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), authno)) {
-        log.info("Job has been sent previously");
+        log.debug("Job has been sent previously");
         return Optional.of(new UnprocessedCSVRow(row, "Job has been sent previously"));
       } else if (jobResourceService.existsByTmJobId(ingest.getTmJobId())) {
-        log.info("Job is a reallocation");
+        log.debug("Job is a reallocation");
         final SendUpdateJobHeaderRequestMessage request = tmJobConverterService.updateJob(ingest, username);
         // TODO add error handling
         tmService.send(request);
@@ -81,14 +82,14 @@ public class JobServiceImpl implements JobService {
         switch (ingest.getLegacySampleSurveyType()) {
         case GFF:
           if (ingest.isGffReissue()) {
-            log.info("Job is a GFF reissue");
+            log.debug("Job is a GFF reissue");
             // send the job to TM
             final SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
             tmService.send(request);
             // save the job in the database
             jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
           } else {
-            log.info("Job is a new GFF job");
+            log.debug("Job is a new GFF job");
             // send the job to TM
             final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
             tmService.send(request);
@@ -97,7 +98,7 @@ public class JobServiceImpl implements JobService {
           }
           break;
         case LFS:
-          log.info("Job is a new LFS job");
+          log.debug("Job is a new LFS job");
           // send the job to TM
           final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
           tmService.send(request);
@@ -108,7 +109,7 @@ public class JobServiceImpl implements JobService {
           throw new IllegalArgumentException("Unknown survey type");
         }
       }
-      log.info("Job sent successfully");
+      log.debug("Job sent successfully");
       return Optional.empty();
     } catch (Exception e) {
       log.error("Error while sending job", e);
@@ -117,15 +118,15 @@ public class JobServiceImpl implements JobService {
   }
 
   protected Optional<UserDto> findUser(LegacySampleIngest ingest) {
-    log.info("Handling entry with authno: " + ingest.getAuth());
+    log.debug("Handling entry with authno: " + ingest.getAuth());
     Optional<UserDto> userDto = userResourceService.findByAuthNo(ingest.getAuth());
     if (userDto.isPresent()) {
-      log.info("Found user by authno: " + userDto.toString());
+      log.debug("Found user by authno: " + userDto.toString());
       return userDto;
     }
     userDto = userResourceService.findByAlternateAuthNo(ingest.getAuth());
     if (userDto.isPresent()) {
-      log.info("Found user by alternate authno: " + userDto.toString());
+      log.debug("Found user by alternate authno: " + userDto.toString());
       return userDto;
     } else {
       return Optional.empty();
@@ -135,6 +136,7 @@ public class JobServiceImpl implements JobService {
   @Override
   public SampleSummaryDTO processSampleFile(MultipartFile file)
       throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
+    log.debug("processSampleFile: handling file with name '{}'", file.getOriginalFilename());
     FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
     Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService
         .parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
