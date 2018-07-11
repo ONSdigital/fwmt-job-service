@@ -3,6 +3,7 @@ package uk.gov.ons.fwmt.job_service.exceptions;
 import lombok.Getter;
 
 public enum ExceptionCode {
+  // indicates an unexpected exception, usually a runtime exception
   FWMT_JOB_SERVICE_0001("UNKNOWN"),
 
   FWMT_JOB_SERVICE_0002("INVALID_FILE_NAME"),
@@ -25,18 +26,21 @@ public enum ExceptionCode {
   // indicates that totalmobile could not be contacted
   FWMT_JOB_SERVICE_0010("TM_INACCESSIBLE"),
 
-  FWMT_JOB_SERVICE_0011("UNKNOWN_FIELD_PERIOD"),
+  // indicates that TM could be accessed, but did not behave as expected
+  // this includes strange HTTP responses
+  FWMT_JOB_SERVICE_0011("TM_MALFUNCTION"),
+
+  // indicates that the resource service has rejected our credentials
+  FWMT_JOB_SERVICE_0012("RESOURCE_SERVICE_UNAUTHENTICATED"),
 
   // indicates that the resource service could not be contacted
-  FWMT_JOB_SERVICE_0012("RESOURCE_SERVICE_INACCESSIBLE"),
+  FWMT_JOB_SERVICE_0013("RESOURCE_SERVICE_INACCESSIBLE"),
 
   // indicates that the resource service could be accessed, but did not behave as expected
   // this includes strange HTTP responses
-  FWMT_JOB_SERVICE_0013("RESOURCE_SERVICE_MALFUNCTION"),
+  FWMT_JOB_SERVICE_0014("RESOURCE_SERVICE_MALFUNCTION"),
 
-  // indicates that TM could be accessed, but did not behave as expected
-  // this includes strange HTTP responses
-  FWMT_JOB_SERVICE_0014("TM_MALFUNCTION");
+  FWMT_JOB_SERVICE_0015("UNKNOWN_FIELD_PERIOD");
 
   @Getter
   private final String description;

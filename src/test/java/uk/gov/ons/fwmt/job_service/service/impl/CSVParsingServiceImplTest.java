@@ -163,7 +163,7 @@ public class CSVParsingServiceImplTest {
     //Given
     when(fieldPeriodResourceService.findByFieldPeriod(any())).thenReturn(Optional.empty());
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.FWMT_JOB_SERVICE_0011.toString());
+    expectedException.expectMessage(ExceptionCode.FWMT_JOB_SERVICE_0015.toString());
 
     //When
     csvParsingServiceImpl.convertToGFFDate(anyString());
@@ -192,7 +192,7 @@ public class CSVParsingServiceImplTest {
     //Given
     when(fieldPeriodResourceService.findByFieldPeriod(any())).thenReturn(Optional.empty());
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.FWMT_JOB_SERVICE_0011.toString());
+    expectedException.expectMessage(ExceptionCode.FWMT_JOB_SERVICE_0015.toString());
 
     //When
     csvParsingServiceImpl.convertToLFSDate(anyString());

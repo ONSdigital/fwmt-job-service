@@ -119,7 +119,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
       final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
       return fieldPeriod.getEndDate();
     } else {
-      throw new FWMTCommonException(ExceptionCode.FWMT_JOB_SERVICE_0011);
+      throw new FWMTCommonException(ExceptionCode.FWMT_JOB_SERVICE_0015);
     }
   }
 
@@ -130,7 +130,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
       final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
       return fieldPeriod.getEndDate();
     } else {
-      throw new FWMTCommonException(ExceptionCode.FWMT_JOB_SERVICE_0011);
+      throw new FWMTCommonException(ExceptionCode.FWMT_JOB_SERVICE_0015);
     }
   }
 
