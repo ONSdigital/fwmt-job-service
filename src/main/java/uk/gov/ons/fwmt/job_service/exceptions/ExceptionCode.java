@@ -6,18 +6,25 @@ public enum ExceptionCode {
   // indicates an unexpected exception, usually a runtime exception
   FWMT_JOB_SERVICE_0001("UNKNOWN"),
 
+  // used in InvalidFileNameException
   FWMT_JOB_SERVICE_0002("INVALID_FILE_NAME"),
 
+  // used in MediaTypeNotSupportedException
   FWMT_JOB_SERVICE_0003("INVALID_MEDIA_TYPE"),
 
+  // unused?
   FWMT_JOB_SERVICE_0004("UNKNOWN_JOB_ID"),
 
+  // used in UnknownUserException
   FWMT_JOB_SERVICE_0005("UNKNOWN_USER_ID"),
 
+  // used in CSVMissingColumnException
   FWMT_JOB_SERVICE_0006("CSV_MISSING_COLUMN"),
 
+  // used in CSVInvalidFieldException
   FWMT_JOB_SERVICE_0007("CSV_INVALID_FIELD"),
 
+  // used in CSVOtherException
   FWMT_JOB_SERVICE_0008("CSV_OTHER"),
 
   // indicates that totalmobile rejected our credentials

@@ -15,6 +15,8 @@ import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleLFSDataIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
+import uk.gov.ons.fwmt.job_service.exceptions.types.CSVMissingColumnException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.CSVOtherException;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.FieldPeriodResourceService;
 import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
@@ -45,13 +47,14 @@ public class CSVParsingServiceImpl implements CSVParsingService {
    * from the columns of a CSV record
    *
    * @param instance An instance of the class that will be mutated
-   * @param record A row of a CSV file
-   * @param pivot A string used to determine which field name should be used, in
-   *          events where there are many options
-   * @param <T> A class with fields annotated with CSVColumn
+   * @param record   A row of a CSV file
+   * @param pivot    A string used to determine which field name should be used, in
+   *                 events where there are many options
+   * @param <T>      A class with fields annotated with CSVColumn
    */
 
-  protected  <T> void setFromCSVColumnAnnotations(T instance, CSVRecord record, String pivot) {
+  protected <T> void setFromCSVColumnAnnotations(T instance, CSVRecord record, String pivot)
+      throws FWMTCommonException {
     Class<?> tClass = instance.getClass();
     PropertyAccessor accessor = PropertyAccessorFactory.forBeanPropertyAccess(instance);
     for (Field field : tClass.getDeclaredFields()) {
@@ -70,15 +73,19 @@ public class CSVParsingServiceImpl implements CSVParsingService {
           if (mapping.isPresent()) {
             columnName = mapping.get().value();
           } else {
-            throw new IllegalArgumentException("Given pivot does not occur in the CSVColumn annotation");
+            throw new CSVOtherException("Given pivot does not occur in the CSVColumn annotation");
           }
         } else {
-          throw new IllegalStateException("CSVColumn lacked a 'value' or 'values' field");
+          throw new CSVOtherException("CSVColumn lacked a 'value' or 'values' field");
         }
         // if it's mandatory or set, try
         // if it's ignored, don't try
-        if ((record.isSet(columnName) || csvColumn.mandatory()) && !csvColumn.ignored()) {
-          accessor.setPropertyValue(field.getName(), record.get(columnName));
+        if (csvColumn.mandatory() && !csvColumn.ignored()) {
+          if (record.isSet(columnName)) {
+            accessor.setPropertyValue(field.getName(), record.get(columnName));
+          } else {
+            throw new CSVMissingColumnException(String.format("Missing column: name=%s", columnName));
+          }
         }
       }
     }
@@ -138,10 +145,23 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     return CSVFormat.DEFAULT.withHeader();
   }
 
+  public void parseLegacySampleGFFData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException {
+    // set normal fields
+    setFromCSVColumnAnnotations(instance, record, "GFF");
+    // set derived due date
+    instance.setDueDate(convertToGFFDate(instance.getStage()));
+    // set survey type and extra data
+    instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
+    instance.setGffData(new LegacySampleGFFDataIngest());
+    instance.setLfsData(null);
+    setFromCSVColumnAnnotations(instance.getGffData(), record, null);
+  }
+
   // TODO possibly simplify this horribleness?
   @Override
   public Iterator<CSVParseResult<LegacySampleIngest>> parseLegacySample(Reader reader,
       LegacySampleSurveyType legacySampleSurveyType) throws IOException {
+    log.debug("parseLegacySample: began parsing file: surveyType={}", legacySampleSurveyType);
     CSVParser parser = getCSVFormat().parse(reader);
     return new CSVIterator<LegacySampleIngest>(parser) {
       @Override
@@ -160,15 +180,8 @@ public class CSVParsingServiceImpl implements CSVParsingService {
           setFromCSVColumnAnnotations(instance.getLfsData(), record, null);
           break;
         case GFF:
-          // set normal fields
-          setFromCSVColumnAnnotations(instance, record, "GFF");
-          // set derived due date
-          instance.setDueDate(convertToGFFDate(instance.getStage()));
-          // set survey type and extra data
-          instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
-          instance.setGffData(new LegacySampleGFFDataIngest());
-          instance.setLfsData(null);
-          setFromCSVColumnAnnotations(instance.getGffData(), record, null);
+          // handle the GFF-specific fields
+          parseLegacySampleGFFData(instance, record);
           break;
         default:
           throw new IllegalArgumentException("Unknown survey type");
