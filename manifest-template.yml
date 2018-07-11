@@ -9,7 +9,6 @@ applications:
   - route: '&{INTERNAL_DOMAIN}/&{PATH}'
   - route: '&{EXTERNAL_DOMAIN}/&{PATH}'
   env:
-    SPRING_APPLICATION_JSON: '&{SPRING_JSON}'
     logging_level_uk_gov_ons_fwmt: FWMT_LOG_LEVEL
     logging_level_org_springframework_security: SPRING_LOG_LEVEL
     logging_level_org_springframework_web: SPRING_LOG_LEVEL
