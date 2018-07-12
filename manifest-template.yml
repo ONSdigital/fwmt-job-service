@@ -9,4 +9,15 @@ applications:
   - route: '&{INTERNAL_DOMAIN}/&{PATH}'
   - route: '&{EXTERNAL_DOMAIN}/&{PATH}'
   env:
-    SPRING_APPLICATION_JSON: '&{SPRING_JSON}'
+    logging_level_uk_gov_ons_fwmt: FWMT_LOG_LEVEL
+    logging_level_org_springframework_security: SPRING_LOG_LEVEL
+    logging_level_org_springframework_web: SPRING_LOG_LEVEL
+    logging_level_org_hibernate: SPRING_LOG_LEVEL
+    logging_level_org_apache_commons_dbcp2: SPRING_LOG_LEVEL
+    security_user_name: "user"
+    security_user_password: REPLACE_PASSWORD
+    totalmobile_username: REPLACE_TM_USER
+    totalmobile_password: REPLACE_TM_PASS
+    totalmobile_url: REPLACE_TM_URL
+    service_resource_password: REPLACE_RESOURCE_PASSWORD
+    service_resource_baseUrl: REPLACE_RESOURCE_URL

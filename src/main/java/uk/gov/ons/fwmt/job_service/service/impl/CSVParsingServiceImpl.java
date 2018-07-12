@@ -150,11 +150,26 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     setFromCSVColumnAnnotations(instance, record, "GFF");
     // set derived due date
     instance.setDueDate(convertToGFFDate(instance.getStage()));
+    instance.setCalculatedDueDate(String.valueOf(convertToGFFDate(instance.getStage())));
     // set survey type and extra data
     instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
     instance.setGffData(new LegacySampleGFFDataIngest());
     instance.setLfsData(null);
     setFromCSVColumnAnnotations(instance.getGffData(), record, null);
+  }
+
+  public void parseLegacySampleLFSData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException {
+    // set normal fields
+    setFromCSVColumnAnnotations(instance, record, "LFS");
+    // set derived due date
+    instance.setDueDate(convertToLFSDate(instance.getStage()));
+    // TODO should this be using convertToGFFDate?
+    instance.setCalculatedDueDate(String.valueOf(convertToGFFDate(instance.getStage())));
+    // set survey type and extra data
+    instance.setLegacySampleSurveyType(LegacySampleSurveyType.LFS);
+    instance.setGffData(null);
+    instance.setLfsData(new LegacySampleLFSDataIngest());
+    setFromCSVColumnAnnotations(instance.getLfsData(), record, null);
   }
 
   // TODO possibly simplify this horribleness?
@@ -169,15 +184,8 @@ public class CSVParsingServiceImpl implements CSVParsingService {
         LegacySampleIngest instance = new LegacySampleIngest();
         switch (legacySampleSurveyType) {
         case LFS:
-          // set normal fields
-          setFromCSVColumnAnnotations(instance, record, "LFS");
-          // set derived due date
-          instance.setDueDate(convertToLFSDate(instance.getStage()));
-          // set survey type and extra data
-          instance.setLegacySampleSurveyType(LegacySampleSurveyType.LFS);
-          instance.setGffData(null);
-          instance.setLfsData(new LegacySampleLFSDataIngest());
-          setFromCSVColumnAnnotations(instance.getLfsData(), record, null);
+          // handle the LFS-specific fields
+          parseLegacySampleLFSData(instance, record);
           break;
         case GFF:
           // handle the GFF-specific fields

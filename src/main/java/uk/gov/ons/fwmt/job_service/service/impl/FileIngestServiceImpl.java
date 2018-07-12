@@ -126,8 +126,8 @@ public class FileIngestServiceImpl implements FileIngestService {
   }
 
   public FileIngest ingestSampleFile(MultipartFile file) throws IOException, InvalidFileNameException {
-    log.debug("ingestSampleFile began with filename {}", file.getOriginalFilename());
-    final Filename filename = verifyCSVFilename(file.getOriginalFilename(), "sample");
+    log.debug("ingestSampleFile began with filename {}", file.getName());
+    final Filename filename = verifyCSVFilename(file.getName(), "sample");
     final Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
     FileIngest fileIngest = new FileIngest(filename, reader);
     log.debug("ingestSampleFile passed with {}", fileIngest);

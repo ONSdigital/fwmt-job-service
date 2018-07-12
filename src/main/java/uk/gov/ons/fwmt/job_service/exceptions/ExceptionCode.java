@@ -47,7 +47,9 @@ public enum ExceptionCode {
   // this includes strange HTTP responses
   FWMT_JOB_SERVICE_0014("RESOURCE_SERVICE_MALFUNCTION"),
 
-  FWMT_JOB_SERVICE_0015("UNKNOWN_FIELD_PERIOD");
+  FWMT_JOB_SERVICE_0015("UNKNOWN_FIELD_PERIOD"),
+
+  FWMT_JOB_SERVICE_0016("UNABLE_TO_SAVE_FILE");
 
   @Getter
   private final String description;
