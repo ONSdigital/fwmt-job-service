@@ -27,7 +27,6 @@ public class WebConfig extends WsConfigurerAdapter {
   // creates a /tm/GenericOutgoingWs.wsdl
   @Bean(name = "GenericOutgoingWsSoap")
   public Wsdl11Definition defaultGenericOutgoingWsWsdl11Definition() {
-    log.info("WebConfig: GenericOutgoingWs.wsdl was accessed");
     SimpleWsdl11Definition wsdl11Definition = new SimpleWsdl11Definition();
     wsdl11Definition.setWsdl(new ClassPathResource("/wsdl/Messaging_GenericOutgoingWs.wsdl"));
     return wsdl11Definition;
@@ -36,7 +35,6 @@ public class WebConfig extends WsConfigurerAdapter {
   // creates a /tm/MessageQueueWs.wsdl
   @Bean(name = "MessageQueueWs")
   public Wsdl11Definition defaultMessageQueueWsdl11Definition() {
-    log.info("WebConfig: MessageQueueWs.wsdl was accessed");
     SimpleWsdl11Definition wsdl11Definition = new SimpleWsdl11Definition();
     wsdl11Definition.setWsdl(new ClassPathResource("/wsdl/Messaging_MessageQueueWs.wsdl"));
     return wsdl11Definition;
@@ -45,7 +43,6 @@ public class WebConfig extends WsConfigurerAdapter {
   // creates a /tm/OutgoingWs.wsdl
   @Bean(name = "OutgoingWs")
   public Wsdl11Definition defaultOutgoingWsWsdl11Definition() {
-    log.info("WebConfig: OutgoingWs.wsdl was accessed");
     SimpleWsdl11Definition wsdl11Definition = new SimpleWsdl11Definition();
     wsdl11Definition.setWsdl(new ClassPathResource("/wsdl/Messaging_OutgoingWs.wsdl"));
     return wsdl11Definition;
