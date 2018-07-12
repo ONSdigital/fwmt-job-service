@@ -12,6 +12,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleGFFDataIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
+import uk.gov.ons.fwmt.job_service.exceptions.types.CSVMissingColumnException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.CSVOtherException;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.FieldPeriodResourceService;
 import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
@@ -43,7 +45,7 @@ public class CSVParsingServiceImplTest {
   @Mock private FieldPeriodDto fieldPeriodDto;
 
   @Test
-  public void setFromCSVColumnAnnotations() throws IOException {
+  public void setFromCSVColumnAnnotations() throws IOException, FWMTCommonException {
     //Given
     File testFile = new File("src/test/resources/sampledata/unit_tests/sample_GFF_2018-05-17T15-34-00Z.csv");
     Reader reader = new InputStreamReader(new FileInputStream(testFile));
@@ -63,7 +65,7 @@ public class CSVParsingServiceImplTest {
   }
 
   @Test(expected = NoSuchElementException.class)
-  public void inputCSVHasNoRecords() throws IOException {
+  public void inputCSVHasNoRecords() throws IOException, FWMTCommonException {
     //Given
     File testFile = new File("src/test/resources/sampledata/unit_tests/headersOnly.csv");
     Reader reader = new InputStreamReader(new FileInputStream(testFile));
@@ -78,8 +80,8 @@ public class CSVParsingServiceImplTest {
     csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(), "GFF");
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void notAValidPivot() throws IOException {
+  @Test(expected = CSVOtherException.class)
+  public void notAValidPivot() throws IOException, FWMTCommonException {
     //Given
     File testFile = new File("src/test/resources/sampledata/unit_tests/sample_GFF_2018-05-17T15-34-00Z.csv");
     Reader reader = new InputStreamReader(new FileInputStream(testFile));
@@ -94,8 +96,8 @@ public class CSVParsingServiceImplTest {
     csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(), "hdsjf");
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void missingMandatoryColumnsInCSV() throws IOException {
+  @Test(expected = CSVMissingColumnException.class)
+  public void missingMandatoryColumnsInCSV() throws IOException, FWMTCommonException {
     //Given
     File testFile = new File("src/test/resources/sampledata/unit_tests/missingColumns.csv");
     Reader reader = new InputStreamReader(new FileInputStream(testFile));

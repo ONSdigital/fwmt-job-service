@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.ws.client.core.WebServiceTemplate;
+import uk.gov.ons.fwmt.job_service.exceptions.types.TMMalfunctionException;
 
 import javax.xml.bind.JAXBElement;
 
@@ -145,7 +146,7 @@ public class TMServiceImplTest {
     assertEquals(queryMessagesResponse, result);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = TMMalfunctionException.class)
   public void shouldThrowExceptionWhenReceivedResponseWIsNotInPermittedResponses() {
     //Given
     QueryMessagesRequest queryMessagesRequest = new QueryMessagesRequest();
