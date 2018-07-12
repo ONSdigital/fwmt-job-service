@@ -50,9 +50,10 @@ public class JobServiceController {
   public ResponseEntity<SampleSummaryDTO> sampleREST(@RequestParam("file") MultipartFile file,
       RedirectAttributes redirectAttributes)
       throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
-    log.info("Entered sample endpoint");
+    log.info("sampleREST: entered with file name {}", file.getOriginalFilename());
     SampleSummaryDTO summary = jobService.processSampleFile(file);
-    log.info("Exited sample endpoint");
+    log.info("sampleREST: exited with {} processed rows and {} unprocessed rows", summary.getProcessedRows(),
+        summary.getUnprocessedRows().size());
     return ResponseEntity.ok(summary);
   }
 }
