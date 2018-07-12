@@ -1,17 +1,15 @@
 package uk.gov.ons.fwmt.job_service.controller.tm_endpoint;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendMessageResponse;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.WebServiceAdapterOutputRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendMessageResponse;
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.WebServiceAdapterOutputRequest;
-
-import lombok.extern.slf4j.Slf4j;
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 
 @Slf4j
 @Endpoint
