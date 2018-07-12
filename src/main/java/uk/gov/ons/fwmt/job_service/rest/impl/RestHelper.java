@@ -18,7 +18,7 @@ public class RestHelper {
       final ResponseEntity<T> responseEntity = restTemplate.getForEntity(url, klass, parameters);
       if (responseEntity.getStatusCode().is2xxSuccessful()) {
         // return a successful result
-        log.info(String.format("GET successful, received %s", klass.getSimpleName()));
+        log.info("GET successful, received {}", klass.getSimpleName());
         return Optional.ofNullable(responseEntity.getBody());
       }
       // any success that doesn't have a 200 is an unexpected error
@@ -29,7 +29,7 @@ public class RestHelper {
     } catch (HttpClientErrorException httpException) {
       if (httpException.getStatusCode() == HttpStatus.NOT_FOUND) {
         // a 404, which occurs when we can't find the entity
-        log.info(String.format("GET failed with entity %s not found", klass.getSimpleName()));
+        log.info("GET failed with entity {} not found", klass.getSimpleName());
         return Optional.empty();
       }
       // any other unexpected error
@@ -52,7 +52,7 @@ public class RestHelper {
       final ResponseEntity<T> responseEntity = restTemplate.postForEntity(url, request, klass, parameters);
       if (responseEntity.getStatusCode().is2xxSuccessful()) {
         // return a successful result
-        log.info(String.format("POST successful, received %s", klass.getSimpleName()));
+        log.info("POST successful, received {}", klass.getSimpleName());
         return Optional.ofNullable(responseEntity.getBody());
       }
       // any success that doesn't have a 2xx is an unexpected error

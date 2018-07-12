@@ -69,7 +69,7 @@ public class MessageQueueWs {
   private ObjectFactory objectFactory = new ObjectFactory();
 
   private void stub(String messageType) {
-    log.debug(String.format("MessageQueueWs: Found message of type %s", messageType));
+    log.debug("MessageQueueWs: Found message of type {}", messageType);
   }
 
   @PayloadRoot(namespace = NAMESPACE_URI, localPart = "SendMessageRequest")

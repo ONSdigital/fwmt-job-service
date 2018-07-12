@@ -22,7 +22,7 @@ public class OutgoingWs {
   private static final String NAMESPACE_URI = "http://schemas.consiliumtechnologies.com/services/mobile/2009/03/messaging";
 
   private void stub(String messageType) {
-    log.debug(String.format("OutgoingWs: Found message of type %s", messageType));
+    log.debug("OutgoingWs: Found message of type {}", messageType);
   }
 
   @PayloadRoot(namespace = NAMESPACE_URI, localPart = "updateVisitStatusRequest")
