@@ -3,6 +3,8 @@ package uk.gov.ons.fwmt.job_service.exceptions.types;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 
 public class ResourceServiceInaccessibleException extends FWMTCommonRuntimeException {
+  static public final long serialVersionUID = 0L;
+
   public ResourceServiceInaccessibleException() {
     super(ExceptionCode.FWMT_JOB_SERVICE_0013, "The resource service could not be contacted");
   }

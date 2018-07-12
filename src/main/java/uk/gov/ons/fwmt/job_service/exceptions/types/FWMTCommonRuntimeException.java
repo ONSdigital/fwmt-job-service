@@ -3,7 +3,7 @@ package uk.gov.ons.fwmt.job_service.exceptions.types;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 
 public class FWMTCommonRuntimeException extends RuntimeException {
-  static final long serialVersionUID = 0L;
+  static public final long serialVersionUID = 0L;
 
   protected static String makeMessage(ExceptionCode code, String message) {
     if (message != null) {

@@ -3,7 +3,7 @@ package uk.gov.ons.fwmt.job_service.exceptions.types;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 
 public class InvalidFileNameException extends FWMTCommonException {
-  static final long serialVersionUID = 0L;
+  static public final long serialVersionUID = 0L;
 
   private static String makeMessage(String name, String reason) {
     if (reason != null) {
