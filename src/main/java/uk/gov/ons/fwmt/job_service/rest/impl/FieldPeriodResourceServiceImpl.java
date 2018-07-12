@@ -29,7 +29,7 @@ public class FieldPeriodResourceServiceImpl implements FieldPeriodResourceServic
   @Override
   public Optional<FieldPeriodDto> findByFieldPeriod(final String fieldPeriod) {
     log.debug("findByFieldPeriod entered: fieldPeriod={}", fieldPeriod);
-    final Optional<FieldPeriodDto> jobDto = RestCommon.get(restTemplate, findUrl, FieldPeriodDto.class, fieldPeriod);
+    final Optional<FieldPeriodDto> jobDto = RestHelper.get(restTemplate, findUrl, FieldPeriodDto.class, fieldPeriod);
     if (jobDto.isPresent()) {
       log.debug("findByFieldPeriod found: {}", jobDto.get());
     } else {

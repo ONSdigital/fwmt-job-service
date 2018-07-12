@@ -12,7 +12,7 @@ import uk.gov.ons.fwmt.job_service.exceptions.types.ResourceServiceMalfunctionEx
 import java.util.Optional;
 
 @Slf4j
-public class RestCommon {
+public class RestHelper {
   public static <T> Optional<T> get(RestTemplate restTemplate, String url, Class<T> klass, Object... parameters) {
     try {
       final ResponseEntity<T> responseEntity = restTemplate.getForEntity(url, klass, parameters);
