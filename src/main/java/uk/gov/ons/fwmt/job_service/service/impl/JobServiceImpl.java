@@ -72,7 +72,7 @@ public class JobServiceImpl implements JobService {
   }
 
   private SampleSummaryDTO validateSampleFile(File file) throws InvalidFileNameException, MediaTypeNotSupportedException, IOException{
-    log.debug("processSampleFile: handling file with name '{}'", file.getOriginalFilename());
+    log.debug("processSampleFile: handling file with name '{}'", file.getName());
 
     FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
     Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService.parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
@@ -94,7 +94,7 @@ public class JobServiceImpl implements JobService {
   }
 
   private File convertFile(MultipartFile file) throws IOException{
-    log.debug("convertFile: handling file with name {}", file.getName())
+    log.debug("convertFile: handling file with name {}", file.getName());
 
     File convFile = new File (file.getOriginalFilename());
     FileCopyUtils.copy(file.getInputStream(), new FileOutputStream(convFile));

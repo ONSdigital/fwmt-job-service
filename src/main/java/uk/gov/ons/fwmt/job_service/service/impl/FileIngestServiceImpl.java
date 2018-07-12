@@ -9,6 +9,8 @@ import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -125,10 +127,10 @@ public class FileIngestServiceImpl implements FileIngestService {
     return timestamp;
   }
 
-  public FileIngest ingestSampleFile(MultipartFile file) throws IOException, InvalidFileNameException {
+  public FileIngest ingestSampleFile(File file) throws IOException, InvalidFileNameException {
     log.debug("ingestSampleFile began with filename {}", file.getName());
     final Filename filename = verifyCSVFilename(file.getName(), "sample");
-    final Reader reader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
+    final Reader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
     FileIngest fileIngest = new FileIngest(filename, reader);
     log.debug("ingestSampleFile passed with {}", fileIngest);
     return fileIngest;
