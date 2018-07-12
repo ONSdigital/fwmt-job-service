@@ -1,18 +1,10 @@
 package uk.gov.ons.fwmt.job_service.service.impl;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
-
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.UnprocessedCSVRow;
 import uk.gov.ons.fwmt.job_service.data.dto.SampleSummaryDTO;
@@ -22,20 +14,16 @@ import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
 import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
 import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
-import uk.gov.ons.fwmt.job_service.rest.UserResourceService;
-import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
-import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 import uk.gov.ons.fwmt.job_service.service.JobService;
-import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
-import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service

@@ -119,7 +119,6 @@ dependencies {
     testCompile group: 'io.cucumber', name: 'cucumber-spring', version: '3.0.2'
     testCompile "junit:junit:4.12"
     testCompile("org.springframework.boot:spring-boot-starter-test")
-
 }
 
 processResources {

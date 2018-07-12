@@ -2,7 +2,6 @@ package uk.gov.ons.fwmt.job_service.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.Filename;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
