@@ -19,6 +19,20 @@ spring:
   jackson:
       serialization:
         WRITE_DATES_AS_TIMESTAMPS: false
+  datasource:
+    url: jdbc:postgresql://localhost/postgres?currentSchema=gateway
+    driver-class-name: org.postgresql.Driver
+    schema: classpath:/schema.sql
+    continue-on-error: false
+    username: postgres
+    password: postgres
+
+liquibase:
+  url: jdbc:postgresql://localhost:5432/postgres?currentSchema=gateway
+  default-schema: gateway
+  change-log: classpath:db/changelog/db.changelog-master.yml
+  user: postgres
+  password: postgres
 
 management.endpoint.health.show-details: always
 

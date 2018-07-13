@@ -1,0 +1,19 @@
+databaseChangeLog:
+ - changeSet:
+    id: v1
+    author: soundararajan
+    comment: Added JobService Tables
+    changes:
+      - sqlFile:
+          path: 1_Add_JobService_Tables.sql
+          relativeToChangelogFile: true
+          splitStatements: false
+ - changeSet:
+    id: v2
+    author: soundararajan
+    comment: Added FieldPeriod info
+    changes:
+      - sqlFile:
+          path: 2_Add_2018-19_Field_Periods.sql
+          relativeToChangelogFile: true
+          splitStatements: false
