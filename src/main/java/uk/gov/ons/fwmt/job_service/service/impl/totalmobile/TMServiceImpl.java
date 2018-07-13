@@ -59,15 +59,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.stereotype.Service;
+import org.springframework.ws.client.WebServiceClientException;
 import org.springframework.ws.client.core.support.WebServiceGatewaySupport;
+import org.springframework.ws.client.support.interceptor.ClientInterceptor;
+import org.springframework.ws.context.MessageContext;
 import org.springframework.ws.soap.client.core.SoapActionCallback;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
 import uk.gov.ons.fwmt.job_service.exceptions.types.TMMalfunctionException;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 
 import javax.xml.bind.JAXBElement;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -134,14 +139,38 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
       @Value("${totalmobile.password}") String password) throws Exception {
     this.messageQueueUrl = url + messageQueuePath;
     this.namespace = namespace;
+
     Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
     marshaller.setContextPath(messageQueuePackage);
     this.setMarshaller(marshaller);
     this.setUnmarshaller(marshaller);
+
     HttpComponentsMessageSender messageSender = new HttpComponentsMessageSender();
     messageSender.setCredentials(new UsernamePasswordCredentials(username, password));
     messageSender.afterPropertiesSet();
     this.setMessageSender(messageSender);
+
+    ClientInterceptor[] interceptors = { new ClientInterceptor() {
+      @Override public boolean handleRequest(MessageContext messageContext) throws WebServiceClientException {
+        log.trace(messageContext.getRequest().toString());
+        return true;
+      }
+
+      @Override public boolean handleResponse(MessageContext messageContext) throws WebServiceClientException {
+        log.trace(messageContext.getRequest().toString());
+        return true;
+      }
+
+      @Override public boolean handleFault(MessageContext messageContext) throws WebServiceClientException {
+        log.trace(messageContext.getRequest().toString());
+        return true;
+      }
+
+      @Override public void afterCompletion(MessageContext messageContext, Exception ex)
+          throws WebServiceClientException { }
+    } };
+    this.setInterceptors(interceptors);
+
     this.objectFactory = new ObjectFactory();
   }
 
@@ -194,7 +223,8 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
       log.error("Message received from TM that does not match any TotalMobile message", response);
       throw new TMMalfunctionException("Message received from TM that does not match any TotalMobile message");
     }
-    log.debug("send: successfully sent message and received a response of class {}", response.getClass().getSimpleName());
+    log.debug("send: successfully sent message and received a response of class {}",
+        response.getClass().getSimpleName());
     return response;
   }
 
