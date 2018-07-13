@@ -32,7 +32,7 @@ public class UserResourceServiceImpl implements UserResourceService {
   @Override
   public Optional<UserDto> findByAuthNo(String authNo) {
     log.debug("findByAuthNo: authNo={}", authNo);
-    Optional<UserDto> userDto = RestHelper.get(restTemplate, findUrl, UserDto.class, authNo);
+    Optional<UserDto> userDto = ResourceRESTHelper.get(restTemplate, findUrl, UserDto.class, authNo);
     if (userDto.isPresent()) {
       log.debug("findByAuthNo found: {}", userDto.get());
     } else {
@@ -44,7 +44,7 @@ public class UserResourceServiceImpl implements UserResourceService {
   @Override
   public Optional<UserDto> findByAlternateAuthNo(String authNo) {
     log.debug("findByAlternateAuthNo: authNo={}", authNo);
-    Optional<UserDto> userDto = RestHelper.get(restTemplate, findAltUrl, UserDto.class, authNo);
+    Optional<UserDto> userDto = ResourceRESTHelper.get(restTemplate, findAltUrl, UserDto.class, authNo);
     if (userDto.isPresent()) {
       log.debug("findByAuthNo found: {}", userDto.get());
     } else {

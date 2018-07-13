@@ -54,7 +54,7 @@ public class JobResourceServiceImpl implements JobResourceService {
   @Override
   public boolean existsByTmJobId(String tmJobId) {
     log.debug("existsByTmJobId entered: tmJobId={}", tmJobId);
-    final Optional<JobDto> jobDto = RestHelper.get(restTemplate, findUrl, JobDto.class, tmJobId);
+    final Optional<JobDto> jobDto = ResourceRESTHelper.get(restTemplate, findUrl, JobDto.class, tmJobId);
     if (jobDto.isPresent()) {
       log.debug("existsByTmJobId: JobDto found");
     } else {
@@ -66,7 +66,7 @@ public class JobResourceServiceImpl implements JobResourceService {
   @Override
   public boolean existsByTmJobIdAndLastAuthNo(String tmJobId, String lastAuthNo) {
     log.debug("existsByTmJobIdAndLastAuthNo entered: tmJobId={},lastAuthNo={}", tmJobId, lastAuthNo);
-    final Optional<JobDto> jobDto = RestHelper.get(restTemplate, findUrl, JobDto.class, tmJobId);
+    final Optional<JobDto> jobDto = ResourceRESTHelper.get(restTemplate, findUrl, JobDto.class, tmJobId);
     boolean result = jobDto.map(jobDto1 -> jobDto1.getLastAuthNo().equals(lastAuthNo)).orElse(false);
     if (result) {
       log.debug("existsByTmJobIdAndLastAuthNo: JobDto found");
@@ -79,7 +79,7 @@ public class JobResourceServiceImpl implements JobResourceService {
   @Override
   public Optional<JobDto> findByTmJobId(String tmJobId) {
     log.debug("findByTmJobId entered: tmJobId={}", tmJobId);
-    final Optional<JobDto> jobDto = RestHelper.get(restTemplate, findUrl, JobDto.class, tmJobId);
+    final Optional<JobDto> jobDto = ResourceRESTHelper.get(restTemplate, findUrl, JobDto.class, tmJobId);
     if (jobDto.isPresent()) {
       log.debug("findByTmJobId found: {}", jobDto.get());
     } else {
@@ -91,14 +91,14 @@ public class JobResourceServiceImpl implements JobResourceService {
   @Override
   public void createJob(JobDto jobDto) {
     log.debug("createJob entered: jobDto.tmJobId={}", jobDto.getTmJobId());
-    RestHelper.post(restTemplate, createUrl, new HttpEntity<>(jobDto), Void.class, jobDto);
+    ResourceRESTHelper.post(restTemplate, createUrl, new HttpEntity<>(jobDto), Void.class, jobDto);
     log.debug("createJob posted");
   }
 
   @Override
   public void updateJob(JobDto jobDto) {
     log.debug("updateJob entered: jobDto.tmJobId={}", jobDto.getTmJobId());
-    RestHelper.put(restTemplate, createUrl, new HttpEntity<>(jobDto));
+    ResourceRESTHelper.put(restTemplate, createUrl, new HttpEntity<>(jobDto));
     log.debug("updateJob updated");
   }
 
