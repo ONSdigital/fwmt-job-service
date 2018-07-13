@@ -139,6 +139,10 @@ public class LegacySampleIngest {
   @CSVColumn("Last_Updated")
   private String lastUpdated;
 
+  @CSVColumn("Spare4")
+  @JobAdditionalProperty("spare4")
+  private String lcfIncentive;
+
   // Data that is specific surveys
   private LegacySampleSurveyType legacySampleSurveyType;
   private LegacySampleGFFDataIngest gffData;
