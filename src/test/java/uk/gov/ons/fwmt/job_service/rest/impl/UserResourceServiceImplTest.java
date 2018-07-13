@@ -1,6 +1,8 @@
 package uk.gov.ons.fwmt.job_service.rest.impl;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -29,6 +31,9 @@ public class UserResourceServiceImplTest {
   @Mock private RestTemplate restTemplate;
   @Mock private ResponseEntity<UserDto> responseEntity;
 
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+
   @Test
   public void findByAuthNo() {
     //Given
@@ -54,19 +59,14 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    ResourceServiceMalfunctionException exception = null;
+    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
-    try {
-      Optional<UserDto> result = userResourceService.findByAuthNo(testAuthNo);
-    } catch (ResourceServiceMalfunctionException e) {
-      exception = e;
-    }
+    Optional<UserDto> result = userResourceService.findByAuthNo(testAuthNo);
 
     //Then
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
-    assertNotNull(exception);
-    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 
   @Test
@@ -93,19 +93,14 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAltAuth)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    ResourceServiceMalfunctionException exception = null;
+    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
-    try {
-      Optional<UserDto> result = userResourceService.findByAlternateAuthNo(testAltAuth);
-    } catch (ResourceServiceMalfunctionException e) {
-      exception = e;
-    }
+    userResourceService.findByAlternateAuthNo(testAltAuth);
 
     //Then
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAltAuth));
-    assertNotNull(exception);
-    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 
   @Test
@@ -135,19 +130,14 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    ResourceServiceMalfunctionException exception = null;
+    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
-    try {
-      userResourceService.existsByAuthNoAndActive(testAuthNo, isActive);
-    } catch (ResourceServiceMalfunctionException e) {
-      exception = e;
-    }
+    userResourceService.existsByAuthNoAndActive(testAuthNo, isActive);
 
     //Then
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
-    assertNotNull(exception);
-    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 
   @Test
@@ -158,19 +148,14 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    ResourceServiceMalfunctionException exception = null;
+    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
-    try {
-      Boolean result = userResourceService.existsByAuthNoAndActive(testAuthNo, isActive);
-    } catch (ResourceServiceMalfunctionException e) {
-      exception = e;
-    }
+    userResourceService.existsByAuthNoAndActive(testAuthNo, isActive);
 
     //Then
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
-    assertNotNull(exception);
-    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 
   @Test
@@ -196,45 +181,33 @@ public class UserResourceServiceImplTest {
   public void altAuthNoUserNotActive() {
     //Given
     String testAlthNo = "1111";
-    Boolean isActive = false;
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAlthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    ResourceServiceMalfunctionException exception = null;
+    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
-    try {
-      Boolean result = userResourceService.existsByAlternateAuthNoAndActive(testAlthNo, isActive);
-    } catch (ResourceServiceMalfunctionException e) {
-      exception = e;
-    }
+    userResourceService.existsByAlternateAuthNoAndActive(testAlthNo, false);
 
     //Then
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAlthNo));
-    assertNotNull(exception);
-    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 
   @Test
   public void altAuthNoUserNotExist() {
     //Given
     String testAlthNo = "1111";
-    Boolean isActive = true;
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAlthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    ResourceServiceMalfunctionException exception = null;
+    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
-    try {
-      userResourceService.existsByAlternateAuthNoAndActive(testAlthNo, isActive);
-    } catch (ResourceServiceMalfunctionException e) {
-      exception = e;
-    }
+    userResourceService.existsByAlternateAuthNoAndActive(testAlthNo, true);
 
     //Then
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAlthNo));
-    assertNotNull(exception);
-    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 }

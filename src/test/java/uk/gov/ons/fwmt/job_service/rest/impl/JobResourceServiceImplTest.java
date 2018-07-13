@@ -1,7 +1,9 @@
 package uk.gov.ons.fwmt.job_service.rest.impl;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -32,6 +34,9 @@ public class JobResourceServiceImplTest {
   @Mock private RestTemplate restTemplate;
   @Mock private ResponseEntity<JobDto> jobDtoResponseEntity;
   @Mock private ResponseEntity<Void> voidResponseEntity;
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Before
   public void setup() {
@@ -92,46 +97,34 @@ public class JobResourceServiceImplTest {
     //Given
     String tmJobId = "testID";
     String lastAuthNo = "lastAuth";
-    JobDto expectedJobDto = new JobDto(tmJobId, lastAuthNo);
     when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    ResourceServiceMalfunctionException exception = null;
+    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
-    try {
-      jobResourceService.existsByTmJobIdAndLastAuthNo(tmJobId, lastAuthNo);
-    } catch (ResourceServiceMalfunctionException e) {
-      exception = e;
-    }
+    jobResourceService.existsByTmJobIdAndLastAuthNo(tmJobId, lastAuthNo);
 
     //Then
     verify(restTemplate).getForEntity(any(), eq(JobDto.class), eq(tmJobId));
-    assertNotNull(exception);
-    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 
   @Test
   public void findByTmJobId() {
     //Given
     String tmJobId = "testID";
-    JobDto expectedJobDto = new JobDto(tmJobId, null);
     when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    ResourceServiceMalfunctionException exception = null;
+    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
-    try {
-      Optional<JobDto> result = jobResourceService.findByTmJobId(tmJobId);
-    } catch (ResourceServiceMalfunctionException e) {
-      exception = e;
-    }
+    jobResourceService.findByTmJobId(tmJobId);
 
     //Then
     verify(restTemplate).getForEntity(any(), eq(JobDto.class), eq(tmJobId));
-    assertNotNull(exception);
-    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 
   @Test
@@ -161,19 +154,14 @@ public class JobResourceServiceImplTest {
     when(restTemplate.postForEntity(any(), eq(request), eq(Void.class), eq(jobDto)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    ResourceServiceMalfunctionException exception = null;
+    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
-    try {
-      jobResourceService.createJob(jobDto);
-    } catch (ResourceServiceMalfunctionException e) {
-      exception = e;
-    }
+    jobResourceService.createJob(jobDto);
 
     //Then
     verify(restTemplate).postForEntity(any(), eq(request), eq(Void.class), eq(jobDto));
-    assertNotNull(exception);
-    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 
   @Test
@@ -198,21 +186,15 @@ public class JobResourceServiceImplTest {
     String tmJobId = "testID";
     String lastAuthNo = "lastAuth";
     JobDto jobDto = new JobDto(tmJobId, lastAuthNo);
-    HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
     doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST)).when(restTemplate).put(anyString(), any());
 
-    ResourceServiceMalfunctionException exception = null;
+    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
-    try {
-      jobResourceService.updateJob(jobDto);
-    } catch (ResourceServiceMalfunctionException e) {
-      exception = e;
-    }
+    jobResourceService.updateJob(jobDto);
 
     //Then
     verify(restTemplate).put(anyString(), any());
-    assertNotNull(exception);
-    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
   }
 }

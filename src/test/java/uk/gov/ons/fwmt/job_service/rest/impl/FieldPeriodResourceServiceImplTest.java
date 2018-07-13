@@ -1,6 +1,8 @@
 package uk.gov.ons.fwmt.job_service.rest.impl;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -30,6 +32,9 @@ public class FieldPeriodResourceServiceImplTest {
   @Mock private RestTemplate restTemplate;
   @Mock private ResponseEntity<FieldPeriodDto> responseEntity;
 
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
+
   @Test
   public void findByFieldPeriod() {
     //Given
@@ -56,17 +61,10 @@ public class FieldPeriodResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(FieldPeriodDto.class), eq(fieldPeriod)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    ResourceServiceMalfunctionException exception = null;
+    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
-    try {
-      Optional<FieldPeriodDto> result = fieldPeriodResourceService.findByFieldPeriod(fieldPeriod);
-    } catch (ResourceServiceMalfunctionException e) {
-      exception = e;
-    }
-
-    //Then
-    assertNotNull(exception);
-    assertTrue(exception.getMessage().contains(HttpStatus.BAD_REQUEST.toString()));
+    fieldPeriodResourceService.findByFieldPeriod(fieldPeriod);
   }
 }
