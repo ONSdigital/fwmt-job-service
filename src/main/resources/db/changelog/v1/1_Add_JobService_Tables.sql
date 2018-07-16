@@ -2,8 +2,8 @@ SET SCHEMA 'jobservice';
 
 CREATE TABLE jobservice.jobs (
     id         bigserial PRIMARY KEY,
-    job_id  varchar(40) UNIQUE
-    last_auth_no varchar(40);
+    job_id  varchar(40) UNIQUE,
+    last_auth_no varchar(40)
 );
 CREATE TABLE jobservice.field_periods (
     id            bigserial PRIMARY KEY,

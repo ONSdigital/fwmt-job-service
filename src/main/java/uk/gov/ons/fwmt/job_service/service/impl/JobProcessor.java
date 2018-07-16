@@ -10,12 +10,12 @@ import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.UnprocessedCSVRow;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
+import uk.gov.ons.fwmt.job_service.entity.JobEntity;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
 import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
-import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
+import uk.gov.ons.fwmt.job_service.repo.JobRepo;
 import uk.gov.ons.fwmt.job_service.rest.UserResourceService;
-import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
 import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
@@ -44,7 +44,7 @@ public class JobProcessor {
   private TMJobConverterService tmJobConverterService;
 
   @Autowired
-  private JobResourceService jobResourceService;
+  private JobRepo jobRepo;
 
   @Autowired
   private TMService tmService;
@@ -53,14 +53,14 @@ public class JobProcessor {
       CSVParsingService csvParsingService,
       UserResourceService userResourceService,
       TMJobConverterService tmJobConverterService,
-      JobResourceService jobResourceService,
+      JobRepo jobRepo,
       TMService tmService
       ){
         this.fileIngestService = fileIngestService;
         this.csvParsingService = csvParsingService;
         this.userResourceService = userResourceService;
         this.tmJobConverterService = tmJobConverterService;
-        this.jobResourceService = jobResourceService;
+        this.jobRepo = jobRepo;
         this.tmService = tmService;
   }
   
@@ -100,16 +100,16 @@ public class JobProcessor {
     String authno = userDto.getAuthNo();
     String username = userDto.getTmUsername();
     try {
-      if (jobResourceService.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), authno)) {
+      if (jobRepo.existsByJobIdAndLastAuthNo(ingest.getTmJobId(), authno)) {
         return Optional.of(new UnprocessedCSVRow(row, "Job has been sent previously"));
-      } else if (jobResourceService.existsByTmJobId(ingest.getTmJobId())) {
+      } else if (jobRepo.existsByJobId(ingest.getTmJobId())) {
         final SendUpdateJobHeaderRequestMessage request = tmJobConverterService.updateJob(ingest, username);
         // TODO add error handling
         tmService.send(request);
-        final Optional<JobDto> jobDto = jobResourceService.findByTmJobId(ingest.getTmJobId());
+        final Optional<JobEntity> jobDto = jobRepo.findByJobId(ingest.getTmJobId());
         jobDto.ifPresent(jobDto1 -> {
           jobDto1.setLastAuthNo(ingest.getAuth());
-          jobResourceService.updateJob(jobDto1);
+          jobRepo.save(jobDto1);
         });
 
       } else {
@@ -118,17 +118,26 @@ public class JobProcessor {
           if (ingest.isGffReissue()) {
             final SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
             tmService.send(request);
-            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
+            final JobEntity jobEntity = new JobEntity();
+            jobEntity.setJobId(ingest.getTmJobId());
+            jobEntity.setLastAuthNo(ingest.getAuth());
+            jobRepo.save(jobEntity);
           } else {
             final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
             tmService.send(request);
-            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
+            final JobEntity jobEntity = new JobEntity();
+            jobEntity.setJobId(ingest.getTmJobId());
+            jobEntity.setLastAuthNo(ingest.getAuth());
+            jobRepo.save(jobEntity);
           }
           break;
         case LFS:
           final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
           tmService.send(request);
-          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
+          final JobEntity jobEntity = new JobEntity();
+          jobEntity.setJobId(ingest.getTmJobId());
+          jobEntity.setLastAuthNo(ingest.getAuth());
+          jobRepo.save(jobEntity);
           break;
         default:
           throw new IllegalArgumentException("Unknown survey type");

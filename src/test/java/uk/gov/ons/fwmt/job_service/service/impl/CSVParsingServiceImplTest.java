@@ -11,9 +11,10 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleGFFDataIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
+import uk.gov.ons.fwmt.job_service.entity.FieldPeriodEntity;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
-import uk.gov.ons.fwmt.job_service.rest.FieldPeriodResourceService;
+import uk.gov.ons.fwmt.job_service.repo.FieldPeriodRepo;
 import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
 import uk.gov.ons.fwmt.job_service.utilities.TestIngestBuilder;
 
@@ -39,8 +40,8 @@ public class CSVParsingServiceImplTest {
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
   @InjectMocks private CSVParsingServiceImpl csvParsingServiceImpl;
-  @Mock private FieldPeriodResourceService fieldPeriodResourceService;
-  @Mock private FieldPeriodDto fieldPeriodDto;
+  @Mock private FieldPeriodRepo fieldPeriodRepo;
+  @Mock private FieldPeriodEntity fieldPeriodDto;
 
   @Test
   public void setFromCSVColumnAnnotations() throws IOException {
@@ -148,11 +149,11 @@ public class CSVParsingServiceImplTest {
     int month = 7;
     int day = 1;
     LocalDate date = LocalDate.of(year, month, day);
-    when(fieldPeriodResourceService.findByFieldPeriod(any())).thenReturn(Optional.of(fieldPeriodDto));
+    when(fieldPeriodRepo.findByFieldPeriod(any())).thenReturn(Optional.of(fieldPeriodDto));
     when(fieldPeriodDto.getEndDate()).thenReturn(date);
 
     //When
-    LocalDate result = csvParsingServiceImpl.convertToGFFDate(stage);
+    LocalDate result = csvParsingServiceImpl.convertToFieldPeriodDate(stage);
 
     //Then
     assertEquals(date, result);
@@ -161,12 +162,12 @@ public class CSVParsingServiceImplTest {
   @Test
   public void convertToGFFDateShouldThrowExceptionWhenStageMissing() throws FWMTCommonException {
     //Given
-    when(fieldPeriodResourceService.findByFieldPeriod(any())).thenReturn(Optional.empty());
+    when(fieldPeriodRepo.findByFieldPeriod(any())).thenReturn(Optional.empty());
     expectedException.expect(FWMTCommonException.class);
     expectedException.expectMessage(ExceptionCode.FWMT_JOB_SERVICE_0011.toString());
 
     //When
-    csvParsingServiceImpl.convertToGFFDate(anyString());
+    csvParsingServiceImpl.convertToFieldPeriodDate(anyString());
   }
 
   @Test
@@ -177,11 +178,11 @@ public class CSVParsingServiceImplTest {
     int month = 7;
     int day = 1;
     LocalDate date = LocalDate.of(year, month, day);
-    when(fieldPeriodResourceService.findByFieldPeriod(any())).thenReturn(Optional.of(fieldPeriodDto));
+    when(fieldPeriodRepo.findByFieldPeriod(any())).thenReturn(Optional.of(fieldPeriodDto));
     when(fieldPeriodDto.getEndDate()).thenReturn(date);
 
     //When
-    LocalDate result = csvParsingServiceImpl.convertToLFSDate(fieldPeriod);
+    LocalDate result = csvParsingServiceImpl.convertToFieldPeriodDate(fieldPeriod);
 
     //Then
     assertEquals(date, result);
@@ -190,12 +191,12 @@ public class CSVParsingServiceImplTest {
   @Test
   public void convertToLFSDateShouldThrowExceptionWhenFieldPeriodMissing() throws FWMTCommonException {
     //Given
-    when(fieldPeriodResourceService.findByFieldPeriod(any())).thenReturn(Optional.empty());
+    when(fieldPeriodRepo.findByFieldPeriod(any())).thenReturn(Optional.empty());
     expectedException.expect(FWMTCommonException.class);
     expectedException.expectMessage(ExceptionCode.FWMT_JOB_SERVICE_0011.toString());
 
     //When
-    csvParsingServiceImpl.convertToLFSDate(anyString());
+    csvParsingServiceImpl.convertToFieldPeriodDate(anyString());
   }
 
   @Test

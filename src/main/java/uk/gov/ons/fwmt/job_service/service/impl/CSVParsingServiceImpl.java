@@ -14,10 +14,10 @@ import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleGFFDataIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleLFSDataIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
+import uk.gov.ons.fwmt.job_service.entity.FieldPeriodEntity;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
-import uk.gov.ons.fwmt.job_service.rest.FieldPeriodResourceService;
-import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
+import uk.gov.ons.fwmt.job_service.repo.FieldPeriodRepo;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 
 import java.io.IOException;
@@ -33,11 +33,11 @@ import java.util.Optional;
 @Service
 public class CSVParsingServiceImpl implements CSVParsingService {
 
-  private FieldPeriodResourceService fieldPeriodResourceService;
+  private FieldPeriodRepo fieldPeriodRepo;
 
   @Autowired
-  public CSVParsingServiceImpl(FieldPeriodResourceService fieldPeriodResourceService) {
-    this.fieldPeriodResourceService = fieldPeriodResourceService;
+  public CSVParsingServiceImpl(FieldPeriodRepo fieldPeriodRepo) {
+    this.fieldPeriodRepo = fieldPeriodRepo;
   }
 
   /**
@@ -113,21 +113,10 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     }
   }
 
-  public LocalDate convertToGFFDate(String stage) throws FWMTCommonException {
-    final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceService.findByFieldPeriod(stage);
+  public LocalDate convertToFieldPeriodDate(String stage) throws FWMTCommonException {
+    final Optional<FieldPeriodEntity> existsByFieldperiod = fieldPeriodRepo.findByFieldPeriod(stage);
     if (existsByFieldperiod.isPresent()) {
-      final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
-      return fieldPeriod.getEndDate();
-    } else {
-      throw new FWMTCommonException(ExceptionCode.FWMT_JOB_SERVICE_0011);
-    }
-  }
-
-  // technically, 'stage' here is the field period 'fp'
-  public LocalDate convertToLFSDate(String stage) throws FWMTCommonException {
-    final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceService.findByFieldPeriod(stage);
-    if (existsByFieldperiod.isPresent()) {
-      final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
+      final FieldPeriodEntity fieldPeriod = existsByFieldperiod.get();
       return fieldPeriod.getEndDate();
     } else {
       throw new FWMTCommonException(ExceptionCode.FWMT_JOB_SERVICE_0011);
@@ -152,8 +141,8 @@ public class CSVParsingServiceImpl implements CSVParsingService {
           // set normal fields
           setFromCSVColumnAnnotations(instance, record, "LFS");
           // set derived due date
-          instance.setDueDate(convertToLFSDate(instance.getStage()));
-          instance.setCalculatedDueDate(String.valueOf(convertToGFFDate(instance.getStage())));
+          instance.setDueDate(convertToFieldPeriodDate(instance.getStage()));
+          instance.setCalculatedDueDate(String.valueOf(convertToFieldPeriodDate(instance.getStage())));
           // set survey type and extra data
           instance.setLegacySampleSurveyType(LegacySampleSurveyType.LFS);
           instance.setGffData(null);
@@ -164,8 +153,8 @@ public class CSVParsingServiceImpl implements CSVParsingService {
           // set normal fields
           setFromCSVColumnAnnotations(instance, record, "GFF");
           // set derived due date
-          instance.setDueDate(convertToGFFDate(instance.getStage()));
-          instance.setCalculatedDueDate(String.valueOf(convertToGFFDate(instance.getStage())));
+          instance.setDueDate(convertToFieldPeriodDate(instance.getStage()));
+          instance.setCalculatedDueDate(String.valueOf(convertToFieldPeriodDate(instance.getStage())));
           // set survey type and extra data
           instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
           instance.setGffData(new LegacySampleGFFDataIngest());

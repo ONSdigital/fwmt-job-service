@@ -1,6 +1,8 @@
 package uk.gov.ons.fwmt.job_service.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.*;
 
@@ -13,7 +15,7 @@ public class JobEntity {
   private Long id;
 
   @Column(nullable = false)
-  private String tmJobId;
+  private String jobId;
 
   @Column(nullable = false)
   private String lastAuthNo;
