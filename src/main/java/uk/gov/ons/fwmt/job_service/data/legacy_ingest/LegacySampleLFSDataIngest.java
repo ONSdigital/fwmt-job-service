@@ -26,7 +26,6 @@ public class LegacySampleLFSDataIngest {
   private String householdsDesc;
 
   // // // Names
-
   @CSVColumn("QRES_LINE_NAME_1")
   private String respondentName1;
 

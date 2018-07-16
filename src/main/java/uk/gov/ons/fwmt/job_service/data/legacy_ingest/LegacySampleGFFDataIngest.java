@@ -3,6 +3,7 @@ package uk.gov.ons.fwmt.job_service.data.legacy_ingest;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.ons.fwmt.job_service.data.annotation.CSVColumn;
+import uk.gov.ons.fwmt.job_service.data.annotation.JobAdditionalProperty;
 
 @Data
 @NoArgsConstructor
@@ -10,12 +11,6 @@ public class LegacySampleGFFDataIngest {
   // TODO should this be 'name'?
   @CSVColumn("Name")
   private String name;
-
-  @CSVColumn("LAUA")
-  private String laua;
-
-  @CSVColumn("LAUA_Name")
-  private String lauaName;
 
   @CSVColumn("SubSample")
   private String subSample;
