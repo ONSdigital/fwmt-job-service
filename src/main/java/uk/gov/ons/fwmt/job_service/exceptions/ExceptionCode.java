@@ -4,61 +4,69 @@ import lombok.Getter;
 
 public enum ExceptionCode {
   // indicates an unexpected exception, usually a runtime exception
-  FWMT_JOB_SERVICE_0001("UNKNOWN"),
+  UNKNOWN(1, "UNKNOWN"),
 
   // used in InvalidFileNameException
-  FWMT_JOB_SERVICE_0002("INVALID_FILE_NAME"),
+  INVALID_FILE_NAME(2, "INVALID_FILE_NAME"),
 
   // used in MediaTypeNotSupportedException
-  FWMT_JOB_SERVICE_0003("INVALID_MEDIA_TYPE"),
+  INVALID_MEDIA_TYPE(3, "INVALID_MEDIA_TYPE"),
 
   // unused?
-  FWMT_JOB_SERVICE_0004("UNKNOWN_JOB_ID"),
+  UNKNOWN_JOB_ID(4, "UNKNOWN_JOB_ID"),
 
   // used in UnknownUserException
-  FWMT_JOB_SERVICE_0005("UNKNOWN_USER_ID"),
+  UNKNOWN_USER_ID(5, "UNKNOWN_USER_ID"),
 
   // used in CSVMissingColumnException
-  FWMT_JOB_SERVICE_0006("CSV_MISSING_COLUMN"),
+  CSV_MISSING_COLUMN(6, "CSV_MISSING_COLUMN"),
 
   // used in CSVInvalidFieldException
-  FWMT_JOB_SERVICE_0007("CSV_INVALID_FIELD"),
+  CSV_INVALID_FIELD(7, "CSV_INVALID_FIELD"),
 
   // used in CSVOtherException
-  FWMT_JOB_SERVICE_0008("CSV_OTHER"),
+  CSV_OTHER(8, "CSV_OTHER"),
 
   // indicates that totalmobile rejected our credentials
-  FWMT_JOB_SERVICE_0009("TM_UNAUTHENTICATED"),
+  TM_UNAUTHENTICATED(9, "TM_UNAUTHENTICATED"),
 
   // indicates that totalmobile could not be contacted
-  FWMT_JOB_SERVICE_0010("TM_INACCESSIBLE"),
+  TM_INACCESSIBLE(10, "TM_INACCESSIBLE"),
 
   // indicates that TM could be accessed, but did not behave as expected
   // this includes strange HTTP responses
-  FWMT_JOB_SERVICE_0011("TM_MALFUNCTION"),
+  TM_MALFUNCTION(11, "TM_MALFUNCTION"),
 
   // indicates that the resource service has rejected our credentials
-  FWMT_JOB_SERVICE_0012("RESOURCE_SERVICE_UNAUTHENTICATED"),
+  RESOURCE_SERVICE_UNAUTHENTICATED(12, "RESOURCE_SERVICE_UNAUTHENTICATED"),
 
   // indicates that the resource service could not be contacted
-  FWMT_JOB_SERVICE_0013("RESOURCE_SERVICE_INACCESSIBLE"),
+  RESOURCE_SERVICE_INACCESSIBLE(13, "RESOURCE_SERVICE_INACCESSIBLE"),
 
   // indicates that the resource service could be accessed, but did not behave as expected
   // this includes strange HTTP responses
-  FWMT_JOB_SERVICE_0014("RESOURCE_SERVICE_MALFUNCTION"),
+  RESOURCE_SERVICE_MALFUNCTION(14, "RESOURCE_SERVICE_MALFUNCTION"),
 
-  FWMT_JOB_SERVICE_0015("UNKNOWN_FIELD_PERIOD"),
+  UNKNOWN_FIELD_PERIOD(15, "UNKNOWN_FIELD_PERIOD"),
 
-  FWMT_JOB_SERVICE_0016("UNABLE_TO_SAVE_FILE");
+  UNABLE_TO_SAVE_FILE(16, "UNABLE_TO_SAVE_FILE");
+
+  @Getter
+  private final int errorCode;
 
   @Getter
   private final String description;
-  
-  ExceptionCode(String description) {
+
+  @Getter
+  private final String prefixedName;
+
+  ExceptionCode(int errorCode, String description) {
+    this.errorCode = errorCode;
     this.description = description;
+    this.prefixedName = "FWMT_JOB_SERVICE_" + String.format("%04d", this.getErrorCode()) + " " + this.getDescription();
   }
 
   public String toString() {
-    return this.name() + " " + this.description;
+    return this.getPrefixedName();
   }
 }

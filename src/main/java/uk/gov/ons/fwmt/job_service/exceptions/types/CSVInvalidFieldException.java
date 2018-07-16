@@ -10,10 +10,10 @@ public class CSVInvalidFieldException extends FWMTCommonException {
   }
 
   public CSVInvalidFieldException(String reason) {
-    super(ExceptionCode.FWMT_JOB_SERVICE_0007, makeMessage(reason));
+    super(ExceptionCode.CSV_INVALID_FIELD, makeMessage(reason));
   }
 
   public CSVInvalidFieldException(String reason, Throwable cause) {
-    super(ExceptionCode.FWMT_JOB_SERVICE_0007, makeMessage(reason), cause);
+    super(ExceptionCode.CSV_INVALID_FIELD, makeMessage(reason), cause);
   }
 }

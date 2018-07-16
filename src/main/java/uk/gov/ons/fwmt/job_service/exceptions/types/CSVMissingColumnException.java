@@ -10,10 +10,10 @@ public class CSVMissingColumnException extends FWMTCommonException {
   }
 
   public CSVMissingColumnException(String fieldName) {
-    super(ExceptionCode.FWMT_JOB_SERVICE_0006, makeMessage(fieldName));
+    super(ExceptionCode.CSV_MISSING_COLUMN, makeMessage(fieldName));
   }
 
   public CSVMissingColumnException(String fieldName, Throwable cause) {
-    super(ExceptionCode.FWMT_JOB_SERVICE_0006, makeMessage(fieldName), cause);
+    super(ExceptionCode.CSV_MISSING_COLUMN, makeMessage(fieldName), cause);
   }
 }

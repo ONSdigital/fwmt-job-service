@@ -75,22 +75,22 @@ public class JobProcessor {
     while (csvRowIterator.hasNext()) {
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
       if (row.isError()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0001 + " - Entry could not be processed");
+        log.error(ExceptionCode.UNKNOWN + " - Entry could not be processed");
         continue;
       }
       final LegacySampleIngest ingest = row.getResult();
       final Optional<UserDto> user = findUser(ingest);
       if (!user.isPresent()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0005 + " - User did not exist in the gateway");
+        log.error(ExceptionCode.UNKNOWN_USER_ID + " - User did not exist in the gateway");
         continue;
       }
       if (!user.get().isActive()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0005 + " - User was not active");
+        log.error(ExceptionCode.UNKNOWN_USER_ID + " - User was not active");
         continue;
       }
       final Optional<UnprocessedCSVRow> unprocessedCSVRow = sendJobToUser(row.getRow(), ingest, user.get());
       if (unprocessedCSVRow.isPresent()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0004 + " - Job could not be sent");
+        log.error(ExceptionCode.UNKNOWN_JOB_ID + " - Job could not be sent");
         continue;
       }
     }

@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.ResourceServiceMalfunctionException;
 import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
 
@@ -60,6 +61,7 @@ public class UserResourceServiceImplTest {
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getDescription());
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When

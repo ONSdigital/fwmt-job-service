@@ -6,6 +6,6 @@ public class UnknownException extends FWMTCommonException {
   static public final long serialVersionUID = 0L;
 
   public UnknownException(Exception cause) {
-    super(ExceptionCode.FWMT_JOB_SERVICE_0001, null, cause);
+    super(ExceptionCode.UNKNOWN, null, cause);
   }
 }
