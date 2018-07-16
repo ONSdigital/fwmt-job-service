@@ -58,8 +58,10 @@ public class CSVParsingServiceImplTest {
     //When
     csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(), "GFF");
 
+
     //Then
     assertEquals(expected, testIngestData.getTla());
+    assertEquals("testLcfIncentive", testIngestData.getLcfIncentive());
   }
 
   @Test(expected = NoSuchElementException.class)
