@@ -121,9 +121,7 @@ public class FileIngestServiceImplTest {
     assertEquals(expectedEndpoint, result);
   }
 
-  // this normally throws InvalidFileNameException
-  // TODO add checks to make sure that this throws the right exception
-  @Test(expected = FWMTCommonException.class)
+  @Test(expected = IllegalArgumentException.class)
   public void correctFilenameSentToWrongEndpoint() {
     //Given
     String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.csv";
