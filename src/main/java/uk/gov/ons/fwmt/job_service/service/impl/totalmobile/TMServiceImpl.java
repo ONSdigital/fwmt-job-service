@@ -150,17 +150,17 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
 
     ClientInterceptor[] interceptors = {new ClientInterceptor() {
       @Override public boolean handleRequest(MessageContext messageContext) throws WebServiceClientException {
-        log.trace("handleRequest: " + messageContext.getRequest().toString());
+        log.info("handleRequest: " + messageContext.getRequest().toString());
         return true;
       }
 
       @Override public boolean handleResponse(MessageContext messageContext) throws WebServiceClientException {
-        log.trace("handleResponse: " + messageContext.getRequest().toString());
+        log.info("handleResponse: " + messageContext.getRequest().toString());
         return true;
       }
 
       @Override public boolean handleFault(MessageContext messageContext) throws WebServiceClientException {
-        log.trace("handleFault: " + messageContext.getRequest().toString());
+        log.info("handleFault: " + messageContext.getRequest().toString());
         return true;
       }
 
