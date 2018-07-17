@@ -49,9 +49,10 @@ public class JobServiceImpl implements JobService {
   @Override
   public SampleSummaryDTO processSampleFile(MultipartFile file)
           throws IOException, InvalidFileNameException, MediaTypeNotSupportedException{
-    jobResourceService.sendCSV(file);
     File f = convertFile(file);
     SampleSummaryDTO sampleSummaryDTO = validateSampleFile(f);
+    boolean valid = sampleSummaryDTO.getUnprocessedRows().isEmpty();
+    jobResourceService.sendCSV(file, valid);
 
     // This is an async call
     jobProcessor.processSampleFile(f);

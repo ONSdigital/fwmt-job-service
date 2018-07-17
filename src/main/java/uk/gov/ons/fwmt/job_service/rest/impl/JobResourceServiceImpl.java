@@ -105,7 +105,7 @@ public class JobResourceServiceImpl implements JobResourceService {
   }
 
   @Override
-  public boolean sendCSV(MultipartFile file) throws HttpClientErrorException, FileNotFoundException, IOException{
+  public void sendCSV(MultipartFile file, boolean valid) {
     log.debug("SendCSV");
     try {
 
@@ -113,22 +113,19 @@ public class JobResourceServiceImpl implements JobResourceService {
       Resource fileConvert = new FileSystemResource(convFile);
 
       MultiValueMap<String,Object> bodyMap = new LinkedMultiValueMap<>();
-      bodyMap.add("file",fileConvert);
+      bodyMap.add("file", fileConvert);
+      bodyMap.add("validated", valid);
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
       final HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(bodyMap, headers);
-      final ResponseEntity<String> sendCSVResponseEntity = restTemplate.exchange(sendCSVUrl, HttpMethod.POST, request, String.class);
-      return sendCSVResponseEntity.getStatusCode().equals(HttpStatus.OK);
+      restTemplate.exchange(sendCSVUrl, HttpMethod.POST, request, String.class);
     } catch (HttpClientErrorException HttpClientErrorException) {
       log.error("An error occurred while communicating with the resource service", HttpClientErrorException);
-      throw HttpClientErrorException;
     } catch (FileNotFoundException e) {
       log.error("File cannot be found", e);
-      throw e;
     } catch (IOException e) {
       log.error("File could not be converted", e);
-      throw e;
     }
   }
 

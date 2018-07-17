@@ -14,7 +14,7 @@ public interface JobResourceService {
     Optional<JobDto> findByTmJobId(final String tmJobId);
     boolean createJob(final JobDto jobDto);
     boolean updateJob(final JobDto jobDto);
-    boolean sendCSV(final MultipartFile file) throws HttpClientErrorException, FileNotFoundException, IOException;
+    void sendCSV(final MultipartFile file, final boolean valid) throws HttpClientErrorException, FileNotFoundException, IOException;
 
 
 }
