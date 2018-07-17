@@ -9,12 +9,16 @@ import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.Sen
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendMessageRequest;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.ws.client.core.WebServiceTemplate;
+import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 
 import javax.xml.bind.JAXBElement;
@@ -29,6 +33,9 @@ public class TMServiceImplTest {
   @Mock private ObjectFactory objectFactory;
   @Mock private WebServiceTemplate webServiceTemplate;
   @Mock private JAXBElement<Object> jaxbElement;
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Before
   public void setUp() throws Exception {
@@ -146,14 +153,15 @@ public class TMServiceImplTest {
     assertEquals(queryMessagesResponse, result);
   }
 
-  // this normally throws TMMalfunctionException
-  // TODO add checks to make sure that this throws the right exception
-  @Test(expected = FWMTCommonException.class)
+  @Test
   public void shouldThrowExceptionWhenReceivedResponseWIsNotInPermittedResponses() {
     //Given
     QueryMessagesRequest queryMessagesRequest = new QueryMessagesRequest();
     when(webServiceTemplate.marshalSendAndReceive(any(), any(), any())).thenReturn(jaxbElement);
     when(jaxbElement.getValue()).thenReturn(new Object());
+
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.TM_MALFUNCTION.getPrefixedName());
 
     //When
     tmServiceImpl.send(queryMessagesRequest);

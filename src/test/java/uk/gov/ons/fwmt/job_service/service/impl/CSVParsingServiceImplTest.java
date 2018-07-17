@@ -78,9 +78,7 @@ public class CSVParsingServiceImplTest {
     csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(), "GFF");
   }
 
-  // normally expected: CSVOtherException
-  // TODO check for the correct exception variant
-  @Test(expected = FWMTCommonException.class)
+  @Test
   public void notAValidPivot() throws IOException, FWMTCommonException {
     //Given
     File testFile = new File("src/test/resources/sampledata/unit_tests/sample_GFF_2018-05-17T15-34-00Z.csv");
@@ -92,13 +90,14 @@ public class CSVParsingServiceImplTest {
     testIngestData.setGffData(new LegacySampleGFFDataIngest());
     testIngestData.setLegacySampleSurveyType(GFF);
 
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.CSV_OTHER.getPrefixedName());
+
     //When
     csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(), "hdsjf");
   }
 
-  // normally expected: CSVMissingColumnException
-  // TODO check for the correct exception variant
-  @Test(expected = FWMTCommonException.class)
+  @Test
   public void missingMandatoryColumnsInCSV() throws IOException, FWMTCommonException {
     //Given
     File testFile = new File("src/test/resources/sampledata/unit_tests/missingColumns.csv");
@@ -109,6 +108,9 @@ public class CSVParsingServiceImplTest {
     LegacySampleIngest testIngestData = new TestIngestBuilder().ingestBuild();
     testIngestData.setGffData(new LegacySampleGFFDataIngest());
     testIngestData.setLegacySampleSurveyType(GFF);
+
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.CSV_MISSING_COLUMN.getPrefixedName());
 
     //When
     csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(), "GFF");

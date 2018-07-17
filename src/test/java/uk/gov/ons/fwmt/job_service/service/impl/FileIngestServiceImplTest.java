@@ -1,7 +1,10 @@
 package uk.gov.ons.fwmt.job_service.service.impl;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
+import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 
 import java.time.LocalDateTime;
@@ -14,6 +17,7 @@ import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyT
 import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType.LFS;
 
 public class FileIngestServiceImplTest {
+  @Rule public ExpectedException expectedException = ExpectedException.none();
 
   private final String[] validSampleFileNames = {
       "sample_GFF_2018-04-24T19:09:54Z.csv",
@@ -55,24 +59,36 @@ public class FileIngestServiceImplTest {
     }
   }
 
-  // this normally throws InvalidFileNameException
-  // TODO add checks to make sure that this throws the right exception
-  @Test(expected = FWMTCommonException.class)
+  @Test
   public void checkInvalidSampleFileNames() {
     for (String filename : invalidSampleFileNames) {
-      assertNotNull(fileIngestService.verifyCSVFilename(filename, "sample"));
-      // we should throw an InvalidFileNameException before this point
+      try {
+        assertNotNull(fileIngestService.verifyCSVFilename(filename, "sample"));
+      } catch (FWMTCommonException e) {
+        if (!e.getCode().equals(ExceptionCode.INVALID_FILE_NAME)) {
+          fail("Odd positive - filename '" + filename + "' failed for an unexpected reason");
+        } else {
+          continue;
+        }
+      }
+      // we should throw an INVALID_FILE_NAME exception before this point
       fail("False negative - filename '" + filename + "' should be invalid");
     }
   }
 
-  // this normally throws InvalidFileNameException
-  // TODO add checks to make sure that this throws the right exception
-  @Test(expected = FWMTCommonException.class)
+  @Test
   public void checkInvalidStaffFileNames() {
     for (String filename : invalidStaffFileNames) {
-      assertNotNull(fileIngestService.verifyCSVFilename(filename, "staff"));
-      // we should throw an InvalidFileNameException before this point
+      try {
+        assertNotNull(fileIngestService.verifyCSVFilename(filename, "staff"));
+      } catch (FWMTCommonException e) {
+        if (!e.getCode().equals(ExceptionCode.INVALID_FILE_NAME)) {
+          fail("Odd positive - filename '" + filename + "' failed for an unexpected reason");
+        } else {
+          continue;
+        }
+      }
+      // we should throw an INVALID_FILE_NAME exception before this point
       fail("False negative - filename '" + filename + "' should be invalid");
     }
   }
@@ -105,66 +121,59 @@ public class FileIngestServiceImplTest {
     assertEquals(expectedEndpoint, result);
   }
 
-  // this normally throws InvalidFileNameException
-  // TODO add checks to make sure that this throws the right exception
-  @Test(expected = FWMTCommonException.class)
+  @Test
   public void wrongEndpointInSampleFilename() {
     //Given
     String rawFilename = "wrong_GFF_2018-04-24T19:09:54Z.csv";
     String expectedEndpoint = "sample";
     String[] filenameSplitByUnderscore = {"wrong", "GFF", "2018-04-24T19:09:54Z.csv"};
 
-    //When
-    String result = fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getPrefixedName());
 
-    //Then
-    assertEquals(expectedEndpoint, result);
+    //When
+    fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void correctFilenameSentToWrongEndpoint() {
     //Given
     String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.csv";
     String expectedEndpoint = "wrong";
     String[] filenameSplitByUnderscore = {"wrong", "GFF", "2018-04-24T19:09:54Z.csv"};
 
-    //When
-    String result = fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
+    expectedException.expect(IllegalArgumentException.class);
 
-    //Then
-    assertEquals(expectedEndpoint, result);
+    //When
+    fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
   }
 
-  // this normally throws InvalidFileNameException
-  // TODO add checks to make sure that this throws the right exception
-  @Test(expected = FWMTCommonException.class)
+  @Test
   public void sampleFilenameFormattedIncorrectly() {
     //Given
     String rawFilename = "sample_GFF-2018-04-24T19:09:54Z.csv";
     String expectedEndpoint = "sample";
     String[] filenameSplitByUnderscore = {"sample", "GFF-2018-04-24T19:09:54Z.csv"};
 
-    //When
-    String result = fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getPrefixedName());
 
-    //Then
-    assertEquals(expectedEndpoint, result);
+    //When
+    fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
   }
 
-  // this normally throws InvalidFileNameException
-  // TODO add checks to make sure that this throws the right exception
-  @Test(expected = FWMTCommonException.class)
+  @Test
   public void staffFilenameFormattedIncorrectly() {
     //Given
     String rawFilename = "staff__2016-04-24T19:09:54Z.csv";
     String expectedEndpoint = "staff";
     String[] filenameSplitByUnderscore = {"staff", "", "2018-04-24T19:09:54Z.csv"};
 
-    //When
-    String result = fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getPrefixedName());
 
-    //Then
-    assertEquals(expectedEndpoint, result);
+    //When
+    fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
   }
 
   @Test
@@ -183,18 +192,16 @@ public class FileIngestServiceImplTest {
     assertEquals(expectedExtension, result[1]);
   }
 
-  // this normally throws InvalidFileNameException
-  // TODO add checks to make sure that this throws the right exception
-  @Test(expected = FWMTCommonException.class)
+  @Test
   public void incorrectFileExtension() {
     //Given
     String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.jpg";
-    String expectedExtension = "csv";
 
-    String[] result = fileIngestService.checkFileExtension(rawFilename);
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getPrefixedName());
 
-    //Then
-    assertNotEquals(expectedExtension, result[1]);
+    //When
+    fileIngestService.checkFileExtension(rawFilename);
   }
 
   @Test
@@ -223,18 +230,16 @@ public class FileIngestServiceImplTest {
     assertEquals(LFS, result);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void unrecognizedLegacySampleSurveyType() {
     //Given
     String[] filenameSplitByUnderscore = {"sample", "TLA", "2018-04-24T19:09:54Z.csv"};
     String endpoint = "sample";
 
-    //When
-    LegacySampleSurveyType result = fileIngestService.getLegacySampleSurveyType(filenameSplitByUnderscore, endpoint);
+    expectedException.expect(IllegalArgumentException.class);
 
-    //Then
-    assertNotEquals(LFS, result);
-    assertNotEquals(GFF, result);
+    //When
+    fileIngestService.getLegacySampleSurveyType(filenameSplitByUnderscore, endpoint);
   }
 
   @Test
@@ -250,19 +255,16 @@ public class FileIngestServiceImplTest {
     assertNotNull(result);
   }
 
-  // this normally throws InvalidFileNameException
-  // TODO add checks to make sure that this throws the right exception
-  @Test(expected = FWMTCommonException.class)
+  @Test
   public void noEffortForACorrectDateTimeFormat() {
     //Given
     String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.csv";
     String rawTimestamp = "I am clearly not anything related to date or time";
-    String validTime = "2018-04-24T19:09:54";
+
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getPrefixedName());
 
     //When
-    LocalDateTime result = fileIngestService.getLocalDateTime(rawFilename, rawTimestamp);
-
-    //Then
-    assertNotEquals(validTime, result);
+    fileIngestService.getLocalDateTime(rawFilename, rawTimestamp);
   }
 }

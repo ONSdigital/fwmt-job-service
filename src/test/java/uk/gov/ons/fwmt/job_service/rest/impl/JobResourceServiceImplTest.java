@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
 
@@ -90,8 +91,6 @@ public class JobResourceServiceImplTest {
     assertTrue(result);
   }
 
-  // this normally throws a ResourceServiceMalfunctionException
-  // TODO add a check for the exception code
   @Test
   public void doesNotExistsByTmJobIdAndLastAuthNo() {
     //Given
@@ -101,6 +100,7 @@ public class JobResourceServiceImplTest {
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getPrefixedName());
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
@@ -110,8 +110,6 @@ public class JobResourceServiceImplTest {
     verify(restTemplate).getForEntity(any(), eq(JobDto.class), eq(tmJobId));
   }
 
-  // this normally throws a ResourceServiceMalfunctionException
-  // TODO add a check for the exception code
   @Test
   public void findByTmJobId() {
     //Given
@@ -120,6 +118,7 @@ public class JobResourceServiceImplTest {
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getPrefixedName());
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
@@ -146,8 +145,6 @@ public class JobResourceServiceImplTest {
     verify(restTemplate).postForEntity(any(), eq(request), eq(Void.class), eq(jobDto));
   }
 
-  // this normally throws a ResourceServiceMalfunctionException
-  // TODO add a check for the exception code
   @Test
   public void shouldFailToCreateJobAndThrowHttpClientErrorException() {
     //Given
@@ -159,6 +156,7 @@ public class JobResourceServiceImplTest {
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getPrefixedName());
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
@@ -184,8 +182,6 @@ public class JobResourceServiceImplTest {
     verify(restTemplate).put(anyString(), any());
   }
 
-  // this normally throws a ResourceServiceMalfunctionException
-  // TODO add a check for the exception code
   @Test
   public void shouldFailToUpdateJobAndThrowHttpClientErrorException() {
     //Given
@@ -195,6 +191,7 @@ public class JobResourceServiceImplTest {
     doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST)).when(restTemplate).put(anyString(), any());
 
     expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getPrefixedName());
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
