@@ -65,14 +65,12 @@ import org.springframework.ws.client.support.interceptor.ClientInterceptor;
 import org.springframework.ws.context.MessageContext;
 import org.springframework.ws.soap.client.core.SoapActionCallback;
 import org.springframework.ws.transport.http.HttpComponentsMessageSender;
-import uk.gov.ons.fwmt.job_service.exceptions.types.TMMalfunctionException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 
 import javax.xml.bind.JAXBElement;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -150,7 +148,7 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
     messageSender.afterPropertiesSet();
     this.setMessageSender(messageSender);
 
-    ClientInterceptor[] interceptors = { new ClientInterceptor() {
+    ClientInterceptor[] interceptors = {new ClientInterceptor() {
       @Override public boolean handleRequest(MessageContext messageContext) throws WebServiceClientException {
         log.trace("handleRequest: " + messageContext.getRequest().toString());
         return true;
@@ -167,8 +165,9 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
       }
 
       @Override public void afterCompletion(MessageContext messageContext, Exception ex)
-          throws WebServiceClientException { }
-    } };
+          throws WebServiceClientException {
+      }
+    }};
     this.setInterceptors(interceptors);
 
     this.objectFactory = new ObjectFactory();
@@ -221,7 +220,8 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
         .marshalSendAndReceive(messageQueueUrl, wrapped, new SoapActionCallback(soapAction)));
     if (!Arrays.asList(knownResponseTypes).contains(response.getClass())) {
       log.error("Message received from TM that does not match any TotalMobile message", response);
-      throw new TMMalfunctionException("Message received from TM that does not match any TotalMobile message");
+      throw FWMTCommonException
+          .makeTmMalfunctionException("Message received from TM that does not match any TotalMobile message");
     }
     log.debug("send: successfully sent message and received a response of class {}",
         response.getClass().getSimpleName());

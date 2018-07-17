@@ -15,8 +15,6 @@ import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleLFSDataIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
-import uk.gov.ons.fwmt.job_service.exceptions.types.CSVMissingColumnException;
-import uk.gov.ons.fwmt.job_service.exceptions.types.CSVOtherException;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.FieldPeriodResourceService;
 import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
@@ -73,10 +71,10 @@ public class CSVParsingServiceImpl implements CSVParsingService {
           if (mapping.isPresent()) {
             columnName = mapping.get().value();
           } else {
-            throw new CSVOtherException("Given pivot does not occur in the CSVColumn annotation");
+            throw FWMTCommonException.makeCsvOtherException("Given pivot does not occur in the CSVColumn annotation");
           }
         } else {
-          throw new CSVOtherException("CSVColumn lacked a 'value' or 'values' field");
+          throw FWMTCommonException.makeCsvOtherException("CSVColumn lacked a 'value' or 'values' field");
         }
         // if it's mandatory or set, try
         // if it's ignored, don't try
@@ -84,7 +82,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
           if (record.isSet(columnName)) {
             accessor.setPropertyValue(field.getName(), record.get(columnName));
           } else {
-            throw new CSVMissingColumnException(String.format("Missing column: name=%s", columnName));
+            throw FWMTCommonException.makeCsvMissingColumnException(columnName);
           }
         }
       }

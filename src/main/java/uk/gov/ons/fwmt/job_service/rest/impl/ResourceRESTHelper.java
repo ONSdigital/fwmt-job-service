@@ -6,8 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.ons.fwmt.job_service.exceptions.types.ResourceServiceInaccessibleException;
-import uk.gov.ons.fwmt.job_service.exceptions.types.ResourceServiceMalfunctionException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 
 import java.util.Optional;
 
@@ -20,8 +19,8 @@ public class ResourceRESTHelper {
         // return a successful result
         return Optional.ofNullable(responseEntity.getBody());
       }
-      // any success that doesn't have a 200 is an unexpected error
-      throw new ResourceServiceMalfunctionException(
+      // any success that doesn't have a 2xx is an unexpected error
+      throw FWMTCommonException.makeResourceServiceMalfunctionException(
           String.format("Unexpected HTTP code: %d", responseEntity.getStatusCode().value()));
     } catch (HttpClientErrorException httpException) {
       if (httpException.getStatusCode() == HttpStatus.NOT_FOUND) {
@@ -29,12 +28,12 @@ public class ResourceRESTHelper {
         return Optional.empty();
       }
       // any other unexpected error
-      throw new ResourceServiceMalfunctionException(
+      throw FWMTCommonException.makeResourceServiceMalfunctionException(
           String.format("Unexpected HTTP code: %d", httpException.getStatusCode().value()), httpException);
     } catch (ResourceAccessException accessException) {
       // unable to contact the resource service
-      throw new ResourceServiceInaccessibleException(
-          "Unable to contact the server", accessException);
+      throw FWMTCommonException
+          .makeResourceServiceInaccessibleException("Unable to contact the server", accessException);
     }
   }
 
@@ -47,16 +46,16 @@ public class ResourceRESTHelper {
         return Optional.ofNullable(responseEntity.getBody());
       }
       // any success that doesn't have a 2xx is an unexpected error
-      throw new ResourceServiceMalfunctionException(
+      throw FWMTCommonException.makeResourceServiceMalfunctionException(
           String.format("Unexpected HTTP code: %d", responseEntity.getStatusCode().value()));
     } catch (HttpClientErrorException httpException) {
       // any other unexpected error
-      throw new ResourceServiceMalfunctionException(
+      throw FWMTCommonException.makeResourceServiceMalfunctionException(
           String.format("Unexpected HTTP code: %d", httpException.getStatusCode().value()), httpException);
     } catch (ResourceAccessException accessException) {
       // unable to contact the resource service
-      throw new ResourceServiceInaccessibleException(
-          "Unable to contact the server", accessException);
+      throw FWMTCommonException
+          .makeResourceServiceInaccessibleException("Unable to contact the server", accessException);
     }
   }
 
@@ -66,12 +65,12 @@ public class ResourceRESTHelper {
       // any non-exception is a success
     } catch (HttpClientErrorException httpException) {
       // any other unexpected error
-      throw new ResourceServiceMalfunctionException(
+      throw FWMTCommonException.makeResourceServiceMalfunctionException(
           String.format("Unexpected HTTP code: %d", httpException.getStatusCode().value()), httpException);
     } catch (ResourceAccessException accessException) {
       // unable to contact the resource service
-      throw new ResourceServiceInaccessibleException(
-          "Unable to contact the server", accessException);
+      throw FWMTCommonException
+          .makeResourceServiceInaccessibleException("Unable to contact the server", accessException);
     }
   }
 }

@@ -6,25 +6,18 @@ public enum ExceptionCode {
   // indicates an unexpected exception, usually a runtime exception
   UNKNOWN(1, "UNKNOWN"),
 
-  // used in InvalidFileNameException
   INVALID_FILE_NAME(2, "INVALID_FILE_NAME"),
 
-  // used in MediaTypeNotSupportedException
   INVALID_MEDIA_TYPE(3, "INVALID_MEDIA_TYPE"),
 
-  // unused?
   UNKNOWN_JOB_ID(4, "UNKNOWN_JOB_ID"),
 
-  // used in UnknownUserException
   UNKNOWN_USER_ID(5, "UNKNOWN_USER_ID"),
 
-  // used in CSVMissingColumnException
   CSV_MISSING_COLUMN(6, "CSV_MISSING_COLUMN"),
 
-  // used in CSVInvalidFieldException
   CSV_INVALID_FIELD(7, "CSV_INVALID_FIELD"),
 
-  // used in CSVOtherException
   CSV_OTHER(8, "CSV_OTHER"),
 
   // indicates that totalmobile rejected our credentials

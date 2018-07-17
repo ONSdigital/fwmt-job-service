@@ -11,14 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.ons.fwmt.job_service.exceptions.types.ResourceServiceMalfunctionException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
 
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -54,6 +52,8 @@ public class FieldPeriodResourceServiceImplTest {
     verify(restTemplate).getForEntity(any(), eq(FieldPeriodDto.class), eq(fieldPeriod));
   }
 
+  // this normally throws a ResourceServiceMalfunctionException
+  // TODO add a check for the exception code
   @Test
   public void findByFieldPeriodAndThrowHttpClientErrorException() {
     //Given
@@ -61,7 +61,7 @@ public class FieldPeriodResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(FieldPeriodDto.class), eq(fieldPeriod)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expect(FWMTCommonException.class);
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When

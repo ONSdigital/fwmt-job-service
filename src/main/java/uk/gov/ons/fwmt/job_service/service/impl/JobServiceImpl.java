@@ -11,8 +11,6 @@ import uk.gov.ons.fwmt.job_service.data.dto.SampleSummaryDTO;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
-import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
-import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
 import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
@@ -47,9 +45,10 @@ public class JobServiceImpl implements JobService {
 
   @Override
   public SampleSummaryDTO processSampleFile(MultipartFile file)
-          throws IOException, InvalidFileNameException, MediaTypeNotSupportedException{
+          throws IOException {
     log.debug("processSampleFile: handling file with name '{}'", file.getOriginalFilename());
 
+    log.info("processSampleFile: ");
     jobResourceService.sendCSV(file);
     File f = convertFile(file);
     SampleSummaryDTO sampleSummaryDTO = validateSampleFile(f);
@@ -59,7 +58,7 @@ public class JobServiceImpl implements JobService {
     return sampleSummaryDTO;
   }
 
-  private SampleSummaryDTO validateSampleFile(File file) throws InvalidFileNameException, MediaTypeNotSupportedException, IOException{
+  private SampleSummaryDTO validateSampleFile(File file) throws IOException{
     log.debug("processSampleFile: handling file with name '{}'", file.getName());
 
     FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
@@ -71,7 +70,7 @@ public class JobServiceImpl implements JobService {
     while (csvRowIterator.hasNext()) {
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
       if (row.isError()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0001 + " - Entry could not be processed");
+        log.error(ExceptionCode.UNKNOWN + " - Entry could not be processed");
         unprocessed.add(new UnprocessedCSVRow(row.getRow(), "Row could not be parsed: " + row.getErrorMessage()));
         continue;
       }

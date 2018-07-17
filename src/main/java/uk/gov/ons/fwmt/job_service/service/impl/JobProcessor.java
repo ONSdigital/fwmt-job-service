@@ -11,8 +11,6 @@ import uk.gov.ons.fwmt.job_service.data.csv_parser.UnprocessedCSVRow;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
-import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
-import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
 import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
 import uk.gov.ons.fwmt.job_service.rest.UserResourceService;
 import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
@@ -66,7 +64,7 @@ public class JobProcessor {
   
   @Async("processExecutor")
   public void processSampleFile(File file)
-      throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
+      throws IOException {
     
     FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
     Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService

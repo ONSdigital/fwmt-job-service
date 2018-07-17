@@ -17,8 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.gov.ons.fwmt.job_service.data.dto.GatewayCommonErrorDTO;
 import uk.gov.ons.fwmt.job_service.data.dto.SampleSummaryDTO;
-import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
-import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
 import uk.gov.ons.fwmt.job_service.service.JobService;
 
 import java.io.IOException;
@@ -50,7 +48,7 @@ public class JobServiceController {
   })
   public ResponseEntity<SampleSummaryDTO> sampleREST(@RequestParam("file") MultipartFile file,
       RedirectAttributes redirectAttributes)
-      throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
+      throws IOException {
     log.info("sampleREST: entered with file name {}", file.getOriginalFilename());
     SampleSummaryDTO summary = jobService.processSampleFile(file);
     log.info("sampleREST: exited with {} processed rows and {} unprocessed rows", summary.getProcessedRows(),

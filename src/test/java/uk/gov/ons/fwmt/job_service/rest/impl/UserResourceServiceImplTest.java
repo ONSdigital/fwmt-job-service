@@ -12,13 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
-import uk.gov.ons.fwmt.job_service.exceptions.types.ResourceServiceMalfunctionException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -53,6 +51,8 @@ public class UserResourceServiceImplTest {
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
   }
 
+  // this normally throws a ResourceServiceMalfunctionException
+  // TODO add a check for the exception code
   @Test
   public void authNoNotFound() {
     //Given
@@ -60,7 +60,7 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expect(FWMTCommonException.class);
     expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getDescription());
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
@@ -71,6 +71,8 @@ public class UserResourceServiceImplTest {
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
   }
 
+  // this normally throws a ResourceServiceMalfunctionException
+  // TODO add a check for the exception code
   @Test
   public void findByAlternateAuthNo() {
     //Given
@@ -88,6 +90,8 @@ public class UserResourceServiceImplTest {
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAltAuth));
   }
 
+  // this normally throws a ResourceServiceMalfunctionException
+  // TODO add a check for the exception code
   @Test
   public void cannotFindByAlternateAuthNo() {
     //Given
@@ -95,7 +99,7 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAltAuth)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expect(FWMTCommonException.class);
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
@@ -124,6 +128,8 @@ public class UserResourceServiceImplTest {
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
   }
 
+  // this normally throws a ResourceServiceMalfunctionException
+  // TODO add a check for the exception code
   @Test
   public void userIsNotActive() {
     //Given
@@ -132,7 +138,7 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expect(FWMTCommonException.class);
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
@@ -142,6 +148,8 @@ public class UserResourceServiceImplTest {
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
   }
 
+  // this normally throws a ResourceServiceMalfunctionException
+  // TODO add a check for the exception code
   @Test
   public void userDoesNotExist() {
     //Given
@@ -150,7 +158,7 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expect(FWMTCommonException.class);
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
@@ -179,6 +187,8 @@ public class UserResourceServiceImplTest {
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAlthNo));
   }
 
+  // this normally throws a ResourceServiceMalfunctionException
+  // TODO add a check for the exception code
   @Test
   public void altAuthNoUserNotActive() {
     //Given
@@ -186,7 +196,7 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAlthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expect(FWMTCommonException.class);
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
@@ -196,6 +206,8 @@ public class UserResourceServiceImplTest {
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAlthNo));
   }
 
+  // this normally throws a ResourceServiceMalfunctionException
+  // TODO add a check for the exception code
   @Test
   public void altAuthNoUserNotExist() {
     //Given
@@ -203,7 +215,7 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAlthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
-    expectedException.expect(ResourceServiceMalfunctionException.class);
+    expectedException.expect(FWMTCommonException.class);
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When

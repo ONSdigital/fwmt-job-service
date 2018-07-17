@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.Filename;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
-import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 
 import java.io.File;
@@ -30,7 +30,7 @@ public class FileIngestServiceImpl implements FileIngestService {
   public static final DateTimeFormatter TIMESTAMP_FORMAT_WINDOWS = DateTimeFormatter
       .ofPattern("yyyy-MM-dd'T'HH-mm-ss'Z'");
 
-  protected Filename verifyCSVFilename(String rawFilename, String expectedEndpoint) throws InvalidFileNameException {
+  protected Filename verifyCSVFilename(String rawFilename, String expectedEndpoint) {
     log.debug("verifyCSVFilename: Began a filename parse for " + rawFilename);
 
     // Check file extension
@@ -56,23 +56,25 @@ public class FileIngestServiceImpl implements FileIngestService {
     return filename;
   }
 
-  protected String extractEndpoint(String rawFilename, String expectedEndpoint, String[] filenameSplitByUnderscore)
-      throws InvalidFileNameException {
+  protected String extractEndpoint(String rawFilename, String expectedEndpoint, String[] filenameSplitByUnderscore) {
     String endpoint = filenameSplitByUnderscore[0];
 
     if (!expectedEndpoint.equals(endpoint)) {
-      throw new InvalidFileNameException(rawFilename, "File had an incorrect endpoint of " + endpoint);
+      throw FWMTCommonException
+          .makeInvalidFileNameException(rawFilename, "File had an incorrect endpoint of " + endpoint);
     }
 
     switch (endpoint) {
     case "staff":
       if (filenameSplitByUnderscore.length != 2) {
-        throw new InvalidFileNameException(rawFilename, "File names for staff should contain one underscore");
+        throw FWMTCommonException
+            .makeInvalidFileNameException(rawFilename, "File names for staff should contain one underscore");
       }
       break;
     case "sample":
       if (filenameSplitByUnderscore.length != 3) {
-        throw new InvalidFileNameException(rawFilename, "File names for samples should contain two underscores");
+        throw FWMTCommonException
+            .makeInvalidFileNameException(rawFilename, "File names for samples should contain two underscores");
       }
       break;
     default:
@@ -81,10 +83,10 @@ public class FileIngestServiceImpl implements FileIngestService {
     return endpoint;
   }
 
-  protected String[] checkFileExtension(String rawFilename) throws InvalidFileNameException {
+  protected String[] checkFileExtension(String rawFilename) {
     String[] filenameSplitByDot = rawFilename.split("\\.");
     if (filenameSplitByDot.length != 2 || !("csv".equals(filenameSplitByDot[1]))) {
-      throw new InvalidFileNameException(rawFilename, "No 'csv' extension");
+      throw FWMTCommonException.makeInvalidFileNameException(rawFilename, "No 'csv' extension");
     }
     return filenameSplitByDot;
   }
@@ -108,7 +110,7 @@ public class FileIngestServiceImpl implements FileIngestService {
     return tla;
   }
 
-  protected LocalDateTime getLocalDateTime(String rawFilename, String rawTimestamp) throws InvalidFileNameException {
+  protected LocalDateTime getLocalDateTime(String rawFilename, String rawTimestamp) {
     LocalDateTime timestamp;
     try {
       timestamp = LocalDateTime.parse(rawTimestamp, TIMESTAMP_FORMAT_WINDOWS);
@@ -120,13 +122,13 @@ public class FileIngestServiceImpl implements FileIngestService {
         log.error("Failed to parse a windows timestamp", e);
         log.error("Failed to parse a linux timestamp", f);
         // we throw the exception with cause 'e', only because it is the more likely of the two to have been intended
-        throw new InvalidFileNameException(rawFilename, "Invalid timestamp of " + rawTimestamp, e);
+        throw FWMTCommonException.makeInvalidFileNameException(rawFilename, "Invalid timestamp of " + rawTimestamp, e);
       }
     }
     return timestamp;
   }
 
-  public FileIngest ingestSampleFile(File file) throws IOException, InvalidFileNameException {
+  public FileIngest ingestSampleFile(File file) throws IOException {
     log.debug("ingestSampleFile began with filename {}", file.getName());
     final Filename filename = verifyCSVFilename(file.getName(), "sample");
     final Reader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);

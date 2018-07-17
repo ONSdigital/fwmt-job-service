@@ -1,10 +1,14 @@
 package uk.gov.ons.fwmt.job_service.exceptions.types;
 
+import lombok.Getter;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 
 public class FWMTCommonException extends RuntimeException {
   static public final long serialVersionUID = 0L;
+
+  @Getter
+  public final ExceptionCode code;
 
   protected static String makeMessage(ExceptionCode code, String message) {
     if (message != null) {
@@ -15,20 +19,34 @@ public class FWMTCommonException extends RuntimeException {
   }
 
   public FWMTCommonException(ExceptionCode code) {
-    super(code.toString());
+    super(makeMessage(code, null));
+    this.code = code;
   }
 
   public FWMTCommonException(ExceptionCode code, String message) {
     super(makeMessage(code, message));
+    this.code = code;
   }
 
   public FWMTCommonException(ExceptionCode code, String message, Throwable cause) {
     super(makeMessage(code, message), cause);
+    this.code = code;
   }
 
   protected FWMTCommonException(ExceptionCode code, String message, Throwable cause, boolean enableSuppression,
       boolean writableStackTrace) {
     super(makeMessage(code, message), cause, enableSuppression, writableStackTrace);
+    this.code = code;
+  }
+
+  // 0001 - UNKNOWN
+
+  private static String makeUnknownExceptionMessage() {
+    return "Unknown exception";
+  }
+
+  public static FWMTCommonException makeUnknownException(Throwable cause) {
+    return new FWMTCommonException(ExceptionCode.UNKNOWN, makeUnknownExceptionMessage(), cause);
   }
 
   // 0002 - INVALID_FILE_NAME
