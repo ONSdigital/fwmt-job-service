@@ -20,7 +20,7 @@ public class OutgoingWsTest {
   OutgoingWs outgoingWs = new OutgoingWs();
 
   public <T> JAXBElement<T> getElement(Class<T> inputClass) {
-    JAXBElement<T> result = new JAXBElement(QName.valueOf(""), inputClass, null, null);
+    JAXBElement<T> result = new JAXBElement<T>(QName.valueOf(""), inputClass, null, null);
     return result;
   }
 
