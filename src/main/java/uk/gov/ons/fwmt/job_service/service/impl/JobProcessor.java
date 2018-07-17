@@ -1,18 +1,12 @@
 package uk.gov.ons.fwmt.job_service.service.impl;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Optional;
-
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessage;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateJobHeaderRequestMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessage;
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateJobHeaderRequestMessage;
-
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.UnprocessedCSVRow;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
@@ -28,6 +22,10 @@ import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -120,17 +118,17 @@ public class JobProcessor {
           if (ingest.isGffReissue()) {
             final SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
             tmService.send(request);
-            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
+            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), ingest.getLastUpdated()));
           } else {
             final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
             tmService.send(request);
-            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
+            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), ingest.getLastUpdated()));
           }
           break;
         case LFS:
           final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
           tmService.send(request);
-          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
+          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), ingest.getLastUpdated()));
           break;
         default:
           throw new IllegalArgumentException("Unknown survey type");
