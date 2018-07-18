@@ -15,6 +15,9 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.fwmt.job_service.config.CorrelationIdInterceptor;
+
+import java.util.Collections;
 
 /**
  * Main entry point into the Legacy Gateway
@@ -67,7 +70,10 @@ public class ApplicationConfig {
 
   @Bean
   public RestTemplate resourcesRestTemplate(RestTemplateBuilder builder) {
-    return builder.basicAuthorization(userName, password).build();
+    return builder
+        .basicAuthorization(userName, password)
+        .interceptors(Collections.singletonList(new CorrelationIdInterceptor()))
+        .build();
   }
 
 }
