@@ -19,6 +19,7 @@ import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.Sen
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendMessageRequestInfo;
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateJobHeaderRequestMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.PropertyAccessor;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.stereotype.Service;
@@ -99,12 +100,15 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
 
     LocationType location = request.getJob().getLocation();
     List<String> addressLines = location.getAddressDetail().getLines().getAddressLine();
-    addressLines.add(ingest.getAddressLine1());
-    addressLines.add(ingest.getAddressLine2());
-    addressLines.add(ingest.getAddressLine3());
-    addressLines.add(ingest.getAddressLine4());
-    addressLines.add(ingest.getDistrict());
-    addressLines.add(ingest.getPostTown());
+
+    addAddressLines(addressLines, ingest.getAddressLine1());
+    addAddressLines(addressLines, ingest.getAddressLine2());
+    addAddressLines(addressLines, ingest.getAddressLine3());
+    addAddressLines(addressLines, ingest.getAddressLine4());
+    addAddressLines(addressLines, ingest.getDistrict());
+    addAddressLines(addressLines, ingest.getPostTown());
+    checkNumberOfAddressLines(addressLines);
+
     location.getAddressDetail().setPostCode(ingest.getPostcode());
     location.setReference(ingest.getSerNo());
 
@@ -138,6 +142,20 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     request.getJob().setEmergency(false);
 
     return request;
+  }
+
+  protected void addAddressLines(List<String> addressLines, String addressLine) {
+    if (StringUtils.isNotBlank((addressLine))) {
+      addressLines.add(addressLine);
+    }
+  }
+
+  protected void checkNumberOfAddressLines(List<String> addressLines) {
+    if (addressLines.size() == 6 ) {
+      String addressConcat = addressLines.get(2) + " " + addressLines.get(3);
+      addressLines.set(2, addressConcat);
+      addressLines.remove(3);
+    }
   }
 
   protected UpdateJobHeaderRequest makeUpdateJobHeaderRequest(String tmJobId, String username) {

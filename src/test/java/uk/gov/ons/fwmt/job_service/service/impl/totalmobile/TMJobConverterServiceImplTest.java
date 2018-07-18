@@ -15,8 +15,14 @@ import uk.gov.ons.fwmt.job_service.utilities.TestIngestBuilder;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType.GFF;
 import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType.LFS;
 import static uk.gov.ons.fwmt.job_service.service.impl.totalmobile.TMJobConverterServiceImpl.JOB_QUEUE;
@@ -68,18 +74,17 @@ public class TMJobConverterServiceImplTest {
     assertNotNull(result.getJob().getWorld());
     assertEquals(JOB_WORK_TYPE, result.getJob().getWorkType());
     assertEquals(JOB_WORK_TYPE, result.getJob().getWorkType());
+    assertEquals(5, result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().size());
     assertEquals(testIngestData.getAddressLine1(),
         result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(0));
     assertEquals(testIngestData.getAddressLine2(),
         result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(1));
-    assertEquals(testIngestData.getAddressLine3(),
+    assertEquals(testIngestData.getAddressLine3() + " " + testIngestData.getAddressLine4(),
         result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(2));
-    assertEquals(testIngestData.getAddressLine4(),
-        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(3));
     assertEquals(testIngestData.getDistrict(),
-        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(4));
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(3));
     assertEquals(testIngestData.getPostTown(),
-        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(5));
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(4));
     assertEquals(testIngestData.getPostcode(), result.getJob().getLocation().getAddressDetail().getPostCode());
     assertEquals(testIngestData.getSerNo(), result.getJob().getLocation().getReference());
   }
@@ -104,18 +109,82 @@ public class TMJobConverterServiceImplTest {
     assertNotNull(result.getJob().getWorld());
     assertEquals(JOB_WORK_TYPE, result.getJob().getWorkType());
     assertEquals(JOB_WORK_TYPE, result.getJob().getWorkType());
+    assertEquals(5, result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().size());
     assertEquals(testIngestData.getAddressLine1(),
         result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(0));
     assertEquals(testIngestData.getAddressLine2(),
         result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(1));
-    assertEquals(testIngestData.getAddressLine3(),
+    assertEquals(testIngestData.getAddressLine3() + " " + testIngestData.getAddressLine4(),
         result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(2));
-    assertEquals(testIngestData.getAddressLine4(),
-        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(3));
     assertEquals(testIngestData.getDistrict(),
-        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(4));
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(3));
     assertEquals(testIngestData.getPostTown(),
-        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(5));
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(4));
+    assertEquals(testIngestData.getPostcode(), result.getJob().getLocation().getAddressDetail().getPostCode());
+    assertEquals(testIngestData.getSerNo(), result.getJob().getLocation().getReference());
+  }
+
+  @Test
+  public void createGFFJobRequestFromIngestWithEmptyAddressValues() {
+    //Given
+    String username = "testUser";
+    LegacySampleIngest testIngestData = new TestIngestBuilder().ingestBuildWithEmptyAddresses();
+    testIngestData.setGffData(new LegacySampleGFFDataIngest());
+    testIngestData.setLegacySampleSurveyType(GFF);
+
+    //When
+    CreateJobRequest result = tmJobConverterService.createJobRequestFromIngest(testIngestData, username);
+
+    //Then
+    assertNotNull(result.getJob());
+    assertNotNull(result.getJob().getLocation());
+    assertNotNull(result.getJob().getIdentity());
+    assertNotNull(result.getJob().getSkills());
+    assertNotNull(result.getJob().getWorld());
+    assertEquals(JOB_WORK_TYPE, result.getJob().getWorkType());
+    assertEquals(JOB_WORK_TYPE, result.getJob().getWorkType());
+    assertEquals(4, result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().size());
+    assertEquals(testIngestData.getAddressLine1(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(0));
+    assertEquals(testIngestData.getAddressLine2(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(1));
+    assertEquals(testIngestData.getDistrict(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(2));
+    assertEquals(testIngestData.getPostTown(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(3));
+    assertEquals(testIngestData.getPostcode(), result.getJob().getLocation().getAddressDetail().getPostCode());
+    assertEquals(testIngestData.getSerNo(), result.getJob().getLocation().getReference());
+  }
+
+  @Test
+  public void createLFSJobRequestFromIngestEmptyAddressValues() {
+    //Given
+    String username = "testUser";
+
+    LegacySampleIngest testIngestData = new TestIngestBuilder().ingestBuildWithEmptyAddresses();
+    testIngestData.setLfsData(new LegacySampleLFSDataIngest());
+    testIngestData.setLegacySampleSurveyType(LFS);
+
+    //When
+    CreateJobRequest result = tmJobConverterService.createJobRequestFromIngest(testIngestData, username);
+
+    //Then
+    assertNotNull(result.getJob());
+    assertNotNull(result.getJob().getLocation());
+    assertNotNull(result.getJob().getIdentity());
+    assertNotNull(result.getJob().getSkills());
+    assertNotNull(result.getJob().getWorld());
+    assertEquals(JOB_WORK_TYPE, result.getJob().getWorkType());
+    assertEquals(JOB_WORK_TYPE, result.getJob().getWorkType());
+    assertEquals(4, result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().size());
+    assertEquals(testIngestData.getAddressLine1(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(0));
+    assertEquals(testIngestData.getAddressLine2(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(1));
+    assertEquals(testIngestData.getDistrict(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(2));
+    assertEquals(testIngestData.getPostTown(),
+        result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(3));
     assertEquals(testIngestData.getPostcode(), result.getJob().getLocation().getAddressDetail().getPostCode());
     assertEquals(testIngestData.getSerNo(), result.getJob().getLocation().getReference());
   }
@@ -191,6 +260,93 @@ public class TMJobConverterServiceImplTest {
 
     //Then
     assertNotNull(result);
+  }
+
+  @Test
+  public void checkIfAddressLineIsNotBlank() {
+    //Given
+    List<String> testAddressLines = new ArrayList<>();
+    String testLine = "testLine";
+
+    List<String> expectedArray = new ArrayList<>();
+    expectedArray.add("testLine");
+
+    //When
+    tmJobConverterService.addAddressLines(testAddressLines,testLine);
+
+    //Then
+    assertEquals(expectedArray,testAddressLines);
+  }
+
+  @Test
+  public void checkIfAddressLineIsBlank() {
+    //Given
+    List<String> testAddressLines = new ArrayList<>();
+    String testLine = "";
+
+    List<String> expectedArray = new ArrayList<>();
+    expectedArray.add("testLine");
+
+    //When
+    tmJobConverterService.addAddressLines(testAddressLines,testLine);
+
+    //Then
+    assertNotEquals(expectedArray, testAddressLines);
+    int expectedArraySize = 0;
+    assertEquals(expectedArraySize, testAddressLines.size());
+  }
+
+  @Test
+  public void checkIfAllAddressLinesPopulated() {
+    //Given
+    List<String> testAddressLines = new ArrayList<>();
+    List<String> expectedArray = new ArrayList<>();
+
+    for (int i=0;i<6;i++) {
+      String testLine = "testLine" + i;
+      tmJobConverterService.addAddressLines(testAddressLines, testLine);
+    }
+
+    expectedArray.add("testLine0");
+    expectedArray.add("testLine1");
+    expectedArray.add("testLine2 testLine3");
+    expectedArray.add("testLine4");
+    expectedArray.add("testLine5");
+
+    //When
+    tmJobConverterService.checkNumberOfAddressLines(testAddressLines);
+
+    //Then
+    assertEquals(expectedArray,testAddressLines);
+  }
+
+  @Test
+  public void checkIfNotAllAddressLinesPopulated() {
+    //Given
+    List<String> testAddressLines = new ArrayList<>();
+    List<String> expectedArray = new ArrayList<>();
+
+
+    tmJobConverterService.addAddressLines(testAddressLines, "testLine1");
+    tmJobConverterService.addAddressLines(testAddressLines, "testLine2");
+    tmJobConverterService.addAddressLines(testAddressLines, "testLine3");
+    tmJobConverterService.addAddressLines(testAddressLines, "");
+    tmJobConverterService.addAddressLines(testAddressLines, "district");
+    tmJobConverterService.addAddressLines(testAddressLines, "postTown");
+
+    expectedArray.add("testLine1");
+    expectedArray.add("testLine2");
+    expectedArray.add("testLine3");
+    expectedArray.add("district");
+    expectedArray.add("postTown");
+
+    //When
+    tmJobConverterService.checkNumberOfAddressLines(testAddressLines);
+
+    //Then
+    assertEquals(expectedArray, testAddressLines);
+    int expectedArraySize = 5;
+    assertEquals(expectedArraySize, testAddressLines.size());
   }
 
   @Test

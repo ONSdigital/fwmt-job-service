@@ -23,6 +23,7 @@ import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Optional;
@@ -65,7 +66,7 @@ public class JobProcessor {
   }
   
   @Async("processExecutor")
-  public void processSampleFile(MultipartFile file)
+  public void processSampleFile(File file)
       throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
     
     FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
