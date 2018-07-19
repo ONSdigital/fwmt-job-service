@@ -49,9 +49,9 @@ public class JobServiceController {
   public ResponseEntity<SampleSummaryDTO> sampleREST(@RequestParam("file") MultipartFile file,
       RedirectAttributes redirectAttributes)
       throws IOException {
-    log.info("sampleREST: entered with file name {}", file.getOriginalFilename());
+    log.info("Entered with file name {}", file.getOriginalFilename());
     SampleSummaryDTO summary = jobService.processSampleFile(file);
-    log.info("sampleREST: exited with {} processed rows and {} unprocessed rows", summary.getProcessedRows(),
+    log.info("Exited with {} processed rows and {} unprocessed rows", summary.getProcessedRows(),
         summary.getUnprocessedRows().size());
     return ResponseEntity.ok(summary);
   }

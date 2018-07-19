@@ -53,60 +53,59 @@ public class JobResourceServiceImpl implements JobResourceService {
 
   @Override
   public boolean existsByTmJobId(String tmJobId) {
-    log.debug("existsByTmJobId entered: tmJobId={}", tmJobId);
+    log.debug("Start: tmJobId={}", tmJobId);
     final Optional<JobDto> jobDto = ResourceRESTHelper.get(restTemplate, findUrl, JobDto.class, tmJobId);
     if (jobDto.isPresent()) {
       log.debug("existsByTmJobId: JobDto found");
     } else {
-      log.debug("existsByTmJobId: JobDto not found");
+      log.debug("Not found");
     }
     return jobDto.isPresent();
   }
 
   @Override
   public boolean existsByTmJobIdAndLastAuthNo(String tmJobId, String lastAuthNo) {
-    log.debug("existsByTmJobIdAndLastAuthNo entered: tmJobId={},lastAuthNo={}", tmJobId, lastAuthNo);
+    log.debug("Start: tmJobId={},lastAuthNo={}", tmJobId, lastAuthNo);
     final Optional<JobDto> jobDto = ResourceRESTHelper.get(restTemplate, findUrl, JobDto.class, tmJobId);
     boolean result = jobDto.map(jobDto1 -> jobDto1.getLastAuthNo().equals(lastAuthNo)).orElse(false);
     if (result) {
-      log.debug("existsByTmJobIdAndLastAuthNo: JobDto found");
+      log.debug("JobDto found");
     } else {
-      log.debug("existsByTmJobIdAndLastAuthNo: JobDto not found");
+      log.debug("Not found");
     }
     return result;
   }
 
   @Override
   public Optional<JobDto> findByTmJobId(String tmJobId) {
-    log.debug("findByTmJobId entered: tmJobId={}", tmJobId);
+    log.debug("Start: tmJobId={}", tmJobId);
     final Optional<JobDto> jobDto = ResourceRESTHelper.get(restTemplate, findUrl, JobDto.class, tmJobId);
     if (jobDto.isPresent()) {
-      log.debug("findByTmJobId found: {}", jobDto.get());
+      log.debug("Found: {}", jobDto.get());
     } else {
-      log.debug("findByTmJobId not found");
+      log.debug("Not found");
     }
     return jobDto;
   }
 
   @Override
   public void createJob(JobDto jobDto) {
-    log.debug("createJob entered: jobDto.tmJobId={}", jobDto.getTmJobId());
+    log.debug("Start: jobDto.tmJobId={}", jobDto.getTmJobId());
     ResourceRESTHelper.post(restTemplate, createUrl, new HttpEntity<>(jobDto), Void.class, jobDto);
-    log.debug("createJob posted");
+    log.debug("Post completed");
   }
 
   @Override
   public void updateJob(JobDto jobDto) {
-    log.debug("updateJob entered: jobDto.tmJobId={}", jobDto.getTmJobId());
+    log.debug("Start: jobDto.tmJobId={}", jobDto.getTmJobId());
     ResourceRESTHelper.put(restTemplate, createUrl, new HttpEntity<>(jobDto));
-    log.debug("updateJob updated");
+    log.debug("Updated completed");
   }
 
   @Override
-  public boolean sendCSV(MultipartFile file) throws HttpClientErrorException, FileNotFoundException, IOException{
-    log.debug("sendCSV");
+  public boolean sendCSV(MultipartFile file) throws HttpClientErrorException, IOException{
+    log.debug("Start: fileName={}", file.getName());
     try {
-
       File convFile = convertFile(file);
       Resource fileConvert = new FileSystemResource(convFile);
 

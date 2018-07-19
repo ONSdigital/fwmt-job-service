@@ -26,7 +26,7 @@ public class GenericOutgoingWs {
     WebServiceAdapterOutputRequest value = request.getValue();
     msg.setId(value.getId());
     jaxbElement.setValue(msg);
-    log.info("GenericOutgoingWs: Incoming message received. Id:" + value.getId());
+    log.info("Incoming message received. Id:" + value.getId());
     return jaxbElement;
   }
 }

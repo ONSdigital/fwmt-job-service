@@ -43,7 +43,7 @@ public class ApplicationConfig {
    */
   public static void main(String[] args) {
     SpringApplication.run(ApplicationConfig.class, args);
-    log.debug("Started UI Application");
+    log.debug("Started application");
   }
 
   /**

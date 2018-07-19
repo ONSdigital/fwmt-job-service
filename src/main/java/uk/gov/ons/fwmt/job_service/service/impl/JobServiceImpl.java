@@ -46,21 +46,26 @@ public class JobServiceImpl implements JobService {
   @Override
   public SampleSummaryDTO processSampleFile(MultipartFile file)
           throws IOException {
-    log.debug("processSampleFile: handling file with name '{}'", file.getOriginalFilename());
+    log.debug("Handling file with name '{}'", file.getOriginalFilename());
 
-    // TODO finish this logging
-    log.info("processSampleFile: ");
+    log.info("Storing CSV in resource service");
     jobResourceService.sendCSV(file);
+    log.info("CSV stored successfully");
+
     File f = convertFile(file);
+
+    log.info("Validation began");
     SampleSummaryDTO sampleSummaryDTO = validateSampleFile(f);
+    log.info("Validation passed");
 
     // This is an async call
     jobProcessor.processSampleFile(f);
+    log.info("Queued asynchronous call to JobProcessor::processSampleFile");
     return sampleSummaryDTO;
   }
 
   private SampleSummaryDTO validateSampleFile(File file) throws IOException{
-    log.debug("processSampleFile: handling file with name '{}'", file.getName());
+    log.debug("Handling file with name '{}'", file.getName());
 
     FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
     Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService.parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
@@ -82,7 +87,7 @@ public class JobServiceImpl implements JobService {
   }
 
   private File convertFile(MultipartFile file) throws IOException{
-    log.debug("convertFile: handling file with name {}", file.getName());
+    log.debug("Handling file with name {}", file.getName());
 
     File convFile = new File (file.getOriginalFilename());
     FileCopyUtils.copy(file.getInputStream(), new FileOutputStream(convFile));

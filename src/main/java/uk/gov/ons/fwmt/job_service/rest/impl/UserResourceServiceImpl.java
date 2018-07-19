@@ -31,50 +31,50 @@ public class UserResourceServiceImpl implements UserResourceService {
 
   @Override
   public Optional<UserDto> findByAuthNo(String authNo) {
-    log.debug("findByAuthNo: authNo={}", authNo);
+    log.debug("Start: authNo={}", authNo);
     Optional<UserDto> userDto = ResourceRESTHelper.get(restTemplate, findUrl, UserDto.class, authNo);
     if (userDto.isPresent()) {
-      log.debug("findByAuthNo found: {}", userDto.get());
+      log.debug("Found: {}", userDto.get());
     } else {
-      log.debug("findByAuthNo not found");
+      log.debug("Not found");
     }
     return userDto;
  }
 
   @Override
   public Optional<UserDto> findByAlternateAuthNo(String authNo) {
-    log.debug("findByAlternateAuthNo: authNo={}", authNo);
+    log.debug("Start: authNo={}", authNo);
     Optional<UserDto> userDto = ResourceRESTHelper.get(restTemplate, findAltUrl, UserDto.class, authNo);
     if (userDto.isPresent()) {
-      log.debug("findByAuthNo found: {}", userDto.get());
+      log.debug("Found: {}", userDto.get());
     } else {
-      log.debug("findByAuthNo not found");
+      log.debug("Not found");
     }
     return userDto;
   }
 
   @Override
   public boolean existsByAuthNoAndActive(String authNo, boolean active) {
-    log.debug("existsByAuthNoAndActive: authNo={},active={}", authNo, active);
+    log.debug("Start: authNo={},active={}", authNo, active);
     final Optional<UserDto> userDto = findByAuthNo(authNo);
     boolean result = userDto.filter(userDto1 -> userDto1.isActive() == active).isPresent();
     if (result) {
-      log.debug("existsByAuthNoAndActive found");
+      log.debug("Found");
     } else {
-      log.debug("existsByAuthNoAndActive not found");
+      log.debug("Not found");
     }
     return result;
   }
 
   @Override
   public boolean existsByAlternateAuthNoAndActive(String authNo, boolean active) {
-    log.debug("existsByAlternativeAuthNoAndActive: authNo={},active={}", authNo, active);
+    log.debug("Start: authNo={},active={}", authNo, active);
     final Optional<UserDto> userDto = findByAlternateAuthNo(authNo);
     boolean result = userDto.filter(userDto1 -> userDto1.isActive() == active).isPresent();
     if (result) {
-      log.debug("existsByAlternativeAuthNoAndActive found");
+      log.debug("Found");
     } else {
-      log.debug("existsByAlternativeAuthNoAndActive not found");
+      log.debug("Not found");
     }
     return result;
   }

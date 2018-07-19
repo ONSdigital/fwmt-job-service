@@ -150,17 +150,17 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
 
     ClientInterceptor[] interceptors = {new ClientInterceptor() {
       @Override public boolean handleRequest(MessageContext messageContext) throws WebServiceClientException {
-        log.info("handleRequest: " + messageContext.getRequest().toString());
+        log.info(messageContext.getRequest().toString());
         return true;
       }
 
       @Override public boolean handleResponse(MessageContext messageContext) throws WebServiceClientException {
-        log.info("handleResponse: " + messageContext.getRequest().toString());
+        log.info(messageContext.getRequest().toString());
         return true;
       }
 
       @Override public boolean handleFault(MessageContext messageContext) throws WebServiceClientException {
-        log.info("handleFault: " + messageContext.getRequest().toString());
+        log.info(messageContext.getRequest().toString());
         return true;
       }
 
@@ -187,7 +187,7 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
     }
     String className = cl.getSimpleName();
     String action = namespace + messageActionMap.getOrDefault(cl, className);
-    log.debug("lookupSOAPAction found action: {}", action);
+    log.debug("Found action: {}", action);
     return action;
   }
 
@@ -214,7 +214,7 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
   }
 
   public <I, O> O send(I message) {
-    log.debug("send: Began sending message of class {}", message.getClass().getSimpleName());
+    log.debug("Began sending message of class {}", message.getClass().getSimpleName());
     String soapAction = lookupSOAPAction(message.getClass());
     Object wrapped = jaxbWrap(message);
     @SuppressWarnings("unchecked")
@@ -225,7 +225,7 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
       throw FWMTCommonException
           .makeTmMalfunctionException("Message received from TM that does not match any TotalMobile message");
     }
-    log.debug("send: successfully sent message and received a response of class {}",
+    log.debug("Successfully sent message and received a response of class {}",
         response.getClass().getSimpleName());
     return response;
   }

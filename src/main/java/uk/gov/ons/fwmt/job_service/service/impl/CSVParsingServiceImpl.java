@@ -174,7 +174,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
   @Override
   public Iterator<CSVParseResult<LegacySampleIngest>> parseLegacySample(Reader reader,
       LegacySampleSurveyType legacySampleSurveyType) throws IOException {
-    log.debug("parseLegacySample: began parsing file: surveyType={}", legacySampleSurveyType);
+    log.debug("Began parsing file: surveyType={}", legacySampleSurveyType);
     CSVParser parser = getCSVFormat().parse(reader);
     return new CSVIterator<LegacySampleIngest>(parser) {
       @Override

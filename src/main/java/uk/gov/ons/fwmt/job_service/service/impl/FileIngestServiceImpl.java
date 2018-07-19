@@ -31,7 +31,7 @@ public class FileIngestServiceImpl implements FileIngestService {
       .ofPattern("yyyy-MM-dd'T'HH-mm-ss'Z'");
 
   protected Filename verifyCSVFilename(String rawFilename, String expectedEndpoint) {
-    log.debug("verifyCSVFilename: Began a filename parse for " + rawFilename);
+    log.debug("Began a filename parse for " + rawFilename);
 
     // Check file extension
     String[] filenameSplitByDot = checkFileExtension(rawFilename);
@@ -40,16 +40,16 @@ public class FileIngestServiceImpl implements FileIngestService {
     String[] filenameSplitByUnderscore = filenameSplitByDot[0].split("_");
 
     String endpoint = extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
-    log.debug("endpoint detected as {}", endpoint);
+    log.debug("Endpoint detected as {}", endpoint);
 
     // Detect survey type
     LegacySampleSurveyType tla = getLegacySampleSurveyType(filenameSplitByUnderscore, endpoint);
-    log.debug("tla detected as {}", tla);
+    log.debug("TLA detected as {}", tla);
 
     // Timestamp validation
     String rawTimestamp = filenameSplitByUnderscore[filenameSplitByUnderscore.length - 1];
     LocalDateTime timestamp = getLocalDateTime(rawFilename, rawTimestamp);
-    log.debug("timestamp detected as {}", timestamp);
+    log.debug("Timestamp detected as {}", timestamp);
 
     Filename filename = new Filename(endpoint, tla, timestamp);
     log.debug("Passed a filename check with {}", filename);
@@ -129,11 +129,11 @@ public class FileIngestServiceImpl implements FileIngestService {
   }
 
   public FileIngest ingestSampleFile(File file) throws IOException {
-    log.debug("ingestSampleFile began with filename {}", file.getName());
+    log.debug("Began with filename {}", file.getName());
     final Filename filename = verifyCSVFilename(file.getName(), "sample");
     final Reader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
     FileIngest fileIngest = new FileIngest(filename, reader);
-    log.debug("ingestSampleFile passed with {}", fileIngest);
+    log.debug("Passed with {}", fileIngest);
     return fileIngest;
   }
 }
