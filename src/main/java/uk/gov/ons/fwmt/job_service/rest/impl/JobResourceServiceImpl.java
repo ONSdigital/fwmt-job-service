@@ -30,7 +30,7 @@ public class JobResourceServiceImpl implements JobResourceService {
   private transient String findUrl;
   private transient String createUrl;
   private transient String updateUrl;
-  private transient String sendCSVUrl;
+  private transient String storeCSVUrl;
 
   @Autowired
   public JobResourceServiceImpl(
@@ -39,12 +39,12 @@ public class JobResourceServiceImpl implements JobResourceService {
       @Value("${service.resource.operation.jobs.find.path}") String findPath,
       @Value("${service.resource.operation.jobs.create.path}") String createPath,
       @Value("${service.resource.operation.jobs.update.path}") String updatePath,
-      @Value("${service.resource.operation.jobs.sendcsv.path}") String sendCSVPath) {
+      @Value("${service.resource.operation.jobs.sendcsv.path}") String storeCSVPath) {
     this.restTemplate = restTemplate;
     this.findUrl = baseUrl + findPath;
     this.createUrl = baseUrl + createPath;
     this.updateUrl = baseUrl + updatePath;
-    this.sendCSVUrl = baseUrl + sendCSVPath;
+    this.storeCSVUrl = baseUrl + storeCSVPath;
   }
 
   @Override
@@ -102,7 +102,7 @@ public class JobResourceServiceImpl implements JobResourceService {
 
   @Override
   public void storeCSV(File file, boolean valid) {
-    log.debug("SendCSV");
+    log.debug("StoreCSV");
     try {
       Resource fileConvert = new FileSystemResource(file);
 
@@ -113,7 +113,7 @@ public class JobResourceServiceImpl implements JobResourceService {
       headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
       final HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(bodyMap, headers);
-      restTemplate.exchange(sendCSVUrl, HttpMethod.POST, request, String.class);
+      restTemplate.exchange(storeCSVUrl, HttpMethod.POST, request, String.class);
     } catch (HttpClientErrorException HttpClientErrorException) {
       log.error("An error occurred while communicating with the resource service", HttpClientErrorException);
     }
