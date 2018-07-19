@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.job_service.service.impl;
+package uk.gov.ons.fwmt.job_service.utils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -7,20 +7,14 @@ import static org.junit.Assert.fail;
 import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType.GFF;
 import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType.LFS;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDateTime;
 
 import org.junit.Test;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
-import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
 
-public class FileIngestServiceImplTest {
+public class SampleFileUtilsTest {
 
   private final String[] validSampleFileNames = {
       "sample_GFF_2018-04-24T19:09:54Z.csv",
@@ -46,26 +40,25 @@ public class FileIngestServiceImplTest {
       "staff_LFS_2018-04-24T19-31-25Z.csv",
       "staff_2018-04-24T19:31:25Z.csp",
   };
-  private FileIngestServiceImpl fileIngestService = new FileIngestServiceImpl();
 
   @Test
   public void checkValidSampleFileNames() throws InvalidFileNameException {
     for (String filename : validSampleFileNames) {
-      assertNotNull(fileIngestService.verifyCSVFilename(filename, "sample"));
+      assertNotNull(SampleFileUtils.buildSampleFilenameComponents(filename, "sample"));
     }
   }
 
   @Test
   public void checkValidStaffFileNames() throws InvalidFileNameException {
     for (String filename : validStaffFileNames) {
-      assertNotNull(fileIngestService.verifyCSVFilename(filename, "staff"));
+      assertNotNull(SampleFileUtils.buildSampleFilenameComponents(filename, "staff"));
     }
   }
 
   @Test(expected = InvalidFileNameException.class)
   public void checkInvalidSampleFileNames() throws InvalidFileNameException {
     for (String filename : invalidSampleFileNames) {
-      assertNotNull(fileIngestService.verifyCSVFilename(filename, "sample"));
+      assertNotNull(SampleFileUtils.buildSampleFilenameComponents(filename, "sample"));
       // we should throw an InvalidFileNameException before this point
       fail("False negative - filename '" + filename + "' should be invalid");
     }
@@ -74,7 +67,7 @@ public class FileIngestServiceImplTest {
   @Test(expected = InvalidFileNameException.class)
   public void checkInvalidStaffFileNames() throws InvalidFileNameException {
     for (String filename : invalidStaffFileNames) {
-      assertNotNull(fileIngestService.verifyCSVFilename(filename, "staff"));
+      assertNotNull(SampleFileUtils.buildSampleFilenameComponents(filename, "staff"));
       // we should throw an InvalidFileNameException before this point
       fail("False negative - filename '" + filename + "' should be invalid");
     }
@@ -88,7 +81,7 @@ public class FileIngestServiceImplTest {
     String[] filenameSplitByUnderscore = {"sample", "GFF", "2018-04-24T19:09:54Z.csv"};
 
     //When
-    String result = fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
+    String result = SampleFileUtils.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
 
     //Then
     assertEquals(expectedEndpoint, result);
@@ -102,7 +95,7 @@ public class FileIngestServiceImplTest {
     String[] filenameSplitByUnderscore = {"staff", "2018-04-24T19:09:54Z.csv"};
 
     //When
-    String result = fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
+    String result = SampleFileUtils.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
 
     //Then
     assertEquals(expectedEndpoint, result);
@@ -116,7 +109,7 @@ public class FileIngestServiceImplTest {
     String[] filenameSplitByUnderscore = {"wrong", "GFF", "2018-04-24T19:09:54Z.csv"};
 
     //When
-    String result = fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
+    String result = SampleFileUtils.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
 
     //Then
     assertEquals(expectedEndpoint, result);
@@ -130,7 +123,7 @@ public class FileIngestServiceImplTest {
     String[] filenameSplitByUnderscore = {"wrong", "GFF", "2018-04-24T19:09:54Z.csv"};
 
     //When
-    String result = fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
+    String result = SampleFileUtils.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
 
     //Then
     assertEquals(expectedEndpoint, result);
@@ -144,7 +137,7 @@ public class FileIngestServiceImplTest {
     String[] filenameSplitByUnderscore = {"sample", "GFF-2018-04-24T19:09:54Z.csv"};
 
     //When
-    String result = fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
+    String result = SampleFileUtils.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
 
     //Then
     assertEquals(expectedEndpoint, result);
@@ -158,7 +151,7 @@ public class FileIngestServiceImplTest {
     String[] filenameSplitByUnderscore = {"staff", "", "2018-04-24T19:09:54Z.csv"};
 
     //When
-    String result = fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
+    String result = SampleFileUtils.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
 
     //Then
     assertEquals(expectedEndpoint, result);
@@ -172,7 +165,7 @@ public class FileIngestServiceImplTest {
     String expectedExtension = "csv";
 
     //When
-    String[] result = fileIngestService.checkFileExtension(rawFilename);
+    String[] result = SampleFileUtils.checkFileExtension(rawFilename);
 
     //Then
     assertEquals(rawFilename, result[0] + "." + result[1]);
@@ -186,7 +179,7 @@ public class FileIngestServiceImplTest {
     String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.jpg";
     String expectedExtension = "csv";
 
-    String[] result = fileIngestService.checkFileExtension(rawFilename);
+    String[] result = SampleFileUtils.checkFileExtension(rawFilename);
 
     //Then
     assertNotEquals(expectedExtension, result[1]);
@@ -199,7 +192,7 @@ public class FileIngestServiceImplTest {
     String endpoint = "sample";
 
     //When
-    LegacySampleSurveyType result = fileIngestService.getLegacySampleSurveyType(filenameSplitByUnderscore, endpoint);
+    LegacySampleSurveyType result = SampleFileUtils.getLegacySampleSurveyType(filenameSplitByUnderscore, endpoint);
 
     //Then
     assertEquals(GFF, result);
@@ -212,7 +205,7 @@ public class FileIngestServiceImplTest {
     String endpoint = "sample";
 
     //When
-    LegacySampleSurveyType result = fileIngestService.getLegacySampleSurveyType(filenameSplitByUnderscore, endpoint);
+    LegacySampleSurveyType result = SampleFileUtils.getLegacySampleSurveyType(filenameSplitByUnderscore, endpoint);
 
     //Then
     assertEquals(LFS, result);
@@ -225,7 +218,7 @@ public class FileIngestServiceImplTest {
     String endpoint = "sample";
 
     //When
-    LegacySampleSurveyType result = fileIngestService.getLegacySampleSurveyType(filenameSplitByUnderscore, endpoint);
+    LegacySampleSurveyType result = SampleFileUtils.getLegacySampleSurveyType(filenameSplitByUnderscore, endpoint);
 
     //Then
     assertNotEquals(LFS, result);
@@ -239,7 +232,7 @@ public class FileIngestServiceImplTest {
     String rawTimestamp = "2018-04-24T19:09:54Z";
 
     //When
-    LocalDateTime result = fileIngestService.getLocalDateTime(rawFilename, rawTimestamp);
+    LocalDateTime result = SampleFileUtils.getLocalDateTime(rawFilename, rawTimestamp);
 
     //Then
     assertNotNull(result);
@@ -253,7 +246,7 @@ public class FileIngestServiceImplTest {
     String validTime = "2018-04-24T19:09:54";
 
     //When
-    LocalDateTime result = fileIngestService.getLocalDateTime(rawFilename, rawTimestamp);
+    LocalDateTime result = SampleFileUtils.getLocalDateTime(rawFilename, rawTimestamp);
 
     //Then
     assertNotEquals(validTime, result);

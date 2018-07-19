@@ -1,14 +1,25 @@
 package uk.gov.ons.fwmt.job_service.service.impl;
 
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessage;
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateJobHeaderRequestMessage;
-import lombok.extern.slf4j.Slf4j;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessage;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateJobHeaderRequestMessage;
+
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.UnprocessedCSVRow;
-import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
+import uk.gov.ons.fwmt.job_service.data.file_ingest.SampleFilenameComponents;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
@@ -18,21 +29,13 @@ import uk.gov.ons.fwmt.job_service.rest.client.UserResourceServiceClient;
 import uk.gov.ons.fwmt.job_service.rest.client.dto.JobDto;
 import uk.gov.ons.fwmt.job_service.rest.client.dto.UserDto;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
-import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Optional;
+import uk.gov.ons.fwmt.job_service.utils.SampleFileUtils;
 
 @Slf4j
 @Component
 public class JobProcessor { 
-
-  @Autowired
-  private FileIngestService fileIngestService;
 
   @Autowired
   private CSVParsingService csvParsingService;
@@ -49,14 +52,12 @@ public class JobProcessor {
   @Autowired
   private TMService tmService;
   
-  public JobProcessor(FileIngestService fileIngestService,
-      CSVParsingService csvParsingService,
+  public JobProcessor(CSVParsingService csvParsingService,
       UserResourceServiceClient userResourceServiceClient,
       TMJobConverterService tmJobConverterService,
       JobResourceServiceClient jobResourceServiceClient,
       TMService tmService
       ){
-        this.fileIngestService = fileIngestService;
         this.csvParsingService = csvParsingService;
         this.userResourceServiceClient = userResourceServiceClient;
         this.tmJobConverterService = tmJobConverterService;
@@ -68,9 +69,11 @@ public class JobProcessor {
   public void processSampleFile(File file)
       throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
     
-    FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
+    SampleFilenameComponents filename = SampleFileUtils.buildSampleFilenameComponents(file);
+    final Reader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
+
     Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService
-        .parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
+     .parseLegacySample(reader, filename.getTla());
     
     while (csvRowIterator.hasNext()) {
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
