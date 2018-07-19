@@ -1,0 +1,44 @@
+version: '3'
+services:
+  job:
+    container_name: job
+    image: jobsvc
+    ports:
+     - "${JOB_PORT}:9091"
+    external_links:
+     - resource
+    environment: 
+       - service.resource.username=user
+       - service.resource.password=password
+       - service.resource.baseUrl=http://${RESOURCE_HOST}:9093/resources
+  resource:
+    container_name: resource
+    image: resourcesvc
+    ports:
+     - "${RESOURCE_PORT}:9093"
+    external_links:
+     - job
+     - staff
+    environment:
+     - spring.datasource.url=jdbc:postgresql://postgres:${POSTGRES_PORT}/${POSTGRES_HOST}?currentSchema=gateway
+     - liquibase.url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/postgres?currentSchema=gateway
+  staff:
+    container_name: staff
+    image: staffsvc
+    ports:
+     - "${STAFF_PORT}:9092"
+    external_links:
+     - resource
+  postgres:
+    container_name: postgres
+    image: postgres
+    ports:
+     - "${POSTGRES_PORT}:5432"
+    environment: 
+     - service.resource.username=user
+     - service.resource.password=password
+     - service.resource.baseUrl=http://${RESOURCE_HOST}:9093/resources
+networks:
+  default:
+    external:
+      name: rmdockerdev_default
