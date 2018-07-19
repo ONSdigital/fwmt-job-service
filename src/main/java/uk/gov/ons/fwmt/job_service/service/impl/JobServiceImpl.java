@@ -31,7 +31,7 @@ import uk.gov.ons.fwmt.job_service.service.JobService;
 public class JobServiceImpl implements JobService {
   private FileIngestService fileIngestService;
   private CSVParsingService csvParsingService;
-  private JobResourceServiceClient jobResourceService;
+  private JobResourceServiceClient jobResourceServiceClient;
   private JobProcessor jobProcessor;
 
   @Autowired
@@ -39,17 +39,17 @@ public class JobServiceImpl implements JobService {
       FileIngestService fileIngestService,
       CSVParsingService csvParsingService,
       JobProcessor jobProcessService,
-      JobResourceServiceClient jobResourceService) {
+      JobResourceServiceClient jobResourceServiceClient) {
     this.fileIngestService = fileIngestService;
     this.csvParsingService = csvParsingService;
-    this.jobResourceService = jobResourceService;
+    this.jobResourceServiceClient = jobResourceServiceClient;
     this.jobProcessor = jobProcessService;
   }
 
   @Override
   public SampleSummaryDTO processSampleFile(MultipartFile file)
           throws IOException, InvalidFileNameException, MediaTypeNotSupportedException{
-    jobResourceService.sendCSV(file);
+    jobResourceServiceClient.sendCSV(file);
     File f = convertFile(file);
     SampleSummaryDTO sampleSummaryDTO = validateSampleFile(f);
 

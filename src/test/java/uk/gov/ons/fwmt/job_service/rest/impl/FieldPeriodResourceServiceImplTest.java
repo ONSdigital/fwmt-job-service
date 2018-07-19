@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class FieldPeriodResourceServiceImplTest {
 
-  @InjectMocks private FieldPeriodResourceServiceClientImpl fieldPeriodResourceService;
+  @InjectMocks private FieldPeriodResourceServiceClientImpl fieldPeriodResourceServiceClient;
   @Mock private RestTemplate restTemplate;
   @Mock private ResponseEntity<FieldPeriodDto> responseEntity;
 
@@ -41,7 +41,7 @@ public class FieldPeriodResourceServiceImplTest {
     when(responseEntity.getBody()).thenReturn(expectedFPDto);
 
     //When
-    Optional<FieldPeriodDto> result = fieldPeriodResourceService.findByFieldPeriod(fieldPeriod);
+    Optional<FieldPeriodDto> result = fieldPeriodResourceServiceClient.findByFieldPeriod(fieldPeriod);
 
     //Then
     assertTrue(result.isPresent());
@@ -57,7 +57,7 @@ public class FieldPeriodResourceServiceImplTest {
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     //When
-    Optional<FieldPeriodDto> result = fieldPeriodResourceService.findByFieldPeriod(fieldPeriod);
+    Optional<FieldPeriodDto> result = fieldPeriodResourceServiceClient.findByFieldPeriod(fieldPeriod);
 
     //Then
     assertFalse(result.isPresent());

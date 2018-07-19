@@ -33,11 +33,11 @@ import java.util.Optional;
 @Service
 public class CSVParsingServiceImpl implements CSVParsingService {
 
-  private FieldPeriodResourceServiceClient fieldPeriodResourceService;
+  private FieldPeriodResourceServiceClient fieldPeriodResourceServiceClient;
 
   @Autowired
-  public CSVParsingServiceImpl(FieldPeriodResourceServiceClient fieldPeriodResourceService) {
-    this.fieldPeriodResourceService = fieldPeriodResourceService;
+  public CSVParsingServiceImpl(FieldPeriodResourceServiceClient fieldPeriodResourceServiceClient) {
+    this.fieldPeriodResourceServiceClient = fieldPeriodResourceServiceClient;
   }
 
   /**
@@ -114,7 +114,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
   }
 
   public LocalDate convertToGFFDate(String stage) throws FWMTCommonException {
-    final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceService.findByFieldPeriod(stage);
+    final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceServiceClient.findByFieldPeriod(stage);
     if (existsByFieldperiod.isPresent()) {
       final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
       return fieldPeriod.getEndDate();
@@ -125,7 +125,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
 
   // technically, 'stage' here is the field period 'fp'
   public LocalDate convertToLFSDate(String stage) throws FWMTCommonException {
-    final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceService.findByFieldPeriod(stage);
+    final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceServiceClient.findByFieldPeriod(stage);
     if (existsByFieldperiod.isPresent()) {
       final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
       return fieldPeriod.getEndDate();

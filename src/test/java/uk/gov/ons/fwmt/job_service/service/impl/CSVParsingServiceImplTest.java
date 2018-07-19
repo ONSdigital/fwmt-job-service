@@ -39,7 +39,7 @@ public class CSVParsingServiceImplTest {
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
   @InjectMocks private CSVParsingServiceImpl csvParsingServiceImpl;
-  @Mock private FieldPeriodResourceServiceClient fieldPeriodResourceService;
+  @Mock private FieldPeriodResourceServiceClient fieldPeriodResourceServiceClient;
   @Mock private FieldPeriodDto fieldPeriodDto;
 
   @Test
@@ -148,7 +148,7 @@ public class CSVParsingServiceImplTest {
     int month = 7;
     int day = 1;
     LocalDate date = LocalDate.of(year, month, day);
-    when(fieldPeriodResourceService.findByFieldPeriod(any())).thenReturn(Optional.of(fieldPeriodDto));
+    when(fieldPeriodResourceServiceClient.findByFieldPeriod(any())).thenReturn(Optional.of(fieldPeriodDto));
     when(fieldPeriodDto.getEndDate()).thenReturn(date);
 
     //When
@@ -161,7 +161,7 @@ public class CSVParsingServiceImplTest {
   @Test
   public void convertToGFFDateShouldThrowExceptionWhenStageMissing() throws FWMTCommonException {
     //Given
-    when(fieldPeriodResourceService.findByFieldPeriod(any())).thenReturn(Optional.empty());
+    when(fieldPeriodResourceServiceClient.findByFieldPeriod(any())).thenReturn(Optional.empty());
     expectedException.expect(FWMTCommonException.class);
     expectedException.expectMessage(ExceptionCode.FWMT_JOB_SERVICE_0011.toString());
 
@@ -177,7 +177,7 @@ public class CSVParsingServiceImplTest {
     int month = 7;
     int day = 1;
     LocalDate date = LocalDate.of(year, month, day);
-    when(fieldPeriodResourceService.findByFieldPeriod(any())).thenReturn(Optional.of(fieldPeriodDto));
+    when(fieldPeriodResourceServiceClient.findByFieldPeriod(any())).thenReturn(Optional.of(fieldPeriodDto));
     when(fieldPeriodDto.getEndDate()).thenReturn(date);
 
     //When
@@ -190,7 +190,7 @@ public class CSVParsingServiceImplTest {
   @Test
   public void convertToLFSDateShouldThrowExceptionWhenFieldPeriodMissing() throws FWMTCommonException {
     //Given
-    when(fieldPeriodResourceService.findByFieldPeriod(any())).thenReturn(Optional.empty());
+    when(fieldPeriodResourceServiceClient.findByFieldPeriod(any())).thenReturn(Optional.empty());
     expectedException.expect(FWMTCommonException.class);
     expectedException.expectMessage(ExceptionCode.FWMT_JOB_SERVICE_0011.toString());
 

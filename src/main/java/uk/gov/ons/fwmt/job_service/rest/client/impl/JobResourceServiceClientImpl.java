@@ -107,7 +107,6 @@ public class JobResourceServiceClientImpl implements JobResourceServiceClient {
 
   @Override
   public boolean sendCSV(MultipartFile file) throws HttpClientErrorException, FileNotFoundException, IOException{
-    log.debug("SendCSV");
     try {
 
       File convFile = convertFile(file);

@@ -38,29 +38,29 @@ public class JobProcessor {
   private CSVParsingService csvParsingService;
 
   @Autowired
-  private UserResourceServiceClient userResourceService;
+  private UserResourceServiceClient userResourceServiceClient;
 
   @Autowired
   private TMJobConverterService tmJobConverterService;
 
   @Autowired
-  private JobResourceServiceClient jobResourceService;
+  private JobResourceServiceClient jobResourceServiceClient;
 
   @Autowired
   private TMService tmService;
   
   public JobProcessor(FileIngestService fileIngestService,
       CSVParsingService csvParsingService,
-      UserResourceServiceClient userResourceService,
+      UserResourceServiceClient userResourceServiceClient,
       TMJobConverterService tmJobConverterService,
-      JobResourceServiceClient jobResourceService,
+      JobResourceServiceClient jobResourceServiceClient,
       TMService tmService
       ){
         this.fileIngestService = fileIngestService;
         this.csvParsingService = csvParsingService;
-        this.userResourceService = userResourceService;
+        this.userResourceServiceClient = userResourceServiceClient;
         this.tmJobConverterService = tmJobConverterService;
-        this.jobResourceService = jobResourceService;
+        this.jobResourceServiceClient = jobResourceServiceClient;
         this.tmService = tmService;
   }
   
@@ -100,16 +100,16 @@ public class JobProcessor {
     String authno = userDto.getAuthNo();
     String username = userDto.getTmUsername();
     try {
-      if (jobResourceService.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), authno)) {
+      if (jobResourceServiceClient.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), authno)) {
         return Optional.of(new UnprocessedCSVRow(row, "Job has been sent previously"));
-      } else if (jobResourceService.existsByTmJobId(ingest.getTmJobId())) {
+      } else if (jobResourceServiceClient.existsByTmJobId(ingest.getTmJobId())) {
         final SendUpdateJobHeaderRequestMessage request = tmJobConverterService.updateJob(ingest, username);
         // TODO add error handling
         tmService.send(request);
-        final Optional<JobDto> jobDto = jobResourceService.findByTmJobId(ingest.getTmJobId());
+        final Optional<JobDto> jobDto = jobResourceServiceClient.findByTmJobId(ingest.getTmJobId());
         jobDto.ifPresent(jobDto1 -> {
           jobDto1.setLastAuthNo(ingest.getAuth());
-          jobResourceService.updateJob(jobDto1);
+          jobResourceServiceClient.updateJob(jobDto1);
         });
 
       } else {
@@ -118,17 +118,17 @@ public class JobProcessor {
           if (ingest.isGffReissue()) {
             final SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
             tmService.send(request);
-            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
+            jobResourceServiceClient.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
           } else {
             final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
             tmService.send(request);
-            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
+            jobResourceServiceClient.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
           }
           break;
         case LFS:
           final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
           tmService.send(request);
-          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
+          jobResourceServiceClient.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
           break;
         default:
           throw new IllegalArgumentException("Unknown survey type");
@@ -143,12 +143,12 @@ public class JobProcessor {
 
   protected Optional<UserDto> findUser(LegacySampleIngest ingest) {
     log.debug("Handling entry with authno: " + ingest.getAuth());
-    Optional<UserDto> userDto = userResourceService.findByAuthNo(ingest.getAuth());
+    Optional<UserDto> userDto = userResourceServiceClient.findByAuthNo(ingest.getAuth());
     if (userDto.isPresent()) {
       log.debug("Found user by authno: " + userDto.toString());
       return userDto;
     }
-    userDto = userResourceService.findByAlternateAuthNo(ingest.getAuth());
+    userDto = userResourceServiceClient.findByAlternateAuthNo(ingest.getAuth());
     if (userDto.isPresent()) {
       log.debug("Found user by alternate authno: " + userDto.toString());
       return userDto;
