@@ -12,7 +12,7 @@ public class FWMTCommonException extends RuntimeException {
 
   protected static String makeMessage(ExceptionCode code, String message) {
     if (message != null) {
-      return code.toString() + message;
+      return code.toString() + " " + message;
     } else {
       return code.toString();
     }

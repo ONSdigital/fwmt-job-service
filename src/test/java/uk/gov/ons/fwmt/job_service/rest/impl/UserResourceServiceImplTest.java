@@ -59,7 +59,7 @@ public class UserResourceServiceImplTest {
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
@@ -94,7 +94,7 @@ public class UserResourceServiceImplTest {
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
@@ -132,7 +132,7 @@ public class UserResourceServiceImplTest {
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
@@ -151,7 +151,7 @@ public class UserResourceServiceImplTest {
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
@@ -188,7 +188,7 @@ public class UserResourceServiceImplTest {
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
@@ -206,7 +206,7 @@ public class UserResourceServiceImplTest {
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When

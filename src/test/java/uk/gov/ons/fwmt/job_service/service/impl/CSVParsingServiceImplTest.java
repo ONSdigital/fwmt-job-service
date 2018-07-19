@@ -91,7 +91,7 @@ public class CSVParsingServiceImplTest {
     testIngestData.setLegacySampleSurveyType(GFF);
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.CSV_OTHER.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.CSV_OTHER.getCode());
 
     //When
     csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(), "hdsjf");
@@ -110,7 +110,7 @@ public class CSVParsingServiceImplTest {
     testIngestData.setLegacySampleSurveyType(GFF);
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.CSV_MISSING_COLUMN.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.CSV_MISSING_COLUMN.getCode());
 
     //When
     csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(), "GFF");

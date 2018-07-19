@@ -16,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
@@ -161,7 +160,7 @@ public class TMServiceImplTest {
     when(jaxbElement.getValue()).thenReturn(new Object());
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.TM_MALFUNCTION.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.TM_MALFUNCTION.getCode());
 
     //When
     tmServiceImpl.send(queryMessagesRequest);

@@ -51,7 +51,7 @@ public class JobServiceControllerTest {
     when(jobService.processSampleFile(any())).thenThrow(FWMTCommonException.makeInvalidMediaTypeException("", ""));
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.INVALID_MEDIA_TYPE.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.INVALID_MEDIA_TYPE.getCode());
 
     //When
     ResponseEntity<SampleSummaryDTO> result = jobServiceController.sampleREST(multipartFile, redirectAttributes);
@@ -80,7 +80,7 @@ public class JobServiceControllerTest {
     when(jobService.processSampleFile(any())).thenThrow(FWMTCommonException.makeInvalidFileNameException("", ""));
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getCode());
 
     //When
     ResponseEntity<SampleSummaryDTO> result = jobServiceController.sampleREST(multipartFile, redirectAttributes);

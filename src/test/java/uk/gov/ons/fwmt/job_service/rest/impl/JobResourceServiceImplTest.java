@@ -100,7 +100,7 @@ public class JobResourceServiceImplTest {
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
@@ -118,7 +118,7 @@ public class JobResourceServiceImplTest {
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
@@ -156,7 +156,7 @@ public class JobResourceServiceImplTest {
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
@@ -191,7 +191,7 @@ public class JobResourceServiceImplTest {
     doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST)).when(restTemplate).put(anyString(), any());
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When

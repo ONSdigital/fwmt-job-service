@@ -129,7 +129,7 @@ public class FileIngestServiceImplTest {
     String[] filenameSplitByUnderscore = {"wrong", "GFF", "2018-04-24T19:09:54Z.csv"};
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getCode());
 
     //When
     fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
@@ -156,7 +156,7 @@ public class FileIngestServiceImplTest {
     String[] filenameSplitByUnderscore = {"sample", "GFF-2018-04-24T19:09:54Z.csv"};
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getCode());
 
     //When
     fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
@@ -170,7 +170,7 @@ public class FileIngestServiceImplTest {
     String[] filenameSplitByUnderscore = {"staff", "", "2018-04-24T19:09:54Z.csv"};
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getCode());
 
     //When
     fileIngestService.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
@@ -198,7 +198,7 @@ public class FileIngestServiceImplTest {
     String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.jpg";
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getCode());
 
     //When
     fileIngestService.checkFileExtension(rawFilename);
@@ -262,7 +262,7 @@ public class FileIngestServiceImplTest {
     String rawTimestamp = "I am clearly not anything related to date or time";
 
     expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getPrefixedName());
+    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getCode());
 
     //When
     fileIngestService.getLocalDateTime(rawFilename, rawTimestamp);
