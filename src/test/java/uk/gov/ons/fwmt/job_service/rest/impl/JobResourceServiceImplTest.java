@@ -191,7 +191,6 @@ public class JobResourceServiceImplTest {
 
   @Test
   public void sendCSV() {
-    //MockMultipartFile file = new MockMultipartFile("file", "bla", "csv", "test".getBytes());
     File file = new File("bla");
     when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class))).thenReturn(responseEntity);
     jobResourceService.sendCSV(file, true);
