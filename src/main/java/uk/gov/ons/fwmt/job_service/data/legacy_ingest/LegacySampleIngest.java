@@ -4,8 +4,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.ons.fwmt.job_service.data.annotation.CSVColumn;
 import uk.gov.ons.fwmt.job_service.data.annotation.JobAdditionalProperty;
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -137,7 +139,8 @@ public class LegacySampleIngest {
   private String auth;
 
   @CSVColumn("Last_Updated")
-  private String lastUpdated;
+  @Convert(converter = Jsr310JpaConverters.LocalDateTimeConverter.class)
+  private LocalDateTime lastUpdated;
 
   // Data that is specific surveys
   private LegacySampleSurveyType legacySampleSurveyType;
