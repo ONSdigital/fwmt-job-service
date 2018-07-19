@@ -164,11 +164,10 @@ public class TMServiceImpl extends WebServiceGatewaySupport implements TMService
         return true;
       }
 
-      /**
-       * We don't need to use this method
-       */
       @Override public void afterCompletion(MessageContext messageContext, Exception ex)
-          throws WebServiceClientException { }
+          throws WebServiceClientException {
+        // un-used method, which must be implemented
+      }
     }};
     this.setInterceptors(interceptors);
 
