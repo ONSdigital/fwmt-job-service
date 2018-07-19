@@ -193,7 +193,7 @@ public class JobResourceServiceImplTest {
   public void sendCSV() {
     File file = new File("bla");
     when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class))).thenReturn(responseEntity);
-    jobResourceService.sendCSV(file, true);
+    jobResourceService.storeCSV(file, true);
     verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class));
   }
 
@@ -202,7 +202,7 @@ public class JobResourceServiceImplTest {
     File file = new File("bla");
     when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
-    jobResourceService.sendCSV(file, true);
+    jobResourceService.storeCSV(file, true);
     verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class));
   }
 

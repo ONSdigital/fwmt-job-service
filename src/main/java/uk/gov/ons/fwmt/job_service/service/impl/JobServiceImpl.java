@@ -50,8 +50,7 @@ public class JobServiceImpl implements JobService {
           throws IOException, InvalidFileNameException, MediaTypeNotSupportedException{
     File f = convertFile(file);
     SampleSummaryDTO sampleSummaryDTO = validateSampleFile(f);
-    boolean valid = sampleSummaryDTO.getUnprocessedRows().isEmpty();
-    jobResourceService.sendCSV(f, valid);
+    jobResourceService.storeCSV(f, sampleSummaryDTO.getUnprocessedRows().isEmpty());
 
     // This is an async call
     jobProcessor.processSampleFile(f);

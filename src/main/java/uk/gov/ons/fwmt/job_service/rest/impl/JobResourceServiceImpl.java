@@ -101,7 +101,7 @@ public class JobResourceServiceImpl implements JobResourceService {
   }
 
   @Override
-  public void sendCSV(File file, boolean valid) {
+  public void storeCSV(File file, boolean valid) {
     log.debug("SendCSV");
     try {
       Resource fileConvert = new FileSystemResource(file);

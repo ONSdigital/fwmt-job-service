@@ -12,7 +12,7 @@ public interface JobResourceService {
     boolean createJob(final JobDto jobDto);
     boolean updateJob(final JobDto jobDto);
 
-  void sendCSV(final File file, final boolean valid);
+    void storeCSV(final File file, final boolean valid);
 
 
 }
