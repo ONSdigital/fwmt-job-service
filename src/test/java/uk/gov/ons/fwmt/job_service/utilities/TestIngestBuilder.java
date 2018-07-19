@@ -37,6 +37,7 @@ public class TestIngestBuilder extends LegacySampleIngest {
     //additional properties
     ingest.setGeoX(3.56f);
     ingest.setGeoY(3.56f);
+    ingest.setLcfIncentive("testLcfIncentive");
     return ingest;
   }
 
@@ -71,6 +72,7 @@ public class TestIngestBuilder extends LegacySampleIngest {
     //additional properties
     ingest.setGeoX(3.56f);
     ingest.setGeoY(3.56f);
+    ingest.setLcfIncentive("testLcfIncentive");
     return ingest;
   }
 }
