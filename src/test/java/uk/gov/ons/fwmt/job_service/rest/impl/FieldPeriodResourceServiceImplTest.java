@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
+
+import uk.gov.ons.fwmt.job_service.rest.client.dto.FieldPeriodDto;
+import uk.gov.ons.fwmt.job_service.rest.client.impl.FieldPeriodResourceServiceClientImpl;
 
 import java.util.Optional;
 
@@ -24,7 +26,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class FieldPeriodResourceServiceImplTest {
 
-  @InjectMocks private FieldPeriodResourceServiceImpl fieldPeriodResourceService;
+  @InjectMocks private FieldPeriodResourceServiceClientImpl fieldPeriodResourceService;
   @Mock private RestTemplate restTemplate;
   @Mock private ResponseEntity<FieldPeriodDto> responseEntity;
 

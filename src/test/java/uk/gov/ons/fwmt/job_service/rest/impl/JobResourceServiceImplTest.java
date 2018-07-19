@@ -11,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
+
+import uk.gov.ons.fwmt.job_service.rest.client.dto.JobDto;
+import uk.gov.ons.fwmt.job_service.rest.client.impl.JobResourceServiceClientImpl;
 
 import java.util.Optional;
 
@@ -25,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 public class JobResourceServiceImplTest {
 
-  @InjectMocks private JobResourceServiceImpl jobResourceService;
+  @InjectMocks private JobResourceServiceClientImpl jobResourceService;
   @Mock private RestTemplate restTemplate;
   @Mock private ResponseEntity responseEntity;
 

@@ -13,10 +13,10 @@ import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
 import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
-import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
-import uk.gov.ons.fwmt.job_service.rest.UserResourceService;
-import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
-import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
+import uk.gov.ons.fwmt.job_service.rest.client.JobResourceServiceClient;
+import uk.gov.ons.fwmt.job_service.rest.client.UserResourceServiceClient;
+import uk.gov.ons.fwmt.job_service.rest.client.dto.JobDto;
+import uk.gov.ons.fwmt.job_service.rest.client.dto.UserDto;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
@@ -38,22 +38,22 @@ public class JobProcessor {
   private CSVParsingService csvParsingService;
 
   @Autowired
-  private UserResourceService userResourceService;
+  private UserResourceServiceClient userResourceService;
 
   @Autowired
   private TMJobConverterService tmJobConverterService;
 
   @Autowired
-  private JobResourceService jobResourceService;
+  private JobResourceServiceClient jobResourceService;
 
   @Autowired
   private TMService tmService;
   
   public JobProcessor(FileIngestService fileIngestService,
       CSVParsingService csvParsingService,
-      UserResourceService userResourceService,
+      UserResourceServiceClient userResourceService,
       TMJobConverterService tmJobConverterService,
-      JobResourceService jobResourceService,
+      JobResourceServiceClient jobResourceService,
       TMService tmService
       ){
         this.fileIngestService = fileIngestService;

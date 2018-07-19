@@ -1,10 +1,10 @@
-package uk.gov.ons.fwmt.job_service.rest;
-
-import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
+package uk.gov.ons.fwmt.job_service.rest.client;
 
 import java.util.Optional;
 
-public interface UserResourceService {
+import uk.gov.ons.fwmt.job_service.rest.client.dto.UserDto;
+
+public interface UserResourceServiceClient {
 
     Optional<UserDto> findByAuthNo(String authNo);
     Optional<UserDto> findByAlternateAuthNo(String authNo);

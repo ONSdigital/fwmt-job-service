@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.job_service.rest.impl;
+package uk.gov.ons.fwmt.job_service.rest.client.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +17,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
-import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
+
+import uk.gov.ons.fwmt.job_service.rest.client.JobResourceServiceClient;
+import uk.gov.ons.fwmt.job_service.rest.client.dto.JobDto;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,7 +29,7 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class JobResourceServiceImpl implements JobResourceService {
+public class JobResourceServiceClientImpl implements JobResourceServiceClient {
   private transient RestTemplate restTemplate;
 
   private transient String findUrl;
@@ -37,7 +38,7 @@ public class JobResourceServiceImpl implements JobResourceService {
   private transient String sendCSVUrl;
 
   @Autowired
-  public JobResourceServiceImpl(
+  public JobResourceServiceClientImpl(
       RestTemplate restTemplate,
       @Value("${service.resource.baseUrl}") String baseUrl,
       @Value("${service.resource.operation.jobs.find.path}") String findPath,

@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
+
+import uk.gov.ons.fwmt.job_service.rest.client.dto.UserDto;
+import uk.gov.ons.fwmt.job_service.rest.client.impl.UserResourceServiceCientImpl;
 
 import java.util.Optional;
 
@@ -23,7 +25,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class UserResourceServiceImplTest {
 
-  @InjectMocks private UserResourceServiceImpl userResourceService;
+  @InjectMocks private UserResourceServiceCientImpl userResourceService;
   @Mock private RestTemplate restTemplate;
   @Mock private ResponseEntity<UserDto> responseEntity;
 

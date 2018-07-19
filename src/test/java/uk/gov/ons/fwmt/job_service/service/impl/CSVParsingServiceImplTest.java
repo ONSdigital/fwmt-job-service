@@ -13,8 +13,8 @@ import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleGFFDataIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
-import uk.gov.ons.fwmt.job_service.rest.FieldPeriodResourceService;
-import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
+import uk.gov.ons.fwmt.job_service.rest.client.FieldPeriodResourceServiceClient;
+import uk.gov.ons.fwmt.job_service.rest.client.dto.FieldPeriodDto;
 import uk.gov.ons.fwmt.job_service.utilities.TestIngestBuilder;
 
 import java.io.File;
@@ -39,7 +39,7 @@ public class CSVParsingServiceImplTest {
 
   @Rule public ExpectedException expectedException = ExpectedException.none();
   @InjectMocks private CSVParsingServiceImpl csvParsingServiceImpl;
-  @Mock private FieldPeriodResourceService fieldPeriodResourceService;
+  @Mock private FieldPeriodResourceServiceClient fieldPeriodResourceService;
   @Mock private FieldPeriodDto fieldPeriodDto;
 
   @Test

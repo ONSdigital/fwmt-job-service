@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.job_service.rest.dto;
+package uk.gov.ons.fwmt.job_service.rest.client.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

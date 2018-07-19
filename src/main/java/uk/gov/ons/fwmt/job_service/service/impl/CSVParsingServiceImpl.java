@@ -16,8 +16,8 @@ import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleLFSDataIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
-import uk.gov.ons.fwmt.job_service.rest.FieldPeriodResourceService;
-import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
+import uk.gov.ons.fwmt.job_service.rest.client.FieldPeriodResourceServiceClient;
+import uk.gov.ons.fwmt.job_service.rest.client.dto.FieldPeriodDto;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 
 import java.io.IOException;
@@ -33,10 +33,10 @@ import java.util.Optional;
 @Service
 public class CSVParsingServiceImpl implements CSVParsingService {
 
-  private FieldPeriodResourceService fieldPeriodResourceService;
+  private FieldPeriodResourceServiceClient fieldPeriodResourceService;
 
   @Autowired
-  public CSVParsingServiceImpl(FieldPeriodResourceService fieldPeriodResourceService) {
+  public CSVParsingServiceImpl(FieldPeriodResourceServiceClient fieldPeriodResourceService) {
     this.fieldPeriodResourceService = fieldPeriodResourceService;
   }
 

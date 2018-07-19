@@ -21,7 +21,7 @@ import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
 import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
-import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
+import uk.gov.ons.fwmt.job_service.rest.client.JobResourceServiceClient;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 import uk.gov.ons.fwmt.job_service.service.JobService;
@@ -31,7 +31,7 @@ import uk.gov.ons.fwmt.job_service.service.JobService;
 public class JobServiceImpl implements JobService {
   private FileIngestService fileIngestService;
   private CSVParsingService csvParsingService;
-  private JobResourceService jobResourceService;
+  private JobResourceServiceClient jobResourceService;
   private JobProcessor jobProcessor;
 
   @Autowired
@@ -39,7 +39,7 @@ public class JobServiceImpl implements JobService {
       FileIngestService fileIngestService,
       CSVParsingService csvParsingService,
       JobProcessor jobProcessService,
-      JobResourceService jobResourceService) {
+      JobResourceServiceClient jobResourceService) {
     this.fileIngestService = fileIngestService;
     this.csvParsingService = csvParsingService;
     this.jobResourceService = jobResourceService;

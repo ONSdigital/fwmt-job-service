@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.job_service.rest.impl;
+package uk.gov.ons.fwmt.job_service.rest.client.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,20 +8,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.ons.fwmt.job_service.rest.FieldPeriodResourceService;
-import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
+
+import uk.gov.ons.fwmt.job_service.rest.client.FieldPeriodResourceServiceClient;
+import uk.gov.ons.fwmt.job_service.rest.client.dto.FieldPeriodDto;
 
 import java.util.Optional;
 
 @Slf4j
 @Service
-public class FieldPeriodResourceServiceImpl implements FieldPeriodResourceService {
+public class FieldPeriodResourceServiceClientImpl implements FieldPeriodResourceServiceClient {
   private transient RestTemplate restTemplate;
 
   private transient String findUrl;
 
   @Autowired
-  public FieldPeriodResourceServiceImpl(
+  public FieldPeriodResourceServiceClientImpl(
       RestTemplate restTemplate,
       @Value("${service.resource.baseUrl}") String baseUrl,
       @Value("${service.resource.operation.fieldPeriods.find.path}") String findPath) {
