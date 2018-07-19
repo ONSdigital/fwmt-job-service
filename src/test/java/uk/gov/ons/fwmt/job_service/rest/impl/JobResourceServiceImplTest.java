@@ -190,7 +190,7 @@ public class JobResourceServiceImplTest {
   }
 
   @Test
-  public void sendCSV() {
+  public void storeCSV() {
     File file = new File("bla");
     when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class))).thenReturn(responseEntity);
     jobResourceService.storeCSV(file, true);
@@ -198,7 +198,7 @@ public class JobResourceServiceImplTest {
   }
 
   @Test
-  public void sendCSV4xxError() {
+  public void storeCSV4xxError() {
     File file = new File("bla");
     when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
