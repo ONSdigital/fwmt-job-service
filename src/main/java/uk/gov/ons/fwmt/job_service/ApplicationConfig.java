@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.fwmt.job_service.config.CorrelationIdInterceptor;
+import uk.gov.ons.fwmt.job_service.config.CorrelationIdTaskDecorator;
 
 import java.util.Collections;
 
@@ -64,6 +65,7 @@ public class ApplicationConfig {
     threadPoolTaskExecutor.setCorePoolSize(3);
     threadPoolTaskExecutor.setMaxPoolSize(3);
     threadPoolTaskExecutor.setQueueCapacity(600);
+    threadPoolTaskExecutor.setTaskDecorator(new CorrelationIdTaskDecorator());
     threadPoolTaskExecutor.afterPropertiesSet();
     return threadPoolTaskExecutor;
   }

@@ -59,7 +59,7 @@ public class CorrelationIdFilter implements Filter {
         log.info("Found correlationId in Header: " + currentCid);
       }
 
-      CorrelationIdHandler.setId(currentCid);
+      MDC.put("CID", currentCid);
     }
 
     filterChain.doFilter(httpServletRequest, servletResponse);

@@ -27,7 +27,7 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-public class JobProcessor { 
+public class JobProcessor {
 
   @Autowired
   private FileIngestService fileIngestService;
@@ -46,30 +46,30 @@ public class JobProcessor {
 
   @Autowired
   private TMService tmService;
-  
+
   public JobProcessor(FileIngestService fileIngestService,
       CSVParsingService csvParsingService,
       UserResourceService userResourceService,
       TMJobConverterService tmJobConverterService,
       JobResourceService jobResourceService,
       TMService tmService
-      ){
-        this.fileIngestService = fileIngestService;
-        this.csvParsingService = csvParsingService;
-        this.userResourceService = userResourceService;
-        this.tmJobConverterService = tmJobConverterService;
-        this.jobResourceService = jobResourceService;
-        this.tmService = tmService;
+  ) {
+    this.fileIngestService = fileIngestService;
+    this.csvParsingService = csvParsingService;
+    this.userResourceService = userResourceService;
+    this.tmJobConverterService = tmJobConverterService;
+    this.jobResourceService = jobResourceService;
+    this.tmService = tmService;
   }
-  
+
   @Async("processExecutor")
   public void processSampleFile(File file)
       throws IOException {
-    
+
     FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
     Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService
         .parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
-    
+
     while (csvRowIterator.hasNext()) {
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
       if (row.isError()) {
