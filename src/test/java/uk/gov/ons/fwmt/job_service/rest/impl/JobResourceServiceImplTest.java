@@ -13,6 +13,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
 
+import java.io.File;
 import java.util.Optional;
 
 import static org.junit.Assert.assertFalse;
@@ -187,4 +188,23 @@ public class JobResourceServiceImplTest {
     verify(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), eq(request), eq(Void.class));
     assertFalse(result);
   }
+
+  @Test
+  public void sendCSV() {
+    //MockMultipartFile file = new MockMultipartFile("file", "bla", "csv", "test".getBytes());
+    File file = new File("bla");
+    when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class))).thenReturn(responseEntity);
+    jobResourceService.sendCSV(file, true);
+    verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class));
+  }
+
+  @Test
+  public void sendCSV4xxError() {
+    File file = new File("bla");
+    when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class)))
+        .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+    jobResourceService.sendCSV(file, true);
+    verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class));
+  }
+
 }
