@@ -3,10 +3,7 @@ package uk.gov.ons.fwmt.job_service.rest.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.fwmt.job_service.rest.FieldPeriodResourceService;
 import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
@@ -31,16 +28,14 @@ public class FieldPeriodResourceServiceImpl implements FieldPeriodResourceServic
 
   @Override
   public Optional<FieldPeriodDto> findByFieldPeriod(final String fieldPeriod) {
-    log.info("findByFieldPeriod: {}", fieldPeriod);
-    try {
-      final ResponseEntity<FieldPeriodDto> responseEntity = restTemplate
-          .getForEntity(findUrl, FieldPeriodDto.class, fieldPeriod);
-      if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-        return Optional.ofNullable(responseEntity.getBody());
-      }
-    } catch (HttpClientErrorException httpException) {
-      log.error("An error occurred while communicating with the resource service", httpException);
+    log.debug("Start: fieldPeriod={}", fieldPeriod);
+    final Optional<FieldPeriodDto> jobDto = ResourceRESTHelper
+        .get(restTemplate, findUrl, FieldPeriodDto.class, fieldPeriod);
+    if (jobDto.isPresent()) {
+      log.debug("Found: {}", jobDto.get());
+    } else {
+      log.debug("Not found");
     }
-    return Optional.empty();
+    return jobDto;
   }
 }

@@ -11,8 +11,7 @@ import uk.gov.ons.fwmt.job_service.data.csv_parser.UnprocessedCSVRow;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
-import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
-import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
 import uk.gov.ons.fwmt.job_service.rest.UserResourceService;
 import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
@@ -31,70 +30,77 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-public class JobProcessor { 
+public class JobProcessor {
 
-  @Autowired
   private FileIngestService fileIngestService;
 
-  @Autowired
   private CSVParsingService csvParsingService;
 
-  @Autowired
   private UserResourceService userResourceService;
 
-  @Autowired
   private TMJobConverterService tmJobConverterService;
 
-  @Autowired
   private JobResourceService jobResourceService;
 
-  @Autowired
   private TMService tmService;
-  
+
+  @Autowired
   public JobProcessor(FileIngestService fileIngestService,
       CSVParsingService csvParsingService,
       UserResourceService userResourceService,
       TMJobConverterService tmJobConverterService,
       JobResourceService jobResourceService,
       TMService tmService
-      ){
-        this.fileIngestService = fileIngestService;
-        this.csvParsingService = csvParsingService;
-        this.userResourceService = userResourceService;
-        this.tmJobConverterService = tmJobConverterService;
-        this.jobResourceService = jobResourceService;
-        this.tmService = tmService;
+  ) {
+    this.fileIngestService = fileIngestService;
+    this.csvParsingService = csvParsingService;
+    this.userResourceService = userResourceService;
+    this.tmJobConverterService = tmJobConverterService;
+    this.jobResourceService = jobResourceService;
+    this.tmService = tmService;
   }
-  
+
   @Async("processExecutor")
   public void processSampleFile(File file)
-      throws IOException, InvalidFileNameException, MediaTypeNotSupportedException {
-    
+      throws IOException {
+
     FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
     Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService
         .parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
-    
+
     while (csvRowIterator.hasNext()) {
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
+
       if (row.isError()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0001 + " - Entry could not be processed");
+        log.error("Entry could not be processed", FWMTCommonException.makeCsvOtherException(row.getErrorMessage()));
         continue;
       }
+
       final LegacySampleIngest ingest = row.getResult();
-      final Optional<UserDto> user = findUser(ingest);
+      final Optional<UserDto> user = userResourceService.findByEitherAuthNo(ingest.getAuth());
+
+      boolean isReallocation = jobResourceService.existsByTmJobId(ingest.getTmJobId());
+      String jobType = isReallocation ? "Reallocation" : "Allocation";
+
       if (!user.isPresent()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0005 + " - User did not exist in the gateway");
+        log.error(jobType + " could not be processed",
+            FWMTCommonException.makeUnknownUserIdException(ingest.getAuth()));
         continue;
       }
+
       if (!user.get().isActive()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0005 + " - User was not active");
+        log.error(jobType + " could not be processed",
+            FWMTCommonException.makeBadUserStateException(user.get(), "User was inactive"));
         continue;
       }
-      final Optional<UnprocessedCSVRow> unprocessedCSVRow = sendJobToUser(row.getRow(), ingest, user.get());
-      if (unprocessedCSVRow.isPresent()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0004 + " - Job could not be sent");
-        continue;
-      }
+        try {
+            final Optional<UnprocessedCSVRow> unprocessedCSVRow = sendJobToUser(row.getRow(), ingest, user.get(),
+                    isReallocation);
+            unprocessedCSVRow.ifPresent(unprocessedCSVRow1 -> log.error("Entry could not be processed",
+                    FWMTCommonException.makeCsvOtherException(unprocessedCSVRow1.getMessage())));
+        } catch (Exception e) {
+            log.error(jobType + " could not be processed", FWMTCommonException.makeUnknownException(e));
+        }
     }
   }
 
@@ -106,6 +112,7 @@ public class JobProcessor {
         return Optional.of(new UnprocessedCSVRow(row, "Job has been sent previously"));
       } else if (jobResourceService.existsByTmJobId(ingest.getTmJobId())) {
         final SendUpdateJobHeaderRequestMessage request = tmJobConverterService.updateJob(ingest, username);
+          log.info("Reallocating job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
         // TODO add error handling
         tmService.send(request);
         final Optional<JobDto> jobDto = jobResourceService.findByTmJobId(ingest.getTmJobId());
@@ -119,43 +126,26 @@ public class JobProcessor {
         case GFF:
           if (ingest.isGffReissue()) {
             final SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
+              log.info("Reissuing GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
             tmService.send(request);
-            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), LocalDateTime.parse(ingest.getLastUpdated(),DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(),LocalDateTime.parse(ingest.getLastUpdated(),DateTimeFormatter.ISO_LOCAL_DATE_TIME)));));
           } else {
             final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
             tmService.send(request);
-            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), LocalDateTime.parse(ingest.getLastUpdated(),DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(),LocalDateTime.parse(ingest.getLastUpdated(),DateTimeFormatter.ISO_LOCAL_DATE_TIME)));));
           }
           break;
         case LFS:
           final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
+          log.info("Reissuing GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
           tmService.send(request);
-          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), LocalDateTime.parse(ingest.getLastUpdated(),DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(),LocalDateTime.parse(ingest.getLastUpdated(),DateTimeFormatter.ISO_LOCAL_DATE_TIME)));));
           break;
         default:
           throw new IllegalArgumentException("Unknown survey type");
         }
       }
-      return Optional.empty();
-    } catch (Exception e) {
-      log.error("Error while sending job", e);
-      return Optional.of(new UnprocessedCSVRow(row, e.toString()));
     }
-  }
-
-  protected Optional<UserDto> findUser(LegacySampleIngest ingest) {
-    log.debug("Handling entry with authno: " + ingest.getAuth());
-    Optional<UserDto> userDto = userResourceService.findByAuthNo(ingest.getAuth());
-    if (userDto.isPresent()) {
-      log.debug("Found user by authno: " + userDto.toString());
-      return userDto;
-    }
-    userDto = userResourceService.findByAlternateAuthNo(ingest.getAuth());
-    if (userDto.isPresent()) {
-      log.debug("Found user by alternate authno: " + userDto.toString());
-      return userDto;
-    } else {
-      return Optional.empty();
-    }
+    return Optional.empty();
   }
 }
