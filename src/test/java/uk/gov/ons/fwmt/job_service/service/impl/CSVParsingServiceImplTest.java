@@ -47,7 +47,6 @@ public class CSVParsingServiceImplTest {
     //Given
     File testFile = new File("src/test/resources/sampledata/unit_tests/sample_GFF_2018-05-17T15-34-00Z.csv");
     Reader reader = new InputStreamReader(new FileInputStream(testFile));
-    String expected = "tla_1";
 
     CSVParser csvParser = CSVFormat.DEFAULT.withHeader().parse(reader);
 
@@ -56,9 +55,8 @@ public class CSVParsingServiceImplTest {
     //When
     csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(), "GFF");
 
-
     //Then
-    assertEquals(expected, testIngestData.getTla());
+    assertEquals("tla_1", testIngestData.getTla());
     assertEquals("testLcfIncentive1", testIngestData.getLcfIncentive());
   }
 

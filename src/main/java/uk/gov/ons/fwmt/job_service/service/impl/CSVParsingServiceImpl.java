@@ -78,11 +78,13 @@ public class CSVParsingServiceImpl implements CSVParsingService {
         }
         // if it's mandatory or set, try
         // if it's ignored, don't try
-        if (csvColumn.mandatory() && !csvColumn.ignored()) {
+        if (!csvColumn.ignored()) {
           if (record.isSet(columnName)) {
             accessor.setPropertyValue(field.getName(), record.get(columnName));
           } else {
-            throw FWMTCommonException.makeCsvMissingColumnException(columnName);
+            if (csvColumn.mandatory()) {
+              throw FWMTCommonException.makeCsvMissingColumnException(columnName);
+            }
           }
         }
       }
