@@ -44,13 +44,8 @@ public class JobServiceImpl implements JobService {
   }
 
   @Override
-  public SampleSummaryDTO processSampleFile(MultipartFile file)
-          throws IOException {
+  public SampleSummaryDTO processSampleFile(MultipartFile file) throws IOException {
     log.debug("Handling file with name '{}'", file.getOriginalFilename());
-
-    log.info("Storing CSV in resource service");
-    jobResourceService.sendCSV(file);
-    log.info("CSV stored successfully");
 
     File f = convertFile(file);
 
@@ -58,17 +53,22 @@ public class JobServiceImpl implements JobService {
     SampleSummaryDTO sampleSummaryDTO = validateSampleFile(f);
     log.info("Validation passed");
 
+    log.info("Storing CSV in resource service");
+    jobResourceService.storeCSV(f, sampleSummaryDTO.getUnprocessedRows().isEmpty());
+    log.info("CSV stored successfully");
+
     // This is an async call
     jobProcessor.processSampleFile(f);
     log.info("Queued asynchronous call to JobProcessor::processSampleFile");
     return sampleSummaryDTO;
   }
 
-  private SampleSummaryDTO validateSampleFile(File file) throws IOException{
+  private SampleSummaryDTO validateSampleFile(File file) throws IOException {
     log.debug("Handling file with name '{}'", file.getName());
 
     FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
-    Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService.parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
+    Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService
+        .parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
 
     int parsed = 0;
     List<UnprocessedCSVRow> unprocessed = new ArrayList<>();
@@ -86,10 +86,8 @@ public class JobServiceImpl implements JobService {
     return new SampleSummaryDTO(file.getName(), parsed, unprocessed);
   }
 
-  private File convertFile(MultipartFile file) throws IOException{
-    log.debug("Handling file with name {}", file.getName());
-
-    File convFile = new File (file.getOriginalFilename());
+  private File convertFile(MultipartFile file) throws IOException {
+    File convFile = new File(file.getOriginalFilename());
     FileCopyUtils.copy(file.getInputStream(), new FileOutputStream(convFile));
     return convFile;
   }

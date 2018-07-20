@@ -16,6 +16,7 @@ import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
 
+import java.io.File;
 import java.util.Optional;
 
 import static org.junit.Assert.assertTrue;
@@ -200,4 +201,22 @@ public class JobResourceServiceImplTest {
     //Then
     verify(restTemplate).put(anyString(), any());
   }
+
+  @Test
+  public void storeCSV() {
+    File file = new File("bla");
+    when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class))).thenReturn(responseEntity);
+    jobResourceService.storeCSV(file, true);
+    verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class));
+  }
+
+  @Test
+  public void storeCSV4xxError() {
+    File file = new File("bla");
+    when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class)))
+        .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+    jobResourceService.storeCSV(file, true);
+    verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class));
+  }
+
 }
