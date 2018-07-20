@@ -51,15 +51,15 @@ public class CSVParsingServiceImplTest {
 
     CSVParser csvParser = CSVFormat.DEFAULT.withHeader().parse(reader);
 
-    LegacySampleIngest testIngestData = new TestIngestBuilder().ingestBuild();
-    testIngestData.setGffData(new LegacySampleGFFDataIngest());
-    testIngestData.setLegacySampleSurveyType(GFF);
+    LegacySampleIngest testIngestData = new LegacySampleIngest();
 
     //When
     csvParsingServiceImpl.setFromCSVColumnAnnotations(testIngestData, csvParser.iterator().next(), "GFF");
 
+
     //Then
     assertEquals(expected, testIngestData.getTla());
+    assertEquals("testLcfIncentive1", testIngestData.getLcfIncentive());
   }
 
   @Test(expected = NoSuchElementException.class)

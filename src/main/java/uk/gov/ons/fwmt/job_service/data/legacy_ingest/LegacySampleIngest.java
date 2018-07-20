@@ -125,6 +125,7 @@ public class LegacySampleIngest {
   private String telNo;
 
   @CSVColumn("Issue_No")
+  @JobAdditionalProperty("issueNo")
   private String issueNo;
 
   @CSVColumn("Part")
@@ -138,6 +139,18 @@ public class LegacySampleIngest {
 
   @CSVColumn("Last_Updated")
   private String lastUpdated;
+
+  @CSVColumn("Spare4")
+  @JobAdditionalProperty("lcfIncentive")
+  private String lcfIncentive;
+
+  // pulled from GFFData
+  @CSVColumn("LAUA")
+  @JobAdditionalProperty("localAuthority")
+  private String laua;
+
+  @CSVColumn("LAUA_Name")
+  private String lauaName;
 
   // Data that is specific surveys
   private LegacySampleSurveyType legacySampleSurveyType;
