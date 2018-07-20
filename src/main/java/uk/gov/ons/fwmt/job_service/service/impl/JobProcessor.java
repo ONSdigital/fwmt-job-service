@@ -68,37 +68,48 @@ public class JobProcessor {
 
     while (csvRowIterator.hasNext()) {
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
+
       if (row.isError()) {
         log.error("Entry could not be processed", FWMTCommonException.makeCsvOtherException(row.getErrorMessage()));
         continue;
       }
+
       final LegacySampleIngest ingest = row.getResult();
       final Optional<UserDto> user = userResourceService.findByEitherAuthNo(ingest.getAuth());
+
+      boolean isReallocation = jobResourceService.existsByTmJobId(ingest.getTmJobId());
+      String jobType = isReallocation ? "Reallocation" : "Allocation";
+
       if (!user.isPresent()) {
-        log.error("Entry could not be processed", FWMTCommonException.makeUnknownUserIdException(ingest.getAuth()));
+        log.error(jobType + " could not be processed",
+            FWMTCommonException.makeUnknownUserIdException(ingest.getAuth()));
         continue;
       }
+
       if (!user.get().isActive()) {
-        log.error("Entry could not be processed",
+        log.error(jobType + " could not be processed",
             FWMTCommonException.makeBadUserStateException(user.get(), "User was inactive"));
         continue;
       }
+
       try {
-        final Optional<UnprocessedCSVRow> unprocessedCSVRow = sendJobToUser(row.getRow(), ingest, user.get());
+        final Optional<UnprocessedCSVRow> unprocessedCSVRow = sendJobToUser(row.getRow(), ingest, user.get(),
+            isReallocation);
         unprocessedCSVRow.ifPresent(unprocessedCSVRow1 -> log.error("Entry could not be processed",
             FWMTCommonException.makeCsvOtherException(unprocessedCSVRow1.getMessage())));
       } catch (Exception e) {
-        log.error("Entry could not be processed", FWMTCommonException.makeUnknownException(e));
+        log.error(jobType + " could not be processed", FWMTCommonException.makeUnknownException(e));
       }
     }
   }
 
-  protected Optional<UnprocessedCSVRow> sendJobToUser(int row, LegacySampleIngest ingest, UserDto userDto) {
+  protected Optional<UnprocessedCSVRow> sendJobToUser(int row, LegacySampleIngest ingest, UserDto userDto,
+      boolean isReallocation) {
     String authNo = userDto.getAuthNo();
     String username = userDto.getTmUsername();
     if (jobResourceService.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), authNo)) {
       return Optional.of(new UnprocessedCSVRow(row, "Job has been sent previously"));
-    } else if (jobResourceService.existsByTmJobId(ingest.getTmJobId())) {
+    } else if (isReallocation) {
       final SendUpdateJobHeaderRequestMessage request = tmJobConverterService.updateJob(ingest, username);
       log.info("Reallocating job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
       // TODO add error handling
