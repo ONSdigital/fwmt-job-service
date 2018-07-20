@@ -12,9 +12,9 @@ public interface JobResourceService {
 
   Optional<JobDto> findByTmJobId(final String tmJobId);
 
-  boolean createJob(final JobDto jobDto);
+  void createJob(final JobDto jobDto);
 
-  boolean updateJob(final JobDto jobDto);
+  void updateJob(final JobDto jobDto);
 
   void storeCSV(final File file, final boolean valid);
 

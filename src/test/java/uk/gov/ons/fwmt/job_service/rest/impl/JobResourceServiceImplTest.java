@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
@@ -34,6 +35,7 @@ public class JobResourceServiceImplTest {
   @Mock private RestTemplate restTemplate;
   @Mock private ResponseEntity<JobDto> jobDtoResponseEntity;
   @Mock private ResponseEntity<Void> voidResponseEntity;
+  @Mock private ResponseEntity<String> stringResponseEntity;
 
   @Rule
   public ExpectedException expectedException = ExpectedException.none();
@@ -205,7 +207,7 @@ public class JobResourceServiceImplTest {
   @Test
   public void storeCSV() {
     File file = new File("bla");
-    when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class))).thenReturn(responseEntity);
+    when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class))).thenReturn(stringResponseEntity);
     jobResourceService.storeCSV(file, true);
     verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class));
   }
