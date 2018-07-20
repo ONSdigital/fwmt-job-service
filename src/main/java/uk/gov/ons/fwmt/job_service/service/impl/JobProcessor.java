@@ -30,24 +30,19 @@ import java.util.Optional;
 @Component
 public class JobProcessor {
 
-  @Autowired
   private FileIngestService fileIngestService;
 
-  @Autowired
   private CSVParsingService csvParsingService;
 
-  @Autowired
   private UserResourceService userResourceService;
 
-  @Autowired
   private TMJobConverterService tmJobConverterService;
 
-  @Autowired
   private JobResourceService jobResourceService;
 
-  @Autowired
   private TMService tmService;
 
+  @Autowired
   public JobProcessor(FileIngestService fileIngestService,
       CSVParsingService csvParsingService,
       UserResourceService userResourceService,
