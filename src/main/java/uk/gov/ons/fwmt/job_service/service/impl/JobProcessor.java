@@ -100,6 +100,7 @@ public class JobProcessor {
       return Optional.of(new UnprocessedCSVRow(row, "Job has been sent previously"));
     } else if (jobResourceService.existsByTmJobId(ingest.getTmJobId())) {
       final SendUpdateJobHeaderRequestMessage request = tmJobConverterService.updateJob(ingest, username);
+      log.info("Reallocating job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
       // TODO add error handling
       tmService.send(request);
       final Optional<JobDto> jobDto = jobResourceService.findByTmJobId(ingest.getTmJobId());
@@ -112,16 +113,19 @@ public class JobProcessor {
       case GFF:
         if (ingest.isGffReissue()) {
           final SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
+          log.info("Reissuing GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
           tmService.send(request);
           jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
         } else {
           final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
+          log.info("Sending GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
           tmService.send(request);
           jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
         }
         break;
       case LFS:
         final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
+        log.info("Sending LFS job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
         tmService.send(request);
         jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
         break;
