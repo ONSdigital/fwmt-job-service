@@ -15,6 +15,10 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.fwmt.job_service.config.CorrelationIdInterceptor;
+import uk.gov.ons.fwmt.job_service.config.CorrelationIdTaskDecorator;
+
+import java.util.Collections;
 
 /**
  * Main entry point into the Legacy Gateway
@@ -39,7 +43,7 @@ public class ApplicationConfig {
    */
   public static void main(String[] args) {
     SpringApplication.run(ApplicationConfig.class, args);
-    log.debug("Started UI Application");
+    log.debug("Started application");
   }
 
   /**
@@ -61,13 +65,17 @@ public class ApplicationConfig {
     threadPoolTaskExecutor.setCorePoolSize(3);
     threadPoolTaskExecutor.setMaxPoolSize(3);
     threadPoolTaskExecutor.setQueueCapacity(600);
+    threadPoolTaskExecutor.setTaskDecorator(new CorrelationIdTaskDecorator());
     threadPoolTaskExecutor.afterPropertiesSet();
     return threadPoolTaskExecutor;
   }
 
   @Bean
   public RestTemplate resourcesRestTemplate(RestTemplateBuilder builder) {
-    return builder.basicAuthorization(userName, password).build();
+    return builder
+        .basicAuthorization(userName, password)
+        .interceptors(Collections.singletonList(new CorrelationIdInterceptor()))
+        .build();
   }
 
 }

@@ -1,6 +1,8 @@
 package uk.gov.ons.fwmt.job_service.rest.impl;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -9,11 +11,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
+import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -26,6 +29,9 @@ public class UserResourceServiceImplTest {
   @InjectMocks private UserResourceServiceImpl userResourceService;
   @Mock private RestTemplate restTemplate;
   @Mock private ResponseEntity<UserDto> responseEntity;
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Test
   public void findByAuthNo() {
@@ -52,11 +58,14 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
+
     //When
     Optional<UserDto> result = userResourceService.findByAuthNo(testAuthNo);
 
     //Then
-    assertFalse(result.isPresent());
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
   }
 
@@ -84,11 +93,14 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAltAuth)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
+
     //When
-    Optional<UserDto> result = userResourceService.findByAlternateAuthNo(testAltAuth);
+    userResourceService.findByAlternateAuthNo(testAltAuth);
 
     //Then
-    assertFalse(result.isPresent());
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAltAuth));
   }
 
@@ -112,7 +124,6 @@ public class UserResourceServiceImplTest {
   }
 
   @Test
-
   public void userIsNotActive() {
     //Given
     String testAuthNo = "1111";
@@ -120,11 +131,14 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
+
     //When
-    Boolean result = userResourceService.existsByAuthNoAndActive(testAuthNo, isActive);
+    userResourceService.existsByAuthNoAndActive(testAuthNo, isActive);
 
     //Then
-    assertFalse(result);
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
   }
 
@@ -136,11 +150,14 @@ public class UserResourceServiceImplTest {
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAuthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
+
     //When
-    Boolean result = userResourceService.existsByAuthNoAndActive(testAuthNo, isActive);
+    userResourceService.existsByAuthNoAndActive(testAuthNo, isActive);
 
     //Then
-    assertFalse(result);
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAuthNo));
   }
 
@@ -167,15 +184,17 @@ public class UserResourceServiceImplTest {
   public void altAuthNoUserNotActive() {
     //Given
     String testAlthNo = "1111";
-    Boolean isActive = false;
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAlthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
+
     //When
-    Boolean result = userResourceService.existsByAlternateAuthNoAndActive(testAlthNo, isActive);
+    userResourceService.existsByAlternateAuthNoAndActive(testAlthNo, false);
 
     //Then
-    assertFalse(result);
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAlthNo));
   }
 
@@ -183,15 +202,17 @@ public class UserResourceServiceImplTest {
   public void altAuthNoUserNotExist() {
     //Given
     String testAlthNo = "1111";
-    Boolean isActive = true;
     when(restTemplate.getForEntity(any(), eq(UserDto.class), eq(testAlthNo)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
+
     //When
-    Boolean result = userResourceService.existsByAlternateAuthNoAndActive(testAlthNo, isActive);
+    userResourceService.existsByAlternateAuthNoAndActive(testAlthNo, true);
 
     //Then
-    assertFalse(result);
     verify(restTemplate).getForEntity(any(), eq(UserDto.class), eq(testAlthNo));
   }
 }

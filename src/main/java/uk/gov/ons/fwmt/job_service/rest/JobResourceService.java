@@ -6,13 +6,16 @@ import java.io.File;
 import java.util.Optional;
 
 public interface JobResourceService {
-    boolean existsByTmJobId(String tmJobId);
-    boolean existsByTmJobIdAndLastAuthNo(final String tmJobId, final String lastAuthNo);
-    Optional<JobDto> findByTmJobId(final String tmJobId);
-    boolean createJob(final JobDto jobDto);
-    boolean updateJob(final JobDto jobDto);
+  boolean existsByTmJobId(String tmJobId);
 
-    void storeCSV(final File file, final boolean valid);
+  boolean existsByTmJobIdAndLastAuthNo(final String tmJobId, final String lastAuthNo);
 
+  Optional<JobDto> findByTmJobId(final String tmJobId);
+
+  void createJob(final JobDto jobDto);
+
+  void updateJob(final JobDto jobDto);
+
+  void storeCSV(final File file, final boolean valid);
 
 }

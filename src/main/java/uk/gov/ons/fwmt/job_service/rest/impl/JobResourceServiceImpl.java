@@ -49,60 +49,58 @@ public class JobResourceServiceImpl implements JobResourceService {
 
   @Override
   public boolean existsByTmJobId(String tmJobId) {
-    final Optional<JobDto> jobDto = findByTmJobId(tmJobId);
+    log.debug("Start: tmJobId={}", tmJobId);
+    final Optional<JobDto> jobDto = ResourceRESTHelper.get(restTemplate, findUrl, JobDto.class, tmJobId);
+    if (jobDto.isPresent()) {
+      log.debug("existsByTmJobId: JobDto found");
+    } else {
+      log.debug("Not found");
+    }
     return jobDto.isPresent();
   }
 
   @Override
   public boolean existsByTmJobIdAndLastAuthNo(String tmJobId, String lastAuthNo) {
-    final Optional<JobDto> jobDto = findByTmJobId(tmJobId);
-    return jobDto.map(jobDto1 -> jobDto1.getLastAuthNo().equals(lastAuthNo)).orElse(false);
+    log.debug("Start: tmJobId={},lastAuthNo={}", tmJobId, lastAuthNo);
+    final Optional<JobDto> jobDto = ResourceRESTHelper.get(restTemplate, findUrl, JobDto.class, tmJobId);
+    boolean result = jobDto.map(jobDto1 -> jobDto1.getLastAuthNo().equals(lastAuthNo)).orElse(false);
+    if (result) {
+      log.debug("JobDto found");
+    } else {
+      log.debug("Not found");
+    }
+    return result;
   }
 
   @Override
   public Optional<JobDto> findByTmJobId(String tmJobId) {
-    log.info("findByTmJobId: {}", tmJobId);
-    try {
-      final ResponseEntity<JobDto> jobDtoResponseEntity = restTemplate.getForEntity(findUrl, JobDto.class, tmJobId);
-      if (jobDtoResponseEntity.getStatusCode().equals(HttpStatus.OK)) {
-        return Optional.ofNullable(jobDtoResponseEntity.getBody());
-      }
-    } catch (HttpClientErrorException httpClientErrorException) {
-      log.error("An error occurred while communicating with the resource service", httpClientErrorException);
+    log.debug("Start: tmJobId={}", tmJobId);
+    final Optional<JobDto> jobDto = ResourceRESTHelper.get(restTemplate, findUrl, JobDto.class, tmJobId);
+    if (jobDto.isPresent()) {
+      log.debug("Found: {}", jobDto.get());
+    } else {
+      log.debug("Not found");
     }
-    return Optional.empty();
+    return jobDto;
   }
 
   @Override
-  public boolean createJob(JobDto jobDto) {
-    log.info("CreateJob: {}", jobDto.toString());
-    try {
-      final HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
-      final ResponseEntity responseEntity = restTemplate.postForEntity(createUrl, request, Void.class, jobDto);
-      return responseEntity.getStatusCode().equals(HttpStatus.CREATED);
-    } catch (HttpClientErrorException httpClientErrorException) {
-      log.error("An error occurred while communicating with the resource service", httpClientErrorException);
-    }
-    return false;
+  public void createJob(JobDto jobDto) {
+    log.debug("Start: jobDto.tmJobId={}", jobDto.getTmJobId());
+    ResourceRESTHelper.post(restTemplate, createUrl, new HttpEntity<>(jobDto), Void.class, jobDto);
+    log.debug("Post completed");
   }
 
-  // TODO can we use the restTemplate.put method?
   @Override
-  public boolean updateJob(JobDto jobDto) {
-    log.info("UpdateJob: {}", jobDto.toString());
-    try {
-      final HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
-      final ResponseEntity jobDtoResponseEntity = restTemplate.exchange(updateUrl, HttpMethod.PUT, request, Void.class);
-      return jobDtoResponseEntity.getStatusCode().equals(HttpStatus.OK);
-    } catch (HttpClientErrorException httpClientErrorException) {
-      log.error("An error occurred while communicating with the resource service", httpClientErrorException);
-    }
-    return false;
+  public void updateJob(JobDto jobDto) {
+    log.debug("Start: jobDto.tmJobId={}", jobDto.getTmJobId());
+    ResourceRESTHelper.put(restTemplate, createUrl, new HttpEntity<>(jobDto));
+    log.debug("Updated completed");
   }
 
   @Override
   public void storeCSV(File file, boolean valid) {
-    log.debug("StoreCSV");
+    log.debug("Start: fileName={}", file.getName());
     try {
       Resource fileConvert = new FileSystemResource(file);
 
@@ -118,5 +116,4 @@ public class JobResourceServiceImpl implements JobResourceService {
       log.error("An error occurred while communicating with the resource service", HttpClientErrorException);
     }
   }
-
 }
