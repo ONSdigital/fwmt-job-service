@@ -3,8 +3,6 @@ package uk.gov.ons.fwmt.job_service.utilities;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class TestIngestBuilder extends LegacySampleIngest {
 
@@ -32,7 +30,7 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setPart("testPart");
     ingest.setEmployeeNo("testEmployeeNo");
     ingest.setAuth("testAuth");
-    ingest.setLastUpdated(LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+    ingest.setLastUpdated("2018-08-01T01:06:01");
     ingest.setTmJobId("testJobID");
     ingest.setDueDate(LocalDate.of(2018, 10, 10));
 
@@ -66,7 +64,7 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setPart("testPart");
     ingest.setEmployeeNo("testEmployeeNo");
     ingest.setAuth("testAuth");
-    ingest.setLastUpdated(LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+    ingest.setLastUpdated("2018-08-01T01:06:01");
     ingest.setTmJobId("testJobID");
     ingest.setDueDate(LocalDate.of(2018, 10, 10));
 

@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.UnprocessedCSVRow;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
@@ -25,6 +24,8 @@ import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.Optional;
 
@@ -119,17 +120,17 @@ public class JobProcessor {
           if (ingest.isGffReissue()) {
             final SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
             tmService.send(request);
-            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), ingest.getLastUpdated()));
+            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), LocalDateTime.parse(ingest.getLastUpdated(),DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
           } else {
             final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
             tmService.send(request);
-            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), ingest.getLastUpdated()));
+            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), LocalDateTime.parse(ingest.getLastUpdated(),DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
           }
           break;
         case LFS:
           final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
           tmService.send(request);
-          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), ingest.getLastUpdated()));
+          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), LocalDateTime.parse(ingest.getLastUpdated(),DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
           break;
         default:
           throw new IllegalArgumentException("Unknown survey type");
