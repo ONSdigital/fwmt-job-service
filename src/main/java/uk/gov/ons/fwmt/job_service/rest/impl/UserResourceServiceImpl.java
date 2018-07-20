@@ -39,7 +39,7 @@ public class UserResourceServiceImpl implements UserResourceService {
       log.debug("Not found");
     }
     return userDto;
- }
+  }
 
   @Override
   public Optional<UserDto> findByAlternateAuthNo(String authNo) {
