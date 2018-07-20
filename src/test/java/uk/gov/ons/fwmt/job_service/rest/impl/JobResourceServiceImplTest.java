@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.fwmt.job_service.rest.client.dto.JobDto;
 import uk.gov.ons.fwmt.job_service.rest.client.impl.JobResourceServiceClientImpl;
 
+import java.io.File;
 import java.util.Optional;
 
 import static org.junit.Assert.assertFalse;
@@ -189,4 +190,22 @@ public class JobResourceServiceImplTest {
     verify(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), eq(request), eq(Void.class));
     assertFalse(result);
   }
+
+  @Test
+  public void storeCSV() {
+    File file = new File("bla");
+    when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class))).thenReturn(responseEntity);
+    jobResourceServiceClient.storeCSVFile(file, true);
+    verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class));
+  }
+
+  @Test(expected=HttpClientErrorException.class)
+  public void storeCSV4xxError() {
+    File file = new File("bla");
+    when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class)))
+        .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+    jobResourceServiceClient.storeCSVFile(file, true);
+    verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class));
+  }
+
 }

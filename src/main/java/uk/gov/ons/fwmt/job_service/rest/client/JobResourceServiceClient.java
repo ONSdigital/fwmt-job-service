@@ -1,13 +1,13 @@
 package uk.gov.ons.fwmt.job_service.rest.client;
 
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.multipart.MultipartFile;
-
-import uk.gov.ons.fwmt.job_service.rest.client.dto.JobDto;
-
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Optional;
+
+import org.springframework.web.client.HttpClientErrorException;
+
+import uk.gov.ons.fwmt.job_service.rest.client.dto.JobDto;
 
 public interface JobResourceServiceClient {
   
@@ -21,7 +21,7 @@ public interface JobResourceServiceClient {
     
     boolean updateJob(final JobDto jobDto);
     
-    boolean storeCSVFile(final MultipartFile file) throws HttpClientErrorException, FileNotFoundException, IOException;
+    void storeCSVFile(final File file, boolean valid) throws HttpClientErrorException, FileNotFoundException, IOException;
 
 
 }
