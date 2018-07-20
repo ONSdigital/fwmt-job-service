@@ -42,7 +42,9 @@ public enum ExceptionCode {
 
   UNKNOWN_FIELD_PERIOD(15),
 
-  UNABLE_TO_SAVE_FILE(16);
+  UNABLE_TO_SAVE_FILE(16),
+
+  BAD_USER_STATE(17);
 
   @Getter
   private final int value;
@@ -56,6 +58,6 @@ public enum ExceptionCode {
   }
 
   public String toString() {
-    return this.getCode() + " " + this.name();
+    return this.getCode() + "-" + this.name();
   }
 }

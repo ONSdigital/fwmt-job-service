@@ -20,6 +20,7 @@ import java.util.UUID;
 @Component
 public class CorrelationIdFilter implements Filter {
   public static final String CORRELATION_ID_HEADER = "correlationId";
+  public static final String CID_KEY = "CID";
 
   /**
    * The paths listed below are ignored for the purposes of creating correlation IDs
@@ -59,7 +60,7 @@ public class CorrelationIdFilter implements Filter {
         log.info("Found correlationId in Header: " + currentCid);
       }
 
-      MDC.put("CID", currentCid);
+      MDC.put(CID_KEY, currentCid);
     }
 
     filterChain.doFilter(httpServletRequest, servletResponse);

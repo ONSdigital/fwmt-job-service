@@ -118,25 +118,20 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     }
   }
 
-  public LocalDate convertToGFFDate(String stage) throws FWMTCommonException {
-    final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceService.findByFieldPeriod(stage);
-    if (existsByFieldperiod.isPresent()) {
-      final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
+  public LocalDate convertToLFSDate(String fp) throws FWMTCommonException {
+    final Optional<FieldPeriodDto> existsByFieldPeriod = fieldPeriodResourceService.findByFieldPeriod(fp);
+    if (existsByFieldPeriod.isPresent()) {
+      final FieldPeriodDto fieldPeriod = existsByFieldPeriod.get();
       return fieldPeriod.getEndDate();
     } else {
-      throw new FWMTCommonException(ExceptionCode.UNKNOWN_FIELD_PERIOD);
+      throw FWMTCommonException.makeUnknownFieldPeriodException(fp);
     }
   }
 
-  // technically, 'stage' here is the field period 'fp'
-  public LocalDate convertToLFSDate(String stage) throws FWMTCommonException {
-    final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceService.findByFieldPeriod(stage);
-    if (existsByFieldperiod.isPresent()) {
-      final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
-      return fieldPeriod.getEndDate();
-    } else {
-      throw new FWMTCommonException(ExceptionCode.UNKNOWN_FIELD_PERIOD);
-    }
+  // TODO replace with a function that calculates the GFF date deterministically
+  // Currently, it falls back on checking the database
+  public LocalDate convertToGFFDate(String stage) {
+    return convertToLFSDate(stage);
   }
 
   private static CSVFormat getCSVFormat() {
@@ -147,8 +142,9 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     // set normal fields
     setFromCSVColumnAnnotations(instance, record, "GFF");
     // set derived due date
-    instance.setDueDate(convertToGFFDate(instance.getStage()));
-    instance.setCalculatedDueDate(String.valueOf(convertToGFFDate(instance.getStage())));
+    LocalDate date = convertToGFFDate(instance.getStage());
+    instance.setDueDate(date);
+    instance.setCalculatedDueDate(String.valueOf(date));
     // set survey type and extra data
     instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
     instance.setGffData(new LegacySampleGFFDataIngest());
@@ -160,9 +156,9 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     // set normal fields
     setFromCSVColumnAnnotations(instance, record, "LFS");
     // set derived due date
-    instance.setDueDate(convertToLFSDate(instance.getStage()));
-    // TODO should this be using convertToGFFDate?
-    instance.setCalculatedDueDate(String.valueOf(convertToGFFDate(instance.getStage())));
+    LocalDate date = convertToLFSDate(instance.getStage());
+    instance.setDueDate(date);
+    instance.setCalculatedDueDate(String.valueOf(date));
     // set survey type and extra data
     instance.setLegacySampleSurveyType(LegacySampleSurveyType.LFS);
     instance.setGffData(null);
@@ -180,13 +176,12 @@ public class CSVParsingServiceImpl implements CSVParsingService {
       @Override
       public LegacySampleIngest ingest(CSVRecord record) throws FWMTCommonException {
         LegacySampleIngest instance = new LegacySampleIngest();
+        // handle fields specific to a survey type
         switch (legacySampleSurveyType) {
         case LFS:
-          // handle the LFS-specific fields
           parseLegacySampleLFSData(instance, record);
           break;
         case GFF:
-          // handle the GFF-specific fields
           parseLegacySampleGFFData(instance, record);
           break;
         default:
@@ -194,12 +189,12 @@ public class CSVParsingServiceImpl implements CSVParsingService {
         }
         // derive the TM job id
         instance.setTmJobId(constructTmJobId(record, legacySampleSurveyType));
-        // derive the coordinates, if we were given a non-null non-empty grid
-        // ref
+        // derive the coordinates, if we were given a non-null non-empty grid ref
         if (instance.getOsGridRef() != null && instance.getOsGridRef().length() > 0) {
           String[] osGridRefSplit = instance.getOsGridRef().split(",", 2);
           if (osGridRefSplit.length != 2) {
-            throw new IllegalArgumentException("OS Grid Reference was not in the expected format");
+            throw FWMTCommonException
+                .makeCsvInvalidFieldException("OSGridRef", "Did not match the expected format of 'X,Y'");
           }
           instance.setGeoX(Float.parseFloat(osGridRefSplit[0]));
           instance.setGeoY(Float.parseFloat(osGridRefSplit[1]));

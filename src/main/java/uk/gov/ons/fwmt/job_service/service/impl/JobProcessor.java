@@ -11,6 +11,7 @@ import uk.gov.ons.fwmt.job_service.data.csv_parser.UnprocessedCSVRow;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
+import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
 import uk.gov.ons.fwmt.job_service.rest.UserResourceService;
 import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
@@ -73,85 +74,66 @@ public class JobProcessor {
     while (csvRowIterator.hasNext()) {
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
       if (row.isError()) {
-        log.error(ExceptionCode.UNKNOWN + " - Entry could not be processed");
+        log.error("Entry could not be processed", FWMTCommonException.makeCsvOtherException(row.getErrorMessage()));
         continue;
       }
       final LegacySampleIngest ingest = row.getResult();
-      final Optional<UserDto> user = findUser(ingest);
+      final Optional<UserDto> user = userResourceService.findByEitherAuthNo(ingest.getAuth());
       if (!user.isPresent()) {
-        log.error(ExceptionCode.UNKNOWN_USER_ID + " - User did not exist in the gateway");
+        log.error("Entry could not be processed", FWMTCommonException.makeUnknownUserIdException(ingest.getAuth()));
         continue;
       }
       if (!user.get().isActive()) {
-        log.error(ExceptionCode.UNKNOWN_USER_ID + " - User was not active");
+        log.error("Entry could not be processed",
+            FWMTCommonException.makeBadUserStateException(user.get(), "User was inactive"));
         continue;
       }
-      final Optional<UnprocessedCSVRow> unprocessedCSVRow = sendJobToUser(row.getRow(), ingest, user.get());
-      if (unprocessedCSVRow.isPresent()) {
-        log.error(ExceptionCode.UNKNOWN_JOB_ID + " - Job could not be sent");
-        continue;
+      try {
+        final Optional<UnprocessedCSVRow> unprocessedCSVRow = sendJobToUser(row.getRow(), ingest, user.get());
+        unprocessedCSVRow.ifPresent(unprocessedCSVRow1 -> log.error("Entry could not be processed",
+            FWMTCommonException.makeCsvOtherException(unprocessedCSVRow1.getMessage())));
+      } catch (Exception e) {
+        log.error("Entry could not be processed", FWMTCommonException.makeUnknownException(e));
       }
     }
   }
 
   protected Optional<UnprocessedCSVRow> sendJobToUser(int row, LegacySampleIngest ingest, UserDto userDto) {
-    String authno = userDto.getAuthNo();
+    String authNo = userDto.getAuthNo();
     String username = userDto.getTmUsername();
-    try {
-      if (jobResourceService.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), authno)) {
-        return Optional.of(new UnprocessedCSVRow(row, "Job has been sent previously"));
-      } else if (jobResourceService.existsByTmJobId(ingest.getTmJobId())) {
-        final SendUpdateJobHeaderRequestMessage request = tmJobConverterService.updateJob(ingest, username);
-        // TODO add error handling
-        tmService.send(request);
-        final Optional<JobDto> jobDto = jobResourceService.findByTmJobId(ingest.getTmJobId());
-        jobDto.ifPresent(jobDto1 -> {
-          jobDto1.setLastAuthNo(ingest.getAuth());
-          jobResourceService.updateJob(jobDto1);
-        });
-
-      } else {
-        switch (ingest.getLegacySampleSurveyType()) {
-        case GFF:
-          if (ingest.isGffReissue()) {
-            final SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
-            tmService.send(request);
-            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
-          } else {
-            final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
-            tmService.send(request);
-            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
-          }
-          break;
-        case LFS:
+    if (jobResourceService.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), authNo)) {
+      return Optional.of(new UnprocessedCSVRow(row, "Job has been sent previously"));
+    } else if (jobResourceService.existsByTmJobId(ingest.getTmJobId())) {
+      final SendUpdateJobHeaderRequestMessage request = tmJobConverterService.updateJob(ingest, username);
+      // TODO add error handling
+      tmService.send(request);
+      final Optional<JobDto> jobDto = jobResourceService.findByTmJobId(ingest.getTmJobId());
+      jobDto.ifPresent(jobDto1 -> {
+        jobDto1.setLastAuthNo(ingest.getAuth());
+        jobResourceService.updateJob(jobDto1);
+      });
+    } else {
+      switch (ingest.getLegacySampleSurveyType()) {
+      case GFF:
+        if (ingest.isGffReissue()) {
+          final SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
+          tmService.send(request);
+          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
+        } else {
           final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
           tmService.send(request);
           jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
-          break;
-        default:
-          throw new IllegalArgumentException("Unknown survey type");
         }
+        break;
+      case LFS:
+        final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
+        tmService.send(request);
+        jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown survey type");
       }
-      return Optional.empty();
-    } catch (Exception e) {
-      log.error("Error while sending job", e);
-      return Optional.of(new UnprocessedCSVRow(row, e.toString()));
     }
-  }
-
-  protected Optional<UserDto> findUser(LegacySampleIngest ingest) {
-    log.debug("Handling entry with authno: " + ingest.getAuth());
-    Optional<UserDto> userDto = userResourceService.findByAuthNo(ingest.getAuth());
-    if (userDto.isPresent()) {
-      log.debug("Found user by authno: " + userDto.toString());
-      return userDto;
-    }
-    userDto = userResourceService.findByAlternateAuthNo(ingest.getAuth());
-    if (userDto.isPresent()) {
-      log.debug("Found user by alternate authno: " + userDto.toString());
-      return userDto;
-    } else {
-      return Optional.empty();
-    }
+    return Optional.empty();
   }
 }

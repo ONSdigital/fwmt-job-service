@@ -54,6 +54,17 @@ public class UserResourceServiceImpl implements UserResourceService {
   }
 
   @Override
+  public Optional<UserDto> findByEitherAuthNo(String authNo) {
+    log.debug("Start: authNo={}" + authNo);
+    Optional<UserDto> userDto = findByAuthNo(authNo);
+    if (userDto.isPresent()) {
+      return userDto;
+    }
+    userDto = findByAlternateAuthNo(authNo);
+    return userDto;
+  }
+
+  @Override
   public boolean existsByAuthNoAndActive(String authNo, boolean active) {
     log.debug("Start: authNo={},active={}", authNo, active);
     final Optional<UserDto> userDto = findByAuthNo(authNo);
@@ -79,4 +90,16 @@ public class UserResourceServiceImpl implements UserResourceService {
     return result;
   }
 
+  @Override
+  public boolean existsByEitherAuthNoAndActive(String authNo, boolean active) {
+    log.debug("Start: authNo={},active={}", authNo, active);
+    final Optional<UserDto> userDto = findByEitherAuthNo(authNo);
+    boolean result = userDto.filter(userDto1 -> userDto1.isActive() == active).isPresent();
+    if (result) {
+      log.debug("Found");
+    } else {
+      log.debug("Not found");
+    }
+    return result;
+  }
 }

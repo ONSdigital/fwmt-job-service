@@ -3,6 +3,7 @@ package uk.gov.ons.fwmt.job_service.exceptions.types;
 import lombok.Getter;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
+import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
 
 public class FWMTCommonException extends RuntimeException {
   static public final long serialVersionUID = 0L;
@@ -12,7 +13,7 @@ public class FWMTCommonException extends RuntimeException {
 
   protected static String makeMessage(ExceptionCode code, String message) {
     if (message != null) {
-      return code.toString() + " " + message;
+      return code.toString() + ": " + message;
     } else {
       return code.toString();
     }
@@ -41,27 +42,14 @@ public class FWMTCommonException extends RuntimeException {
 
   // 0001 - UNKNOWN
 
-  private static String makeUnknownExceptionMessage() {
-    return "Unknown exception";
-  }
-
   public static FWMTCommonException makeUnknownException(Throwable cause) {
-    return new FWMTCommonException(ExceptionCode.UNKNOWN, makeUnknownExceptionMessage(), cause);
+    return new FWMTCommonException(ExceptionCode.UNKNOWN, null, cause);
   }
 
   // 0002 - INVALID_FILE_NAME
 
   private static String makeInvalidFileNameExceptionMessage(String name, String reason) {
-    if (reason != null) {
-      return "'" + name + "' is not a valid file name: " + reason;
-    } else {
-      return "'" + name + "' is not a valid file name";
-    }
-  }
-
-  public static FWMTCommonException makeInvalidFileNameException(String name) {
-    return new FWMTCommonException(ExceptionCode.INVALID_FILE_NAME,
-        makeInvalidFileNameExceptionMessage(name, null));
+    return "'" + name + "' is not a valid file name: " + reason;
   }
 
   public static FWMTCommonException makeInvalidFileNameException(String name, String reason) {
@@ -124,25 +112,15 @@ public class FWMTCommonException extends RuntimeException {
         makeCsvMissingColumnExceptionMessage(fieldName));
   }
 
-  public static FWMTCommonException makeCsvMissingColumnException(String fieldName, Throwable cause) {
-    return new FWMTCommonException(ExceptionCode.CSV_MISSING_COLUMN, makeCsvMissingColumnExceptionMessage(fieldName),
-        cause);
-  }
-
   // 0007 - CSV_INVALID_FIELD
 
-  private static String makeCsvInvalidFieldExceptionMessage(String fieldName) {
-    return "A field was invalid in a CSV file: fieldName=" + fieldName;
+  private static String makeCsvInvalidFieldExceptionMessage(String fieldName, String reason) {
+    return "A field was invalid in a CSV file: fieldName=" + fieldName + " failed to parse: " + reason;
   }
 
-  public static FWMTCommonException makeCsvInvalidFieldException(String fieldName) {
+  public static FWMTCommonException makeCsvInvalidFieldException(String fieldName, String reason) {
     return new FWMTCommonException(ExceptionCode.CSV_INVALID_FIELD,
-        makeCsvInvalidFieldExceptionMessage(fieldName));
-  }
-
-  public static FWMTCommonException makeCsvInvalidFieldException(String fieldName, Throwable cause) {
-    return new FWMTCommonException(ExceptionCode.CSV_INVALID_FIELD, makeCsvInvalidFieldExceptionMessage(fieldName),
-        cause);
+        makeCsvInvalidFieldExceptionMessage(fieldName, reason));
   }
 
   // 0008 - CSV_OTHER
@@ -154,11 +132,6 @@ public class FWMTCommonException extends RuntimeException {
   public static FWMTCommonException makeCsvOtherException(String reason) {
     return new FWMTCommonException(ExceptionCode.CSV_OTHER,
         makeCsvOtherExceptionMessage(reason));
-  }
-
-  public static FWMTCommonException makeCsvOtherException(String reason, Throwable cause) {
-    return new FWMTCommonException(ExceptionCode.CSV_OTHER, makeCsvOtherExceptionMessage(reason),
-        cause);
   }
 
   // 0009 - TM_UNAUTHENTICATED
@@ -261,18 +234,13 @@ public class FWMTCommonException extends RuntimeException {
 
   // 0015 - UNKNOWN_FIELD_PERIOD
 
-  private static String makeUnknownFieldPeriodExceptionMessage(String reason) {
-    return "An unknown field period was requested: " + reason;
+  private static String makeUnknownFieldPeriodExceptionMessage(String fieldPeriod) {
+    return "An unknown field period was requested: fieldPeriod=" + fieldPeriod;
   }
 
-  public static FWMTCommonException makeUnknownFieldPeriodException(String reason) {
+  public static FWMTCommonException makeUnknownFieldPeriodException(String fieldPeriod) {
     return new FWMTCommonException(ExceptionCode.UNKNOWN_FIELD_PERIOD,
-        makeUnknownFieldPeriodExceptionMessage(reason));
-  }
-
-  public static FWMTCommonException makeUnknownFieldPeriodException(String reason, Throwable cause) {
-    return new FWMTCommonException(ExceptionCode.UNKNOWN_FIELD_PERIOD, makeUnknownFieldPeriodExceptionMessage(reason),
-        cause);
+        makeUnknownFieldPeriodExceptionMessage(fieldPeriod));
   }
 
   // 0016 - UNABLE_TO_SAVE_FILE
@@ -289,5 +257,15 @@ public class FWMTCommonException extends RuntimeException {
   public static FWMTCommonException makeUnableToSaveFileException(String reason, Throwable cause) {
     return new FWMTCommonException(ExceptionCode.UNABLE_TO_SAVE_FILE, makeUnableToSaveFileExceptionMessage(reason),
         cause);
+  }
+
+  // 0017 - BAD_USER_STATE
+
+  private static String makeBadUserStateExceptionMessage(UserDto user, String reason) {
+    return "User=" + user.toString() + " was in a bad state because: " + reason;
+  }
+
+  public static FWMTCommonException makeBadUserStateException(UserDto user, String reason) {
+    return new FWMTCommonException(ExceptionCode.BAD_USER_STATE, makeBadUserStateExceptionMessage(user, reason));
   }
 }
