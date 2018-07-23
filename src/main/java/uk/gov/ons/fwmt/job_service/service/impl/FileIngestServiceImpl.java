@@ -94,7 +94,7 @@ public class FileIngestServiceImpl implements FileIngestService {
   protected LegacySampleSurveyType getLegacySampleSurveyType(String[] filenameSplitByUnderscore, String endpoint) {
     LegacySampleSurveyType tla = null;
     if (endpoint.equals("sample")) {
-      String tlaString = filenameSplitByUnderscore[1];
+      String tlaString = filenameSplitByUnderscore[1].toUpperCase();
       log.debug("File TLA detected as " + tlaString);
       switch (tlaString) {
       case "LFS":
