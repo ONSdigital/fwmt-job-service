@@ -52,8 +52,8 @@ public class JobResourceServiceImplTest {
   public void existsByTmJobId() {
     //Given
     String tmJobId = "testID";
-      LocalDateTime timeupdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-    JobDto expectedJobDto = new JobDto(tmJobId, null, timeupdated);
+      LocalDateTime lastUpdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    JobDto expectedJobDto = new JobDto(tmJobId, null, lastUpdated);
     when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId))).thenReturn(jobDtoResponseEntity);
     when(jobDtoResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
     when(jobDtoResponseEntity.getBody()).thenReturn(expectedJobDto);
@@ -69,8 +69,8 @@ public class JobResourceServiceImplTest {
   public void tmJobIDExists() {
     //Given
     String tmJobId = "testID";
-    LocalDateTime timeupdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-    JobDto expectedJobDto = new JobDto(tmJobId, null, timeupdated);
+    LocalDateTime lastUpdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    JobDto expectedJobDto = new JobDto(tmJobId, null, lastUpdated);
     when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId))).thenReturn(jobDtoResponseEntity);
     when(jobDtoResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
     when(jobDtoResponseEntity.getBody()).thenReturn(expectedJobDto);
@@ -87,8 +87,8 @@ public class JobResourceServiceImplTest {
     //Given
     String tmJobId = "testID";
     String lastAuthNo = "lastAuth";
-    LocalDateTime lastupdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-    JobDto expectedJobDto = new JobDto(tmJobId, lastAuthNo,lastupdated);
+    LocalDateTime lastUpdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    JobDto expectedJobDto = new JobDto(tmJobId, lastAuthNo,lastUpdated);
     when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId))).thenReturn(jobDtoResponseEntity);
     when(jobDtoResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
     when(jobDtoResponseEntity.getBody()).thenReturn(expectedJobDto);
@@ -105,8 +105,8 @@ public class JobResourceServiceImplTest {
     //Given
     String tmJobId = "testID";
     String lastAuthNo = "lastAuth";
-    LocalDateTime lastupdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-    JobDto expectedJobDto = new JobDto(tmJobId, lastAuthNo,lastupdated);
+    LocalDateTime lastUpdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    JobDto expectedJobDto = new JobDto(tmJobId, lastAuthNo,lastUpdated);
     when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
@@ -125,8 +125,8 @@ public class JobResourceServiceImplTest {
   public void findByTmJobId() {
     //Given
     String tmJobId = "testID";
-    LocalDateTime lastupdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-    JobDto expectedJobDto = new JobDto(tmJobId, null,lastupdated);
+    LocalDateTime lastUpdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    JobDto expectedJobDto = new JobDto(tmJobId, null,lastUpdated);
     when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
@@ -146,8 +146,8 @@ public class JobResourceServiceImplTest {
     //Given
     String tmJobId = "testID";
     String lastAuthNo = "lastAuth";
-    LocalDateTime lastupdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-    JobDto jobDto = new JobDto(tmJobId, lastAuthNo,lastupdated);
+    LocalDateTime lastUpdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    JobDto jobDto = new JobDto(tmJobId, lastAuthNo,lastUpdated);
     HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
     when(restTemplate.postForEntity(any(), eq(request), eq(Void.class), eq(jobDto))).thenReturn(voidResponseEntity);
     when(voidResponseEntity.getStatusCode()).thenReturn(HttpStatus.CREATED);
@@ -164,8 +164,8 @@ public class JobResourceServiceImplTest {
     //Given
     String tmJobId = "testID";
     String lastAuthNo = "lastAuth";
-    LocalDateTime lastupdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-    JobDto jobDto = new JobDto(tmJobId, lastAuthNo,lastupdated);
+    LocalDateTime lastUpdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    JobDto jobDto = new JobDto(tmJobId, lastAuthNo,lastUpdated);
     HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
     when(restTemplate.postForEntity(any(), eq(request), eq(Void.class), eq(jobDto)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
@@ -186,8 +186,8 @@ public class JobResourceServiceImplTest {
     //Given
     String tmJobId = "testID";
     String lastAuthNo = "lastAuth";
-    LocalDateTime lastupdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-    JobDto jobDto = new JobDto(tmJobId, lastAuthNo,lastupdated);
+    LocalDateTime lastUpdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    JobDto jobDto = new JobDto(tmJobId, lastAuthNo,lastUpdated);
     HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
     doNothing().when(restTemplate).put(anyString(), any());
 
@@ -203,8 +203,8 @@ public class JobResourceServiceImplTest {
     //Given
     String tmJobId = "testID";
     String lastAuthNo = "lastAuth";
-    LocalDateTime lastupdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-    JobDto jobDto = new JobDto(tmJobId, lastAuthNo,lastupdated);
+    LocalDateTime lastUpdated = LocalDateTime.parse("2018-08-01T01:06:01",DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    JobDto jobDto = new JobDto(tmJobId, lastAuthNo, lastUpdated);
     doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST)).when(restTemplate).put(anyString(), any());
 
     expectedException.expect(FWMTCommonException.class);
