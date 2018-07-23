@@ -18,11 +18,12 @@ import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 
 @Slf4j
 public final class SampleFileUtils {
+  private static final String SAMPLE_ENDPOINT_VALUE = "sample";
   public static final DateTimeFormatter TIMESTAMP_FORMAT_LINUX = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
   public static final DateTimeFormatter TIMESTAMP_FORMAT_WINDOWS = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH-mm-ss'Z'");
   
   public static final SampleFilenameComponents buildSampleFilenameComponents(File file) throws IOException, InvalidFileNameException {
-    final SampleFilenameComponents filename = buildSampleFilenameComponents(file.getName(), "sample");
+    final SampleFilenameComponents filename = buildSampleFilenameComponents(file.getName(), SAMPLE_ENDPOINT_VALUE);
     return filename;
   }
     public final static SampleFilenameComponents buildSampleFilenameComponents(String rawFilename, String expectedEndpoint) {
@@ -57,7 +58,7 @@ public final class SampleFileUtils {
             .makeInvalidFileNameException(rawFilename, "File names for staff should contain one underscore");
       }
       break;
-    case "sample":
+    case SAMPLE_ENDPOINT_VALUE:
       if (filenameSplitByUnderscore.length != 3) {
         throw FWMTCommonException
             .makeInvalidFileNameException(rawFilename, "File names for samples should contain two underscores");
@@ -97,7 +98,7 @@ public final class SampleFileUtils {
 
   public final static LegacySampleSurveyType getLegacySampleSurveyType(String[] filenameSplitByUnderscore, String endpoint) {
     LegacySampleSurveyType tla = null;
-    if (endpoint.equals("sample")) {
+    if (endpoint.equals(SAMPLE_ENDPOINT_VALUE)) {
       String tlaString = filenameSplitByUnderscore[1].toUpperCase();
       log.debug("File TLA detected as " + tlaString);
       switch (tlaString) {

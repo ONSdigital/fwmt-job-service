@@ -1,6 +1,8 @@
 package uk.gov.ons.fwmt.job_service.rest.client.impl;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.File;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -8,25 +10,17 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.fwmt.job_service.rest.client.JobResourceServiceClient;
 import uk.gov.ons.fwmt.job_service.rest.client.ResourceRESTHelper;
 import uk.gov.ons.fwmt.job_service.rest.client.dto.JobDto;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -35,7 +29,6 @@ public class JobResourceServiceClientImpl implements JobResourceServiceClient {
 
   private transient String findUrl;
   private transient String createUrl;
-  private transient String updateUrl;
   private transient String storeCSVUrl;
 
   @Autowired
@@ -44,12 +37,10 @@ public class JobResourceServiceClientImpl implements JobResourceServiceClient {
       @Value("${service.resource.baseUrl}") String baseUrl,
       @Value("${service.resource.operation.jobs.find.path}") String findPath,
       @Value("${service.resource.operation.jobs.create.path}") String createPath,
-      @Value("${service.resource.operation.jobs.update.path}") String updatePath,
       @Value("${service.resource.operation.jobs.sendcsv.path}") String storeCSVPath) {
     this.restTemplate = restTemplate;
     this.findUrl = baseUrl + findPath;
     this.createUrl = baseUrl + createPath;
-    this.updateUrl = baseUrl + updatePath;
     this.storeCSVUrl = baseUrl + storeCSVPath;
   }
 

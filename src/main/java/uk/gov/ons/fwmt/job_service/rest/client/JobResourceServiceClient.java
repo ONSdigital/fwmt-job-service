@@ -1,11 +1,7 @@
 package uk.gov.ons.fwmt.job_service.rest.client;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Optional;
-
-import org.springframework.web.client.HttpClientErrorException;
 
 import uk.gov.ons.fwmt.job_service.rest.client.dto.JobDto;
 
