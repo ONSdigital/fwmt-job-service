@@ -10,6 +10,7 @@ import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.UnprocessedCSVRow;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
+import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.JobResourceService;
 import uk.gov.ons.fwmt.job_service.rest.UserResourceService;
@@ -84,22 +85,22 @@ public class JobProcessor {
       String jobType = isReallocation ? "Reallocation" : "Allocation";
 
       if (!user.isPresent()) {
-        log.error(jobType + " could not be processed",
+        log.error(jobType + " could not be processed for job id: {} throwing error: {}", ingest.getTmJobId(),
                 FWMTCommonException.makeUnknownUserIdException(ingest.getAuth()));
         continue;
       }
 
       if (!user.get().isActive()) {
-        log.error(jobType + " could not be processed",
+        log.error(jobType + " could not be processed for job id: {} throwing error: {}", ingest.getTmJobId(),
                 FWMTCommonException.makeBadUserStateException(user.get(), "User was inactive"));
         continue;
       }
       try {
         final Optional<UnprocessedCSVRow> unprocessedCSVRow = sendJobToUser(row.getRow(), ingest, user.get(), isReallocation);
-        unprocessedCSVRow.ifPresent(unprocessedCSVRow1 -> log.error("Entry could not be processed",
+        unprocessedCSVRow.ifPresent(unprocessedCSVRow1 -> log.error("Job Entry could not be processed",
                 FWMTCommonException.makeCsvOtherException(unprocessedCSVRow1.getMessage())));
       } catch (Exception e) {
-        log.error(jobType + " could not be processed", FWMTCommonException.makeUnknownException(e));
+        log.error(jobType + " could not be processed for job id: {} throwing error: {}", ingest.getTmJobId(),ExceptionCode.UNKNOWN.toString(), FWMTCommonException.makeUnknownException(e));
       }
     }
   }
