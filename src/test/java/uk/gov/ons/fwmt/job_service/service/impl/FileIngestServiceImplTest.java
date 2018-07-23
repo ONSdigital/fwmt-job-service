@@ -22,8 +22,10 @@ public class FileIngestServiceImplTest {
   private final String[] validSampleFileNames = {
       "sample_GFF_2018-04-24T19:09:54Z.csv",
       "sample_GFF_2018-04-24T19-09-54Z.csv",
+      "sample_gff_2018-04-24T19-09-54Z.csv",
       "sample_LFS_2018-04-24T19:31:25Z.csv",
       "sample_LFS_2018-04-24T19-31-25Z.csv",
+      "sample_lfs_2018-04-24T19-31-25Z.csv",
   };
   private final String[] validStaffFileNames = {
       "staff_2016-04-24T19:09:54Z.csv",
