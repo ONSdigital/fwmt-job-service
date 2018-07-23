@@ -108,7 +108,6 @@ public class JobProcessor {
     String authNo = userDto.getAuthNo();
     String username = userDto.getTmUsername();
     String lastUpdate   = ingest.getLastUpdated().replace(" ", "T");
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:MM:ss");
     if (jobResourceService.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), authNo)) {
       return Optional.of(new UnprocessedCSVRow(row, "Job has been sent previously"));
     } else if (isReallocation) {
