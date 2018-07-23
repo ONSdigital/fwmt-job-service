@@ -43,6 +43,8 @@ public class JobProcessor {
 
   private TMService tmService;
 
+  private LocalDateTime localDateTime;
+
   @Autowired
   public JobProcessor(FileIngestService fileIngestService,
                       CSVParsingService csvParsingService,
@@ -103,11 +105,13 @@ public class JobProcessor {
   }
 
   protected Optional<UnprocessedCSVRow> sendJobToUser(int row, LegacySampleIngest ingest, UserDto userDto, boolean isReallocation) {
-    String authno = userDto.getAuthNo();
+    String authNo = userDto.getAuthNo();
     String username = userDto.getTmUsername();
-    if (jobResourceService.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), authno)) {
+    String lastUpdate   = ingest.getLastUpdated().replace(" ", "T");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:MM:ss");
+    if (jobResourceService.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), authNo)) {
       return Optional.of(new UnprocessedCSVRow(row, "Job has been sent previously"));
-    } else if (jobResourceService.existsByTmJobId(ingest.getTmJobId())) {
+    } else if (isReallocation) {
       final SendUpdateJobHeaderRequestMessage request = tmJobConverterService.updateJob(ingest, username);
       log.info("Reallocating job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
       // TODO add error handling
@@ -125,18 +129,18 @@ public class JobProcessor {
             final SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
             log.info("Reissuing GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
             tmService.send(request);
-            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), LocalDateTime.parse(ingest.getLastUpdated(), DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), localDateTime.parse(lastUpdate,DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
           } else {
             final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
             tmService.send(request);
-            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), LocalDateTime.parse(ingest.getLastUpdated(), DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), localDateTime.parse(lastUpdate,DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
           }
           break;
         case LFS:
           final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
           log.info("Reissuing GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
           tmService.send(request);
-          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), LocalDateTime.parse(ingest.getLastUpdated(), DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), localDateTime.parse(lastUpdate,DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
           break;
         default:
           throw new IllegalArgumentException("Unknown survey type");
