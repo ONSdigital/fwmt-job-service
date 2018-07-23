@@ -23,6 +23,8 @@ import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.Optional;
 
@@ -42,13 +44,15 @@ public class JobProcessor {
 
   private TMService tmService;
 
+  private LocalDateTime localDateTime;
+
   @Autowired
   public JobProcessor(FileIngestService fileIngestService,
-      CSVParsingService csvParsingService,
-      UserResourceService userResourceService,
-      TMJobConverterService tmJobConverterService,
-      JobResourceService jobResourceService,
-      TMService tmService
+                      CSVParsingService csvParsingService,
+                      UserResourceService userResourceService,
+                      TMJobConverterService tmJobConverterService,
+                      JobResourceService jobResourceService,
+                      TMService tmService
   ) {
     this.fileIngestService = fileIngestService;
     this.csvParsingService = csvParsingService;
@@ -60,11 +64,11 @@ public class JobProcessor {
 
   @Async("processExecutor")
   public void processSampleFile(File file)
-      throws IOException {
+          throws IOException {
 
     FileIngest fileIngest = fileIngestService.ingestSampleFile(file);
     Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService
-        .parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
+            .parseLegacySample(fileIngest.getReader(), fileIngest.getFilename().getTla());
 
     while (csvRowIterator.hasNext()) {
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
@@ -81,32 +85,35 @@ public class JobProcessor {
       String jobType = isReallocation ? "Reallocation" : "Allocation";
 
       if (!user.isPresent()) {
-        log.error(jobType + " could not be processed",
-            FWMTCommonException.makeUnknownUserIdException(ingest.getAuth()));
+        log.error(jobType + " could not be processed for job id: {} throwing error: {}", ingest.getTmJobId(),
+                FWMTCommonException.makeUnknownUserIdException(ingest.getAuth()));
         continue;
       }
 
       if (!user.get().isActive()) {
-        log.error(jobType + " could not be processed",
-            FWMTCommonException.makeBadUserStateException(user.get(), "User was inactive"));
+        log.error(jobType + " could not be processed for job id: {} throwing error: {}", ingest.getTmJobId(),
+                FWMTCommonException.makeBadUserStateException(user.get(), "User was inactive"));
         continue;
       }
-
       try {
-        final Optional<UnprocessedCSVRow> unprocessedCSVRow = sendJobToUser(row.getRow(), ingest, user.get(),
-            isReallocation);
-        unprocessedCSVRow.ifPresent(unprocessedCSVRow1 -> log.error("Entry could not be processed",
-            FWMTCommonException.makeCsvOtherException(unprocessedCSVRow1.getMessage())));
+        final Optional<UnprocessedCSVRow> unprocessedCSVRow = sendJobToUser(row.getRow(), ingest, user.get(), isReallocation);
+        unprocessedCSVRow.ifPresent(unprocessedCSVRow1 -> log.error("Job Entry could not be processed",
+                FWMTCommonException.makeCsvOtherException(unprocessedCSVRow1.getMessage())));
       } catch (Exception e) {
-        log.error(jobType + " could not be processed", FWMTCommonException.makeUnknownException(e));
+        log.error(jobType + " could not be processed for job id: {} throwing error: {}", ingest.getTmJobId(),ExceptionCode.UNKNOWN.toString(), FWMTCommonException.makeUnknownException(e));
       }
     }
   }
 
-  protected Optional<UnprocessedCSVRow> sendJobToUser(int row, LegacySampleIngest ingest, UserDto userDto,
-      boolean isReallocation) {
+  protected Optional<UnprocessedCSVRow> sendJobToUser(int row, LegacySampleIngest ingest, UserDto userDto, boolean isReallocation) {
     String authNo = userDto.getAuthNo();
     String username = userDto.getTmUsername();
+    LocalDateTime lastUpdateParsed = null;
+    try{
+      lastUpdateParsed = localDateTime.parse(ingest.getLastUpdated(),DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    } catch (Exception e) {
+      return Optional.of(new UnprocessedCSVRow(row, "Last updated column cannot be parsed"));
+    }
     if (jobResourceService.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), authNo)) {
       return Optional.of(new UnprocessedCSVRow(row, "Job has been sent previously"));
     } else if (isReallocation) {
@@ -119,29 +126,29 @@ public class JobProcessor {
         jobDto1.setLastAuthNo(ingest.getAuth());
         jobResourceService.updateJob(jobDto1);
       });
+
     } else {
       switch (ingest.getLegacySampleSurveyType()) {
-      case GFF:
-        if (ingest.isGffReissue()) {
-          final SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
+        case GFF:
+          if (ingest.isGffReissue()) {
+            final SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, username);
+            log.info("Reissuing GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
+            tmService.send(request);
+            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(),lastUpdateParsed));
+          } else {
+            final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
+            tmService.send(request);
+            jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), lastUpdateParsed));
+          }
+          break;
+        case LFS:
+          final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
           log.info("Reissuing GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
           tmService.send(request);
-          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
-        } else {
-          final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
-          log.info("Sending GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
-          tmService.send(request);
-          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
-        }
-        break;
-      case LFS:
-        final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, username);
-        log.info("Sending LFS job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
-        tmService.send(request);
-        jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth()));
-        break;
-      default:
-        throw new IllegalArgumentException("Unknown survey type");
+          jobResourceService.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), lastUpdateParsed));
+          break;
+        default:
+          throw new IllegalArgumentException("Unknown survey type");
       }
     }
     return Optional.empty();
