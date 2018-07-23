@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import uk.gov.ons.fwmt.job_service.rest.client.ResourceRESTHelper;
 import uk.gov.ons.fwmt.job_service.rest.client.UserResourceServiceClient;
 import uk.gov.ons.fwmt.job_service.rest.client.dto.UserDto;
 
@@ -35,68 +36,75 @@ public class UserResourceServiceCientImpl implements UserResourceServiceClient {
 
   @Override
   public Optional<UserDto> findByAuthNo(String authNo) {
-    log.info("findByAuthNo: {}", authNo);
-    try {
-      final ResponseEntity<UserDto> userDto = restTemplate.getForEntity(findUrl, UserDto.class, authNo);
-      if (userDto.getStatusCode().equals(HttpStatus.OK)) {
-        // return a successful result
-        return Optional.ofNullable(userDto.getBody());
-      }
-      // any success that doesn't have a 200 is an unexpected error
-      log.warn("findByAuthNo: returned with a non-200 code: authNo={}, code={}", authNo,
-          userDto.getStatusCodeValue());
-      return Optional.empty();
-    } catch (HttpClientErrorException httpException) {
-      if (httpException.getStatusCode() == HttpStatus.NOT_FOUND) {
-        // a 404, which occurs when we can't find an authNo
-        log.info("findByAuthNo: authNo not found", httpException);
-        return Optional.empty();
-      }
-      // any other unexpected error
-      log.warn(String.format("findByAuthNo: error communicating with the resource service: authNo=%s", authNo),
-          httpException);
-      return Optional.empty();
+    log.debug("Start: authNo={}", authNo);
+    Optional<UserDto> userDto = ResourceRESTHelper.get(restTemplate, findUrl, UserDto.class, authNo);
+    if (userDto.isPresent()) {
+      log.debug("Found: {}", userDto.get());
+    } else {
+      log.debug("Not found");
     }
+    return userDto;
   }
 
   @Override
   public Optional<UserDto> findByAlternateAuthNo(String authNo) {
-    log.info("findByAlternateAuthNo: {}", authNo);
-    try {
-      final ResponseEntity<UserDto> userDto = restTemplate.getForEntity(findAltUrl, UserDto.class, authNo);
-      if (userDto.getStatusCode().equals(HttpStatus.OK)) {
-        // return a successful result
-        return Optional.ofNullable(userDto.getBody());
-      }
-      // any success that doesn't have a 200 is an unexpected error
-      log.warn("findByAlternateAuthNo: returned with a non-200 code: authNo={}, code={}", authNo,
-          userDto.getStatusCodeValue());
-      return Optional.empty();
-    } catch (HttpClientErrorException httpException) {
-      if (httpException.getStatusCode() == HttpStatus.NOT_FOUND) {
-        // a 404, which occurs when we can't find an authNo
-        log.info("findByAlternateAuthNo: authNo not found", httpException);
-        return Optional.empty();
-      }
-      // any other unexpected error
-      log.warn(String.format("findByAlternateAuthNo: error communicating with the resource service: authNo=%s", authNo),
-          httpException);
-      return Optional.empty();
+    log.debug("Start: authNo={}", authNo);
+    Optional<UserDto> userDto = ResourceRESTHelper.get(restTemplate, findAltUrl, UserDto.class, authNo);
+    if (userDto.isPresent()) {
+      log.debug("Found: {}", userDto.get());
+    } else {
+      log.debug("Not found");
     }
+    return userDto;
+  }
+
+  @Override
+  public Optional<UserDto> findByEitherAuthNo(String authNo) {
+    log.debug("Start: authNo={}" + authNo);
+    Optional<UserDto> userDto = findByAuthNo(authNo);
+    if (userDto.isPresent()) {
+      return userDto;
+    }
+    userDto = findByAlternateAuthNo(authNo);
+    return userDto;
   }
 
   @Override
   public boolean existsByAuthNoAndActive(String authNo, boolean active) {
-    log.info("existsByAuthNoAndActive: {}, {}", authNo, active);
+    log.debug("Start: authNo={},active={}", authNo, active);
     final Optional<UserDto> userDto = findByAuthNo(authNo);
-    return userDto.filter(userDto1 -> userDto1.isActive() == active).isPresent();
+    boolean result = userDto.filter(userDto1 -> userDto1.isActive() == active).isPresent();
+    if (result) {
+      log.debug("Found");
+    } else {
+      log.debug("Not found");
+    }
+    return result;
   }
 
   @Override
   public boolean existsByAlternateAuthNoAndActive(String authNo, boolean active) {
-    log.info("existsByAlternativeAuthNoAndActive: {}, {}", authNo, active);
+    log.debug("Start: authNo={},active={}", authNo, active);
     final Optional<UserDto> userDto = findByAlternateAuthNo(authNo);
-    return userDto.filter(userDto1 -> userDto1.isActive() == active).isPresent();
+    boolean result = userDto.filter(userDto1 -> userDto1.isActive() == active).isPresent();
+    if (result) {
+      log.debug("Found");
+    } else {
+      log.debug("Not found");
+    }
+    return result;
   }
 
+  @Override
+  public boolean existsByEitherAuthNoAndActive(String authNo, boolean active) {
+    log.debug("Start: authNo={},active={}", authNo, active);
+    final Optional<UserDto> userDto = findByEitherAuthNo(authNo);
+    boolean result = userDto.filter(userDto1 -> userDto1.isActive() == active).isPresent();
+    if (result) {
+      log.debug("Found");
+    } else {
+      log.debug("Not found");
+    }
+    return result;
+  }
 }

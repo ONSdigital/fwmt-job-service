@@ -20,8 +20,6 @@ import uk.gov.ons.fwmt.job_service.data.dto.SampleSummaryDTO;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.SampleFilenameComponents;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
-import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
-import uk.gov.ons.fwmt.job_service.exceptions.types.MediaTypeNotSupportedException;
 import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 import uk.gov.ons.fwmt.job_service.utils.SampleFileUtils;
@@ -40,7 +38,7 @@ public class FileIngestServiceImpl implements FileIngestService {
     this.csvParsingService = csvParsingService;
   }
   
-  public SampleSummaryDTO validateSampleFile(File file) throws InvalidFileNameException, MediaTypeNotSupportedException, IOException{
+  public SampleSummaryDTO validateSampleFile(File file) throws IOException{
     SampleFilenameComponents filename = SampleFileUtils.buildSampleFilenameComponents(file);
     final Reader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
     
@@ -51,7 +49,7 @@ public class FileIngestServiceImpl implements FileIngestService {
     while (csvRowIterator.hasNext()) {
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
       if (row.isError()) {
-        log.error(ExceptionCode.FWMT_JOB_SERVICE_0001 + " - Entry could not be processed");
+        log.error(ExceptionCode.UNKNOWN + " - Entry could not be processed");
         unprocessed.add(new UnprocessedCSVRow(row.getRow(), "Row could not be parsed: " + row.getErrorMessage()));
         continue;
       }

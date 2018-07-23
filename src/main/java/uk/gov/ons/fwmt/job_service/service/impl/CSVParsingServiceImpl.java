@@ -1,25 +1,5 @@
 package uk.gov.ons.fwmt.job_service.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.springframework.beans.PropertyAccessor;
-import org.springframework.beans.PropertyAccessorFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import uk.gov.ons.fwmt.job_service.data.annotation.CSVColumn;
-import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
-import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleGFFDataIngest;
-import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
-import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleLFSDataIngest;
-import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
-import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
-import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
-import uk.gov.ons.fwmt.job_service.rest.client.FieldPeriodResourceServiceClient;
-import uk.gov.ons.fwmt.job_service.rest.client.dto.FieldPeriodDto;
-import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
@@ -28,6 +8,26 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Optional;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.springframework.beans.PropertyAccessor;
+import org.springframework.beans.PropertyAccessorFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import lombok.extern.slf4j.Slf4j;
+import uk.gov.ons.fwmt.job_service.data.annotation.CSVColumn;
+import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleGFFDataIngest;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleLFSDataIngest;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
+import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
+import uk.gov.ons.fwmt.job_service.rest.client.FieldPeriodResourceServiceClient;
+import uk.gov.ons.fwmt.job_service.rest.client.dto.FieldPeriodDto;
+import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 
 @Slf4j
 @Service
@@ -45,13 +45,14 @@ public class CSVParsingServiceImpl implements CSVParsingService {
    * from the columns of a CSV record
    *
    * @param instance An instance of the class that will be mutated
-   * @param record A row of a CSV file
-   * @param pivot A string used to determine which field name should be used, in
-   *          events where there are many options
-   * @param <T> A class with fields annotated with CSVColumn
+   * @param record   A row of a CSV file
+   * @param pivot    A string used to determine which field name should be used, in
+   *                 events where there are many options
+   * @param <T>      A class with fields annotated with CSVColumn
    */
 
-  protected  <T> void setFromCSVColumnAnnotations(T instance, CSVRecord record, String pivot) {
+  protected <T> void setFromCSVColumnAnnotations(T instance, CSVRecord record, String pivot)
+      throws FWMTCommonException {
     Class<?> tClass = instance.getClass();
     PropertyAccessor accessor = PropertyAccessorFactory.forBeanPropertyAccess(instance);
     for (Field field : tClass.getDeclaredFields()) {
@@ -70,15 +71,21 @@ public class CSVParsingServiceImpl implements CSVParsingService {
           if (mapping.isPresent()) {
             columnName = mapping.get().value();
           } else {
-            throw new IllegalArgumentException("Given pivot does not occur in the CSVColumn annotation");
+            throw FWMTCommonException.makeCsvOtherException("Given pivot does not occur in the CSVColumn annotation");
           }
         } else {
-          throw new IllegalStateException("CSVColumn lacked a 'value' or 'values' field");
+          throw FWMTCommonException.makeCsvOtherException("CSVColumn lacked a 'value' or 'values' field");
         }
         // if it's mandatory or set, try
         // if it's ignored, don't try
-        if ((record.isSet(columnName) || csvColumn.mandatory()) && !csvColumn.ignored()) {
-          accessor.setPropertyValue(field.getName(), record.get(columnName));
+        if (!csvColumn.ignored()) {
+          if (record.isSet(columnName)) {
+            accessor.setPropertyValue(field.getName(), record.get(columnName));
+          } else {
+            if (csvColumn.mandatory()) {
+              throw FWMTCommonException.makeCsvMissingColumnException(columnName);
+            }
+          }
         }
       }
     }
@@ -113,76 +120,81 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     }
   }
 
-  public LocalDate convertToGFFDate(String stage) throws FWMTCommonException {
+  public LocalDate convertToLFSDate(String stage) throws FWMTCommonException{
     final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceServiceClient.findByFieldPeriod(stage);
     if (existsByFieldperiod.isPresent()) {
       final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
       return fieldPeriod.getEndDate();
     } else {
-      throw new FWMTCommonException(ExceptionCode.FWMT_JOB_SERVICE_0011);
+      throw FWMTCommonException.makeUnknownFieldPeriodException(stage);
     }
   }
 
-  // technically, 'stage' here is the field period 'fp'
-  public LocalDate convertToLFSDate(String stage) throws FWMTCommonException {
-    final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceServiceClient.findByFieldPeriod(stage);
-    if (existsByFieldperiod.isPresent()) {
-      final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
-      return fieldPeriod.getEndDate();
-    } else {
-      throw new FWMTCommonException(ExceptionCode.FWMT_JOB_SERVICE_0011);
-    }
+  public LocalDate convertToGFFDate(String stage) {
+    return convertToLFSDate(stage);
   }
 
   private static CSVFormat getCSVFormat() {
     return CSVFormat.DEFAULT.withHeader();
   }
 
+  public void parseLegacySampleGFFData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException {
+    // set normal fields
+    setFromCSVColumnAnnotations(instance, record, "GFF");
+    // set derived due date
+    LocalDate date = convertToGFFDate(instance.getStage());
+    instance.setDueDate(date);
+    instance.setCalculatedDueDate(String.valueOf(date));
+    // set survey type and extra data
+    instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
+    instance.setGffData(new LegacySampleGFFDataIngest());
+    instance.setLfsData(null);
+    setFromCSVColumnAnnotations(instance.getGffData(), record, null);
+  }
+
+  public void parseLegacySampleLFSData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException {
+    // set normal fields
+    setFromCSVColumnAnnotations(instance, record, "LFS");
+    // set derived due date
+    LocalDate date = convertToLFSDate(instance.getStage());
+    instance.setDueDate(date);
+    instance.setCalculatedDueDate(String.valueOf(date));
+    // set survey type and extra data
+    instance.setLegacySampleSurveyType(LegacySampleSurveyType.LFS);
+    instance.setGffData(null);
+    instance.setLfsData(new LegacySampleLFSDataIngest());
+    setFromCSVColumnAnnotations(instance.getLfsData(), record, null);
+  }
+
   // TODO possibly simplify this horribleness?
   @Override
   public Iterator<CSVParseResult<LegacySampleIngest>> parseLegacySample(Reader reader,
       LegacySampleSurveyType legacySampleSurveyType) throws IOException {
+    log.debug("Began parsing file: surveyType={}", legacySampleSurveyType);
     CSVParser parser = getCSVFormat().parse(reader);
     return new CSVIterator<LegacySampleIngest>(parser) {
       @Override
       public LegacySampleIngest ingest(CSVRecord record) throws FWMTCommonException {
         LegacySampleIngest instance = new LegacySampleIngest();
+        // handle fields specific to a survey type
         switch (legacySampleSurveyType) {
         case LFS:
-          // set normal fields
-          setFromCSVColumnAnnotations(instance, record, "LFS");
-          // set derived due date
-          instance.setDueDate(convertToLFSDate(instance.getStage()));
-          instance.setCalculatedDueDate(String.valueOf(convertToGFFDate(instance.getStage())));
-          // set survey type and extra data
-          instance.setLegacySampleSurveyType(LegacySampleSurveyType.LFS);
-          instance.setGffData(null);
-          instance.setLfsData(new LegacySampleLFSDataIngest());
-          setFromCSVColumnAnnotations(instance.getLfsData(), record, null);
+          parseLegacySampleLFSData(instance, record);
           break;
         case GFF:
-          // set normal fields
-          setFromCSVColumnAnnotations(instance, record, "GFF");
-          // set derived due date
-          instance.setDueDate(convertToGFFDate(instance.getStage()));
-          instance.setCalculatedDueDate(String.valueOf(convertToGFFDate(instance.getStage())));
-          // set survey type and extra data
-          instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
-          instance.setGffData(new LegacySampleGFFDataIngest());
-          instance.setLfsData(null);
-          setFromCSVColumnAnnotations(instance.getGffData(), record, null);
+          parseLegacySampleGFFData(instance, record);
           break;
         default:
           throw new IllegalArgumentException("Unknown survey type");
         }
         // derive the TM job id
         instance.setTmJobId(constructTmJobId(record, legacySampleSurveyType));
-        // derive the coordinates, if we were given a non-null non-empty grid
-        // ref
+        // derive the coordinates, if we were given a non-null non-empty grid ref
         if (instance.getOsGridRef() != null && instance.getOsGridRef().length() > 0) {
           String[] osGridRefSplit = instance.getOsGridRef().split(",", 2);
           if (osGridRefSplit.length != 2) {
-            throw new IllegalArgumentException("OS Grid Reference was not in the expected format");
+            throw FWMTCommonException
+                .makeCsvInvalidFieldException("OSGridRef", "Did not match the expected format of 'X,Y'");
           }
           instance.setGeoX(Float.parseFloat(osGridRefSplit[0]));
           instance.setGeoY(Float.parseFloat(osGridRefSplit[1]));

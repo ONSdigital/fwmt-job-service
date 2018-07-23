@@ -1,7 +1,21 @@
 package uk.gov.ons.fwmt.job_service.rest.impl;
 
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
+import java.util.Optional;
+
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -12,25 +26,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
+import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.client.dto.JobDto;
 import uk.gov.ons.fwmt.job_service.rest.client.impl.JobResourceServiceClientImpl;
-
-import java.io.File;
-import java.util.Optional;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class JobResourceServiceImplTest {
 
   @InjectMocks private JobResourceServiceClientImpl jobResourceServiceClient;
   @Mock private RestTemplate restTemplate;
-  @Mock private ResponseEntity responseEntity;
+  @Mock private ResponseEntity<JobDto> jobDtoResponseEntity;
+  @Mock private ResponseEntity<Void> voidResponseEntity;
+  @Mock private ResponseEntity<String> stringResponseEntity;
+
+  @Rule
+  public ExpectedException expectedException = ExpectedException.none();
 
   @Before
   public void setup() {
@@ -42,9 +52,9 @@ public class JobResourceServiceImplTest {
     //Given
     String tmJobId = "testID";
     JobDto expectedJobDto = new JobDto(tmJobId, null);
-    when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId))).thenReturn(responseEntity);
-    when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
-    when(responseEntity.getBody()).thenReturn(expectedJobDto);
+    when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId))).thenReturn(jobDtoResponseEntity);
+    when(jobDtoResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+    when(jobDtoResponseEntity.getBody()).thenReturn(expectedJobDto);
 
     //When
     Boolean result = jobResourceServiceClient.existsByTmJobId(tmJobId);
@@ -58,9 +68,9 @@ public class JobResourceServiceImplTest {
     //Given
     String tmJobId = "testID";
     JobDto expectedJobDto = new JobDto(tmJobId, null);
-    when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId))).thenReturn(responseEntity);
-    when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
-    when(responseEntity.getBody()).thenReturn(expectedJobDto);
+    when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId))).thenReturn(jobDtoResponseEntity);
+    when(jobDtoResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+    when(jobDtoResponseEntity.getBody()).thenReturn(expectedJobDto);
 
     //When
     Optional<JobDto> jobDto = jobResourceServiceClient.findByTmJobId(tmJobId);
@@ -75,9 +85,9 @@ public class JobResourceServiceImplTest {
     String tmJobId = "testID";
     String lastAuthNo = "lastAuth";
     JobDto expectedJobDto = new JobDto(tmJobId, lastAuthNo);
-    when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId))).thenReturn(responseEntity);
-    when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
-    when(responseEntity.getBody()).thenReturn(expectedJobDto);
+    when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId))).thenReturn(jobDtoResponseEntity);
+    when(jobDtoResponseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+    when(jobDtoResponseEntity.getBody()).thenReturn(expectedJobDto);
 
     //When
     boolean result = jobResourceServiceClient.existsByTmJobIdAndLastAuthNo(tmJobId, lastAuthNo);
@@ -91,15 +101,17 @@ public class JobResourceServiceImplTest {
     //Given
     String tmJobId = "testID";
     String lastAuthNo = "lastAuth";
-    JobDto expectedJobDto = new JobDto(tmJobId, lastAuthNo);
     when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
+
     //When
-    boolean result = jobResourceServiceClient.existsByTmJobIdAndLastAuthNo(tmJobId, lastAuthNo);
+    jobResourceServiceClient.existsByTmJobIdAndLastAuthNo(tmJobId, lastAuthNo);
 
     //Then
-    assertFalse(result);
     verify(restTemplate).getForEntity(any(), eq(JobDto.class), eq(tmJobId));
   }
 
@@ -107,15 +119,17 @@ public class JobResourceServiceImplTest {
   public void findByTmJobId() {
     //Given
     String tmJobId = "testID";
-    JobDto expectedJobDto = new JobDto(tmJobId, null);
     when(restTemplate.getForEntity(any(), eq(JobDto.class), eq(tmJobId)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
     Optional<JobDto> result = jobResourceServiceClient.findByTmJobId(tmJobId);
 
     //Then
-    assertFalse(result.isPresent());
     verify(restTemplate).getForEntity(any(), eq(JobDto.class), eq(tmJobId));
   }
 
@@ -126,19 +140,18 @@ public class JobResourceServiceImplTest {
     String lastAuthNo = "lastAuth";
     JobDto jobDto = new JobDto(tmJobId, lastAuthNo);
     HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
-    when(restTemplate.postForEntity(any(), eq(request), eq(Void.class), eq(jobDto))).thenReturn(responseEntity);
-    when(responseEntity.getStatusCode()).thenReturn(HttpStatus.CREATED);
+    when(restTemplate.postForEntity(any(), eq(request), eq(Void.class), eq(jobDto))).thenReturn(voidResponseEntity);
+    when(voidResponseEntity.getStatusCode()).thenReturn(HttpStatus.CREATED);
 
     //When
-    Boolean result = jobResourceServiceClient.createJob(jobDto);
+    jobResourceServiceClient.createJob(jobDto);
 
     //Then
     verify(restTemplate).postForEntity(any(), eq(request), eq(Void.class), eq(jobDto));
-    assertTrue(result);
   }
 
   @Test
-  public void shouldFailToCreatJobAndThrowHttpClientErrorException() {
+  public void shouldFailToCreateJobAndThrowHttpClientErrorException() {
     //Given
     String tmJobId = "testID";
     String lastAuthNo = "lastAuth";
@@ -147,12 +160,15 @@ public class JobResourceServiceImplTest {
     when(restTemplate.postForEntity(any(), eq(request), eq(Void.class), eq(jobDto)))
         .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
 
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
+
     //When
-    Boolean result = jobResourceServiceClient.createJob(jobDto);
+    jobResourceServiceClient.createJob(jobDto);
 
     //Then
     verify(restTemplate).postForEntity(any(), eq(request), eq(Void.class), eq(jobDto));
-    assertFalse(result);
   }
 
   @Test
@@ -162,15 +178,13 @@ public class JobResourceServiceImplTest {
     String lastAuthNo = "lastAuth";
     JobDto jobDto = new JobDto(tmJobId, lastAuthNo);
     HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
-    when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), any(), eq(Void.class))).thenReturn(responseEntity);
-    when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+    doNothing().when(restTemplate).put(anyString(), any());
 
     //When
-    Boolean result = jobResourceServiceClient.updateJob(jobDto);
+jobResourceServiceClient.updateJob(jobDto);
 
     //Then
-    verify(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), eq(request), eq(Void.class));
-    assertTrue(result);
+    verify(restTemplate).put(anyString(), any());
   }
 
   @Test
@@ -179,22 +193,23 @@ public class JobResourceServiceImplTest {
     String tmJobId = "testID";
     String lastAuthNo = "lastAuth";
     JobDto jobDto = new JobDto(tmJobId, lastAuthNo);
-    HttpEntity<JobDto> request = new HttpEntity<>(jobDto);
-    when(restTemplate.exchange(anyString(), eq(HttpMethod.PUT), eq(request), eq(Void.class)))
-        .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+    doThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST)).when(restTemplate).put(anyString(), any());
+
+    expectedException.expect(FWMTCommonException.class);
+    expectedException.expectMessage(ExceptionCode.RESOURCE_SERVICE_MALFUNCTION.getCode());
+    expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
-    Boolean result = jobResourceServiceClient.updateJob(jobDto);
+    jobResourceServiceClient.updateJob(jobDto);
 
     //Then
-    verify(restTemplate).exchange(anyString(), eq(HttpMethod.PUT), eq(request), eq(Void.class));
-    assertFalse(result);
+    verify(restTemplate).put(anyString(), any());
   }
 
   @Test
   public void storeCSV() {
     File file = new File("bla");
-    when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class))).thenReturn(responseEntity);
+    when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class))).thenReturn(stringResponseEntity);
     jobResourceServiceClient.storeCSVFile(file, true);
     verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class));
   }

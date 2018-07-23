@@ -7,13 +7,14 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.SampleFilenameComponents;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
-import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
+import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 
 @Slf4j
 public final class SampleFileUtils {
@@ -24,8 +25,7 @@ public final class SampleFileUtils {
     final SampleFilenameComponents filename = buildSampleFilenameComponents(file.getName(), "sample");
     return filename;
   }
-  
-  public final static SampleFilenameComponents buildSampleFilenameComponents(String rawFilename, String expectedEndpoint) throws InvalidFileNameException {
+    public final static SampleFilenameComponents buildSampleFilenameComponents(String rawFilename, String expectedEndpoint) {
     log.debug("Began a filename parse for " + rawFilename);
 
     String[] filenameSplitByDot = checkFileExtension(rawFilename);
@@ -42,24 +42,25 @@ public final class SampleFileUtils {
     return new SampleFilenameComponents(endpoint, tla, timestamp);
   }
   
-  public final static String extractEndpoint(String rawFilename, String expectedEndpoint, String[] filenameSplitByUnderscore)
-      throws InvalidFileNameException {
+  public final static String extractEndpoint(String rawFilename, String expectedEndpoint, String[] filenameSplitByUnderscore){
     String endpoint = filenameSplitByUnderscore[0];
-    log.debug("File endpoint for " + rawFilename + " detected as " + endpoint);
-    
+
     if (!expectedEndpoint.equals(endpoint)) {
-      throw new InvalidFileNameException(rawFilename, "File had an incorrect endpoint of " + endpoint);
+      throw FWMTCommonException
+          .makeInvalidFileNameException(rawFilename, "File had an incorrect endpoint of " + endpoint);
     }
-    
+
     switch (endpoint) {
     case "staff":
       if (filenameSplitByUnderscore.length != 2) {
-        throw new InvalidFileNameException(rawFilename, "File names for staff should contain one underscore");
+        throw FWMTCommonException
+            .makeInvalidFileNameException(rawFilename, "File names for staff should contain one underscore");
       }
       break;
     case "sample":
       if (filenameSplitByUnderscore.length != 3) {
-        throw new InvalidFileNameException(rawFilename, "File names for samples should contain two underscores");
+        throw FWMTCommonException
+            .makeInvalidFileNameException(rawFilename, "File names for samples should contain two underscores");
       }
       break;
     default:
@@ -68,15 +69,15 @@ public final class SampleFileUtils {
     return endpoint;
   }
   
-  public final static String[] checkFileExtension(String rawFilename) throws InvalidFileNameException {
+  public final static String[] checkFileExtension(String rawFilename){
     String[] filenameSplitByDot = rawFilename.split("\\.");
     if (filenameSplitByDot.length != 2 || !("csv".equals(filenameSplitByDot[1]))) {
-      throw new InvalidFileNameException(rawFilename, "No 'csv' extension");
+      throw FWMTCommonException.makeInvalidFileNameException(rawFilename, "No 'csv' extension");
     }
     return filenameSplitByDot;
   }
 
-  public final static LocalDateTime getLocalDateTime(String rawFilename, String rawTimestamp) throws InvalidFileNameException {
+  public final static LocalDateTime getLocalDateTime(String rawFilename, String rawTimestamp){
     LocalDateTime timestamp;
     try {
       timestamp = LocalDateTime.parse(rawTimestamp, TIMESTAMP_FORMAT_WINDOWS);
@@ -88,7 +89,7 @@ public final class SampleFileUtils {
         log.error("Failed to parse a windows timestamp", e);
         log.error("Failed to parse a linux timestamp", f);
         // we throw the exception with cause 'e', only because it is the more likely of the two to have been intended
-        throw new InvalidFileNameException(rawFilename, "Invalid timestamp of " + rawTimestamp, e);
+        throw FWMTCommonException.makeInvalidFileNameException(rawFilename, "Invalid timestamp of " + rawTimestamp, e);
       }
     }
     return timestamp;
@@ -97,7 +98,7 @@ public final class SampleFileUtils {
   public final static LegacySampleSurveyType getLegacySampleSurveyType(String[] filenameSplitByUnderscore, String endpoint) {
     LegacySampleSurveyType tla = null;
     if (endpoint.equals("sample")) {
-      String tlaString = filenameSplitByUnderscore[1];
+      String tlaString = filenameSplitByUnderscore[1].toUpperCase();
       log.debug("File TLA detected as " + tlaString);
       switch (tlaString) {
       case "LFS":
