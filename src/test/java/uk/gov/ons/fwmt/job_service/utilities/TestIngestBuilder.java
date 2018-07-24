@@ -30,13 +30,14 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setPart("testPart");
     ingest.setEmployeeNo("testEmployeeNo");
     ingest.setAuth("testAuth");
-    ingest.setLastUpdated("testLastUpdated");
+    ingest.setLastUpdated("2018-08-01T01:06:01");
     ingest.setTmJobId("testJobID");
     ingest.setDueDate(LocalDate.of(2018, 10, 10));
 
     //additional properties
     ingest.setGeoX(3.56f);
     ingest.setGeoY(3.56f);
+    ingest.setLcfIncentive("testLcfIncentive");
     return ingest;
   }
 
@@ -64,13 +65,14 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setPart("testPart");
     ingest.setEmployeeNo("testEmployeeNo");
     ingest.setAuth("testAuth");
-    ingest.setLastUpdated("testLastUpdated");
+    ingest.setLastUpdated("2018-08-01T01:06:01");
     ingest.setTmJobId("testJobID");
     ingest.setDueDate(LocalDate.of(2018, 10, 10));
 
     //additional properties
     ingest.setGeoX(3.56f);
     ingest.setGeoY(3.56f);
+    ingest.setLcfIncentive("testLcfIncentive");
     return ingest;
   }
 }

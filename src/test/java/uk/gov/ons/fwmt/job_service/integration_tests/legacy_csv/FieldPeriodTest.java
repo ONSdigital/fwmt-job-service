@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.service.impl.CSVParsingServiceImpl;
 
@@ -29,7 +28,7 @@ public class FieldPeriodTest {
     int month = 7;
     int day = 31;
     LocalDate expected = LocalDate.of(year,month,day);
-    LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
+    LocalDate actual = csvParsingServiceImpl.convertToFieldPeriodDate(fieldPeriod);
     assertEquals(expected, actual);
   }
 
@@ -40,7 +39,7 @@ public class FieldPeriodTest {
     int month = 6;
     int day = 30;
     LocalDate expected = LocalDate.of(year,month,day);
-    LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
+    LocalDate actual = csvParsingServiceImpl.convertToFieldPeriodDate(fieldPeriod);
     assertEquals(expected, actual);
   }
   
@@ -51,7 +50,7 @@ public class FieldPeriodTest {
     int month = 5;
     int day = 31;
     LocalDate expected = LocalDate.of(year,month,day);
-    LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
+    LocalDate actual = csvParsingServiceImpl.convertToFieldPeriodDate(fieldPeriod);
     assertEquals(expected, actual);
   }
 
@@ -62,7 +61,7 @@ public class FieldPeriodTest {
     int month = 6;
     int day = 30;
     LocalDate expected = LocalDate.of(year,month,day);
-    LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
+    LocalDate actual = csvParsingServiceImpl.convertToFieldPeriodDate(fieldPeriod);
     assertEquals(expected, actual);
   }
   
@@ -73,7 +72,7 @@ public class FieldPeriodTest {
     int month = 7;
     int day = 31;
     LocalDate expected = LocalDate.of(year,month,day);
-    LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
+    LocalDate actual = csvParsingServiceImpl.convertToFieldPeriodDate(fieldPeriod);
     assertEquals(expected, actual);
   }
 
@@ -84,7 +83,7 @@ public class FieldPeriodTest {
     int month = 6;
     int day = 30;
     LocalDate expected = LocalDate.of(year,month,day);
-    LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
+    LocalDate actual = csvParsingServiceImpl.convertToFieldPeriodDate(fieldPeriod);
     assertEquals(expected, actual);
   }
   
@@ -95,7 +94,7 @@ public class FieldPeriodTest {
     int month = 5;
     int day = 31;
     LocalDate expected = LocalDate.of(year,month,day);
-    LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
+    LocalDate actual = csvParsingServiceImpl.convertToFieldPeriodDate(fieldPeriod);
     assertEquals(expected, actual);
   }
 
@@ -106,7 +105,7 @@ public class FieldPeriodTest {
     int month = 6;
     int day = 30;
     LocalDate expected = LocalDate.of(year,month,day);
-    LocalDate actual = csvParsingServiceImpl.convertToGFFDate(fieldPeriod);
+    LocalDate actual = csvParsingServiceImpl.convertToFieldPeriodDate(fieldPeriod);
     assertEquals(expected, actual);
   }
 
@@ -117,7 +116,7 @@ public class FieldPeriodTest {
     int month = 12;
     int day = 19;
     LocalDate expected = LocalDate.of(year,month,day);
-    LocalDate actual = csvParsingServiceImpl.convertToLFSDate(fieldPeriod);
+    LocalDate actual = csvParsingServiceImpl.convertToFieldPeriodDate(fieldPeriod);
     assertEquals(expected, actual);
   }
 
@@ -128,7 +127,7 @@ public class FieldPeriodTest {
     int month = 4;
     int day = 28;
     LocalDate expected = LocalDate.of(year,month,day);
-    LocalDate actual = csvParsingServiceImpl.convertToLFSDate(fieldPeriod);
+    LocalDate actual = csvParsingServiceImpl.convertToFieldPeriodDate(fieldPeriod);
     assertEquals(expected, actual);
   }
   
@@ -139,7 +138,7 @@ public class FieldPeriodTest {
     int month = 12;
     int day = 28;
     LocalDate expected = LocalDate.of(year,month,day);
-    LocalDate actual = csvParsingServiceImpl.convertToLFSDate(fieldPeriod);
+    LocalDate actual = csvParsingServiceImpl.convertToFieldPeriodDate(fieldPeriod);
     assertEquals(expected, actual);
   }
 
@@ -150,7 +149,7 @@ public class FieldPeriodTest {
     int month = 7;
     int day = 31;
     LocalDate expected = LocalDate.of(year,month,day);
-    LocalDate actual = csvParsingServiceImpl.convertToLFSDate(fieldPeriod);
+    LocalDate actual = csvParsingServiceImpl.convertToFieldPeriodDate(fieldPeriod);
     assertEquals(expected, actual);
   }
 }

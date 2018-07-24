@@ -13,12 +13,6 @@ public class LegacySampleGFFDataIngest {
   @JobAdditionalProperty("respondentName")
   private String name;
 
-  @CSVColumn("LAUA")
-  private String laua;
-
-  @CSVColumn("LAUA_Name")
-  private String lauaName;
-
   @CSVColumn("SubSample")
   @JobAdditionalProperty("splitSampleType")
   private String subSample;

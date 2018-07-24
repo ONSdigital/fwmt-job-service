@@ -5,14 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartHttpServletRequest;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
 import uk.gov.ons.fwmt.job_service.data.dto.GatewayCommonErrorDTO;
-import uk.gov.ons.fwmt.job_service.exceptions.types.InvalidFileNameException;
-import uk.gov.ons.fwmt.job_service.exceptions.types.UnknownUserException;
-
-import javax.servlet.http.HttpServletRequest;
-
-import static org.junit.Assert.*;
 
 public class RestExceptionHandlerTest {
 
