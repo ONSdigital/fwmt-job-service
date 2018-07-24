@@ -2,7 +2,7 @@ version: '3'
 services:
   job:
     container_name: job
-    image: jobsvc
+    image: sdcplatform/jobsvc
     ports:
      - "${JOB_PORT}:9091"
     external_links:
@@ -13,7 +13,7 @@ services:
        - service.resource.baseUrl=http://${RESOURCE_HOST}:9093/resources
   resource:
     container_name: resource
-    image: resourcesvc
+    image: sdcplatform/resourcesvc
     ports:
      - "${RESOURCE_PORT}:9093"
     external_links:
@@ -24,7 +24,7 @@ services:
      - liquibase.url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/postgres?currentSchema=gateway
   staff:
     container_name: staff
-    image: staffsvc
+    image: sdcplatform/staffsvc
     ports:
      - "${STAFF_PORT}:9092"
     external_links:
