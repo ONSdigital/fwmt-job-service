@@ -52,14 +52,15 @@ public class JobResourceServiceClientImpl implements JobResourceServiceClient {
 
   @Override
   public boolean existsByTmJobIdAndLastAuthNo(String tmJobId, String lastAuthNo) {
-    log.debug("Start: tmJobId={}", tmJobId);
+    log.debug("Start: tmJobId={},lastAuthNo={}", tmJobId, lastAuthNo);
     final Optional<JobDto> jobDto = ResourceRESTHelper.get(restTemplate, findUrl, JobDto.class, tmJobId);
-    if (jobDto.isPresent()) {
-      log.debug("existsByTmJobId: JobDto found");
+    boolean result = jobDto.map(jobDto1 -> jobDto1.getLastAuthNo().equals(lastAuthNo)).orElse(false);
+    if (result) {
+      log.debug("JobDto found");
     } else {
       log.debug("Not found");
     }
-    return jobDto.isPresent();
+    return result;
   }
 
   @Override

@@ -156,7 +156,7 @@ public class CSVParsingServiceImplTest {
     when(fieldPeriodDto.getEndDate()).thenReturn(date);
 
     //When
-    LocalDate result = csvParsingServiceImpl.convertToGFFDate(stage);
+    LocalDate result = csvParsingServiceImpl.convertToFieldPeriodDate(stage);
 
     //Then
     assertEquals(date, result);
@@ -170,7 +170,7 @@ public class CSVParsingServiceImplTest {
     expectedException.expectMessage(ExceptionCode.UNKNOWN_FIELD_PERIOD.toString());
 
     //When
-    csvParsingServiceImpl.convertToGFFDate(anyString());
+    csvParsingServiceImpl.convertToFieldPeriodDate(anyString());
   }
 
   @Test
@@ -185,7 +185,7 @@ public class CSVParsingServiceImplTest {
     when(fieldPeriodDto.getEndDate()).thenReturn(date);
 
     //When
-    LocalDate result = csvParsingServiceImpl.convertToLFSDate(fieldPeriod);
+    LocalDate result = csvParsingServiceImpl.convertToFieldPeriodDate(fieldPeriod);
 
     //Then
     assertEquals(date, result);
@@ -199,7 +199,7 @@ public class CSVParsingServiceImplTest {
     expectedException.expectMessage(ExceptionCode.UNKNOWN_FIELD_PERIOD.toString());
 
     //When
-    csvParsingServiceImpl.convertToLFSDate(anyString());
+    csvParsingServiceImpl.convertToFieldPeriodDate(anyString());
   }
 
   @Test

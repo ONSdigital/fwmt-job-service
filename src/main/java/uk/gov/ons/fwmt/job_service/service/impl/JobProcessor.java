@@ -55,28 +55,13 @@ public class JobProcessor {
   @Autowired
   private TMService tmService;
   
-  public JobProcessor(CSVParsingService csvParsingService,
-      UserResourceServiceClient userResourceServiceClient,
-      TMJobConverterService tmJobConverterService,
-      JobResourceServiceClient jobResourceServiceClient,
-      TMService tmService
-      ){
-        this.csvParsingService = csvParsingService;
-        this.userResourceServiceClient = userResourceServiceClient;
-        this.tmJobConverterService = tmJobConverterService;
-        this.jobResourceServiceClient = jobResourceServiceClient;
-        this.tmService = tmService;
-  }
-  
   @Async("processExecutor")
-  public void processSampleFile(File file)
-      throws IOException{
+  public void processSampleFile(File file) throws IOException{
     
     SampleFilenameComponents filename = SampleFileUtils.buildSampleFilenameComponents(file);
     final Reader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
 
-    Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService
-     .parseLegacySample(reader, filename.getTla());
+    Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService.parseLegacySample(reader, filename.getTla());
     
     while (csvRowIterator.hasNext()) {
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();

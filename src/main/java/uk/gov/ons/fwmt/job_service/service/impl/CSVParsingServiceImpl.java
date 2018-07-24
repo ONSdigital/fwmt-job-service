@@ -120,7 +120,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     }
   }
 
-  public LocalDate convertToLFSDate(String stage) throws FWMTCommonException{
+  public LocalDate convertToFieldPeriodDate(String stage) throws FWMTCommonException{
     final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceServiceClient.findByFieldPeriod(stage);
     if (existsByFieldperiod.isPresent()) {
       final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
@@ -128,10 +128,6 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     } else {
       throw FWMTCommonException.makeUnknownFieldPeriodException(stage);
     }
-  }
-
-  public LocalDate convertToGFFDate(String stage) {
-    return convertToLFSDate(stage);
   }
 
   private static CSVFormat getCSVFormat() {
@@ -142,7 +138,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     // set normal fields
     setFromCSVColumnAnnotations(instance, record, "GFF");
     // set derived due date
-    LocalDate date = convertToGFFDate(instance.getStage());
+    LocalDate date = convertToFieldPeriodDate(instance.getStage());
     instance.setDueDate(date);
     instance.setCalculatedDueDate(String.valueOf(date));
     // set survey type and extra data
@@ -156,7 +152,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     // set normal fields
     setFromCSVColumnAnnotations(instance, record, "LFS");
     // set derived due date
-    LocalDate date = convertToLFSDate(instance.getStage());
+    LocalDate date = convertToFieldPeriodDate(instance.getStage());
     instance.setDueDate(date);
     instance.setCalculatedDueDate(String.valueOf(date));
     // set survey type and extra data
