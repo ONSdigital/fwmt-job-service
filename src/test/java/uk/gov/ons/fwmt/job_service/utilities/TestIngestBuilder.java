@@ -30,7 +30,7 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setPart("testPart");
     ingest.setEmployeeNo("testEmployeeNo");
     ingest.setAuth("testAuth");
-    ingest.setLastUpdated("testLastUpdated");
+    ingest.setLastUpdated("2018-08-01T01:06:01");
     ingest.setTmJobId("testJobID");
     ingest.setDueDate(LocalDate.of(2018, 10, 10));
 
@@ -65,7 +65,7 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setPart("testPart");
     ingest.setEmployeeNo("testEmployeeNo");
     ingest.setAuth("testAuth");
-    ingest.setLastUpdated("testLastUpdated");
+    ingest.setLastUpdated("2018-08-01T01:06:01");
     ingest.setTmJobId("testJobID");
     ingest.setDueDate(LocalDate.of(2018, 10, 10));
 

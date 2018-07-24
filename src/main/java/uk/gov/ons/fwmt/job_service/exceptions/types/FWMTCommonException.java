@@ -93,13 +93,8 @@ public class FWMTCommonException extends RuntimeException {
 
   // 0005 - UNKNOWN_USER_ID
 
-  private static String makeUnknownUserIdExceptionMessage(String authNo) {
-    return "A user was not found on our system: authNo=" + authNo;
-  }
-
-  public static FWMTCommonException makeUnknownUserIdException(String authNo) {
-    return new FWMTCommonException(ExceptionCode.UNKNOWN_USER_ID,
-        makeUnknownUserIdExceptionMessage(authNo));
+  public static String makeUnknownUserIdException(String authNo) {
+    return ExceptionCode.UNKNOWN_USER_ID.toString() + " : A user was not found on our system: authNo=" + authNo;
   }
 
   // 0006 - CSV_MISSING_COLUMN
@@ -261,12 +256,7 @@ public class FWMTCommonException extends RuntimeException {
   }
 
   // 0017 - BAD_USER_STATE
-
-  private static String makeBadUserStateExceptionMessage(UserDto user, String reason) {
-    return "User=" + user.toString() + " was in a bad state because: " + reason;
-  }
-
-  public static FWMTCommonException makeBadUserStateException(UserDto user, String reason) {
-    return new FWMTCommonException(ExceptionCode.BAD_USER_STATE, makeBadUserStateExceptionMessage(user, reason));
+  public static String makeBadUserStateException(UserDto user, String reason) {
+    return ExceptionCode.BAD_USER_STATE.toString() +  "User=" + user.toString() + " was in a bad state because: " + reason;
   }
 }
