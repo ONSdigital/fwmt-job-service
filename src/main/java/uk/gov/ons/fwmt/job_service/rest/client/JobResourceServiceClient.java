@@ -1,11 +1,11 @@
-package uk.gov.ons.fwmt.job_service.rest;
-
-import uk.gov.ons.fwmt.job_service.rest.dto.JobDto;
+package uk.gov.ons.fwmt.job_service.rest.client;
 
 import java.io.File;
 import java.util.Optional;
 
-public interface JobResourceService {
+import uk.gov.ons.fwmt.job_service.rest.client.dto.JobDto;
+
+public interface JobResourceServiceClient {
   boolean existsByTmJobId(String tmJobId);
 
   boolean existsByTmJobIdAndLastAuthNo(final String tmJobId, final String lastAuthNo);
@@ -16,6 +16,5 @@ public interface JobResourceService {
 
   void updateJob(final JobDto jobDto);
 
-  void storeCSV(final File file, final boolean valid);
-
+  void storeCSVFile(final File file, final boolean valid);
 }

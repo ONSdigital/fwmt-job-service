@@ -1,5 +1,14 @@
 package uk.gov.ons.fwmt.job_service.rest.impl;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -11,23 +20,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
-import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
-
-import java.util.Optional;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import uk.gov.ons.fwmt.job_service.rest.client.dto.FieldPeriodDto;
+import uk.gov.ons.fwmt.job_service.rest.client.impl.FieldPeriodResourceServiceClientImpl;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FieldPeriodResourceServiceImplTest {
 
-  @InjectMocks private FieldPeriodResourceServiceImpl fieldPeriodResourceService;
+  @InjectMocks private FieldPeriodResourceServiceClientImpl fieldPeriodResourceServiceClient;
   @Mock private RestTemplate restTemplate;
   @Mock private ResponseEntity<FieldPeriodDto> responseEntity;
 
@@ -45,7 +47,7 @@ public class FieldPeriodResourceServiceImplTest {
     when(responseEntity.getBody()).thenReturn(expectedFPDto);
 
     //When
-    Optional<FieldPeriodDto> result = fieldPeriodResourceService.findByFieldPeriod(fieldPeriod);
+    Optional<FieldPeriodDto> result = fieldPeriodResourceServiceClient.findByFieldPeriod(fieldPeriod);
 
     //Then
     assertTrue(result.isPresent());
@@ -65,6 +67,6 @@ public class FieldPeriodResourceServiceImplTest {
     expectedException.expectMessage(HttpStatus.BAD_REQUEST.toString());
 
     //When
-    fieldPeriodResourceService.findByFieldPeriod(fieldPeriod);
+    fieldPeriodResourceServiceClient.findByFieldPeriod(fieldPeriod);
   }
 }

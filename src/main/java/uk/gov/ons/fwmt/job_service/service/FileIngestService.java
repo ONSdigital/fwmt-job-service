@@ -1,10 +1,13 @@
 package uk.gov.ons.fwmt.job_service.service;
 
-import uk.gov.ons.fwmt.job_service.data.file_ingest.FileIngest;
-
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
+
+import uk.gov.ons.fwmt.job_service.data.dto.SampleSummaryDTO;
+
+
 public interface FileIngestService {
-  FileIngest ingestSampleFile(File file) throws IOException;
+  SampleSummaryDTO validateSampleFile(File file) throws InvalidFileNameException, IOException;
 }

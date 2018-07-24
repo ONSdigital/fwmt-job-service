@@ -1,25 +1,5 @@
 package uk.gov.ons.fwmt.job_service.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.springframework.beans.PropertyAccessor;
-import org.springframework.beans.PropertyAccessorFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import uk.gov.ons.fwmt.job_service.data.annotation.CSVColumn;
-import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
-import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleGFFDataIngest;
-import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
-import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleLFSDataIngest;
-import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
-import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
-import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
-import uk.gov.ons.fwmt.job_service.rest.FieldPeriodResourceService;
-import uk.gov.ons.fwmt.job_service.rest.dto.FieldPeriodDto;
-import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.annotation.Annotation;
@@ -29,15 +9,35 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Optional;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.springframework.beans.PropertyAccessor;
+import org.springframework.beans.PropertyAccessorFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import lombok.extern.slf4j.Slf4j;
+import uk.gov.ons.fwmt.job_service.data.annotation.CSVColumn;
+import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleGFFDataIngest;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleLFSDataIngest;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
+import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
+import uk.gov.ons.fwmt.job_service.rest.client.FieldPeriodResourceServiceClient;
+import uk.gov.ons.fwmt.job_service.rest.client.dto.FieldPeriodDto;
+import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
+
 @Slf4j
 @Service
 public class CSVParsingServiceImpl implements CSVParsingService {
 
-  private FieldPeriodResourceService fieldPeriodResourceService;
+  private FieldPeriodResourceServiceClient fieldPeriodResourceServiceClient;
 
   @Autowired
-  public CSVParsingServiceImpl(FieldPeriodResourceService fieldPeriodResourceService) {
-    this.fieldPeriodResourceService = fieldPeriodResourceService;
+  public CSVParsingServiceImpl(FieldPeriodResourceServiceClient fieldPeriodResourceServiceClient) {
+    this.fieldPeriodResourceServiceClient = fieldPeriodResourceServiceClient;
   }
 
   /**
@@ -120,20 +120,14 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     }
   }
 
-  public LocalDate convertToLFSDate(String fp) throws FWMTCommonException {
-    final Optional<FieldPeriodDto> existsByFieldPeriod = fieldPeriodResourceService.findByFieldPeriod(fp);
-    if (existsByFieldPeriod.isPresent()) {
-      final FieldPeriodDto fieldPeriod = existsByFieldPeriod.get();
+  public LocalDate convertToFieldPeriodDate(String stage) throws FWMTCommonException{
+    final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceServiceClient.findByFieldPeriod(stage);
+    if (existsByFieldperiod.isPresent()) {
+      final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
       return fieldPeriod.getEndDate();
     } else {
-      throw FWMTCommonException.makeUnknownFieldPeriodException(fp);
+      throw FWMTCommonException.makeUnknownFieldPeriodException(stage);
     }
-  }
-
-  // TODO replace with a function that calculates the GFF date deterministically
-  // Currently, it falls back on checking the database
-  public LocalDate convertToGFFDate(String stage) {
-    return convertToLFSDate(stage);
   }
 
   private static CSVFormat getCSVFormat() {
@@ -144,7 +138,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     // set normal fields
     setFromCSVColumnAnnotations(instance, record, "GFF");
     // set derived due date
-    LocalDate date = convertToGFFDate(instance.getStage());
+    LocalDate date = convertToFieldPeriodDate(instance.getStage());
     instance.setDueDate(date);
     instance.setCalculatedDueDate(String.valueOf(date));
     // set survey type and extra data
@@ -158,7 +152,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     // set normal fields
     setFromCSVColumnAnnotations(instance, record, "LFS");
     // set derived due date
-    LocalDate date = convertToLFSDate(instance.getStage());
+    LocalDate date = convertToFieldPeriodDate(instance.getStage());
     instance.setDueDate(date);
     instance.setCalculatedDueDate(String.valueOf(date));
     // set survey type and extra data
