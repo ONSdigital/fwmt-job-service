@@ -227,7 +227,7 @@ jobResourceServiceClient.updateJob(jobDto);
     verify(restTemplate).exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class));
   }
 
-  @Test(expected=HttpClientErrorException.class)
+  @Test
   public void storeCSV4xxError() {
     File file = new File("bla");
     when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(), eq(String.class)))
