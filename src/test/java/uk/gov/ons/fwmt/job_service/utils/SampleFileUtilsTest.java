@@ -13,6 +13,7 @@ import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 import org.junit.Test;
 
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
+import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 
 public class SampleFileUtilsTest {
 
@@ -55,7 +56,7 @@ public class SampleFileUtilsTest {
     }
   }
 
-  @Test(expected = InvalidFileNameException.class)
+  @Test(expected = FWMTCommonException.class)
   public void checkInvalidSampleFileNames() {
     for (String filename : invalidSampleFileNames) {
       assertNotNull(SampleFileUtils.buildSampleFilenameComponents(filename, "sample"));
@@ -64,7 +65,7 @@ public class SampleFileUtilsTest {
     }
   }
 
-  @Test(expected = InvalidFileNameException.class)
+  @Test(expected = FWMTCommonException.class)
   public void checkInvalidStaffFileNames() {
     for (String filename : invalidStaffFileNames) {
       assertNotNull(SampleFileUtils.buildSampleFilenameComponents(filename, "staff"));
@@ -101,7 +102,7 @@ public class SampleFileUtilsTest {
     assertEquals(expectedEndpoint, result);
   }
 
-  @Test(expected = InvalidFileNameException.class)
+  @Test(expected = FWMTCommonException.class)
   public void wrongEndpointInSampleFilename() throws InvalidFileNameException {
     //Given
     String rawFilename = "wrong_GFF_2018-04-24T19:09:54Z.csv";
@@ -129,7 +130,7 @@ public class SampleFileUtilsTest {
     assertEquals(expectedEndpoint, result);
   }
 
-  @Test(expected = InvalidFileNameException.class)
+  @Test(expected = FWMTCommonException.class)
   public void sampleFilenameFormattedIncorrectly() throws InvalidFileNameException {
     //Given
     String rawFilename = "sample_GFF-2018-04-24T19:09:54Z.csv";
@@ -143,7 +144,7 @@ public class SampleFileUtilsTest {
     assertEquals(expectedEndpoint, result);
   }
 
-  @Test(expected = InvalidFileNameException.class)
+  @Test(expected = FWMTCommonException.class)
   public void staffFilenameFormattedIncorrectly() throws InvalidFileNameException {
     //Given
     String rawFilename = "staff__2016-04-24T19:09:54Z.csv";
@@ -173,7 +174,7 @@ public class SampleFileUtilsTest {
     assertEquals(expectedExtension, result[1]);
   }
 
-  @Test(expected = InvalidFileNameException.class)
+  @Test(expected = FWMTCommonException.class)
   public void incorrectFileExtension() throws InvalidFileNameException {
     //Given
     String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.jpg";
@@ -238,7 +239,7 @@ public class SampleFileUtilsTest {
     assertNotNull(result);
   }
 
-  @Test(expected = InvalidFileNameException.class)
+  @Test(expected = FWMTCommonException.class)
   public void noEffortForACorrectDateTimeFormat() throws InvalidFileNameException {
     //Given
     String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.csv";
