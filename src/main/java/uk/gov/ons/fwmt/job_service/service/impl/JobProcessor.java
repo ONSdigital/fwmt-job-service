@@ -118,7 +118,7 @@ public class JobProcessor {
     }
   }
 
-  private void processReallocation(LegacySampleIngest ingest, UserDto userDto) {
+  protected void processReallocation(LegacySampleIngest ingest, UserDto userDto) {
     final SendUpdateJobHeaderRequestMessage request = tmJobConverterService.updateJob(ingest, userDto.getTmUsername());
     log.info("Reallocating job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
     tmService.send(request);
@@ -130,13 +130,13 @@ public class JobProcessor {
     });
   }
 
-  private void processBySurveyType(LegacySampleIngest ingest, UserDto userDto, int row) {
+  protected void processBySurveyType(LegacySampleIngest ingest, UserDto userDto, int row) {
     LocalDateTime lastUpdateParsed = null;
 
     try {
       lastUpdateParsed = LocalDateTime.parse(ingest.getLastUpdated(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     } catch (Exception e) {
-      log.error("Job Entry could not be processed for row: {}", row, FWMTCommonException.makeCsvOtherException("Last updated column cannot be parsed"));
+      log.error("Job Entry could not be processed for row: {}", row, FWMTCommonException.makeCsvOtherException("Last updated column cannot be parsed")); //Wierd shouldnt Exceptions be thrown
       return;
     }
 
@@ -152,24 +152,23 @@ public class JobProcessor {
     }
   }
 
-  private void processLFSSample(LegacySampleIngest ingest, UserDto userDto, LocalDateTime lastUpdateParsed) {
+  protected void processLFSSample(LegacySampleIngest ingest, UserDto userDto, LocalDateTime lastUpdateParsed) {
     final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, userDto.getTmUsername());
     log.info("Reissuing GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
     tmService.send(request);
     jobResourceServiceClient.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), lastUpdateParsed));
   }
 
-  private void processGFFSample(LegacySampleIngest ingest, UserDto userDto, LocalDateTime lastUpdateParsed) {
+  protected void processGFFSample(LegacySampleIngest ingest, UserDto userDto, LocalDateTime lastUpdateParsed) {
+    SendCreateJobRequestMessage request = null;
     if (ingest.isGffReissue()) {
-      final SendCreateJobRequestMessage request = tmJobConverterService.createReissue(ingest, userDto.getTmUsername());
+      request  = tmJobConverterService.createReissue(ingest, userDto.getTmUsername());
       log.info("Reissuing GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
-      tmService.send(request);
-      jobResourceServiceClient.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), lastUpdateParsed));
     } else {
-      final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, userDto.getTmUsername());
-      tmService.send(request);
-      jobResourceServiceClient.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), lastUpdateParsed));
-    }
+       request = tmJobConverterService.createJob(ingest, userDto.getTmUsername());
+    }    
+    tmService.send(request);
+    jobResourceServiceClient.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), lastUpdateParsed));
   }
 
 }
