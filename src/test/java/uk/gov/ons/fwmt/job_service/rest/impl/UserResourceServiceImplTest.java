@@ -1,5 +1,13 @@
 package uk.gov.ons.fwmt.job_service.rest.impl;
 
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.Optional;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -11,22 +19,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
-import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
-
-import java.util.Optional;
-
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import uk.gov.ons.fwmt.job_service.rest.client.dto.UserDto;
+import uk.gov.ons.fwmt.job_service.rest.client.impl.UserResourceServiceCientImpl;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserResourceServiceImplTest {
 
-  @InjectMocks private UserResourceServiceImpl userResourceService;
+  @InjectMocks private UserResourceServiceCientImpl userResourceService;
   @Mock private RestTemplate restTemplate;
   @Mock private ResponseEntity<UserDto> responseEntity;
 

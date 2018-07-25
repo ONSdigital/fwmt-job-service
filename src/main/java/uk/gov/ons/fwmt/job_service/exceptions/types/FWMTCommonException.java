@@ -1,13 +1,15 @@
 package uk.gov.ons.fwmt.job_service.exceptions.types;
 
-import lombok.Getter;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+
+import lombok.Getter;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
-import uk.gov.ons.fwmt.job_service.rest.dto.UserDto;
+import uk.gov.ons.fwmt.job_service.rest.client.dto.UserDto;
 
 public class FWMTCommonException extends RuntimeException {
   static public final long serialVersionUID = 0L;
-
+  //Don't change this(JOB_FAILED_STRING) constant , this format is used in splunk to create reports.If changing, change accordingly the splunk report search string.
+  public static final String JOB_FAILED_STRING = " could not be processed for job id: {} throwing error: {}";
   @Getter
   public final ExceptionCode code;
 

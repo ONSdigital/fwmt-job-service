@@ -1,4 +1,4 @@
-package uk.gov.ons.fwmt.job_service.rest.impl;
+package uk.gov.ons.fwmt.job_service.rest.client;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

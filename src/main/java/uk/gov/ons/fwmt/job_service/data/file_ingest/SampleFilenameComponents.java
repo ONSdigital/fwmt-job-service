@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @AllArgsConstructor
-public class Filename {
+public class SampleFilenameComponents {
   private final String endpoint;
   private final LegacySampleSurveyType tla;
   private final LocalDateTime timestamp;

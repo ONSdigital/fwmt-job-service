@@ -239,7 +239,7 @@ public class LegacySampleLFSDataIngest {
   private String qindiv3Difjob;
 
   @CSVColumn("QINDIV_3_INDOUT")
-  @JobAdditionalProperty("respondentLookingForWork3")
+  @JobAdditionalProperty("respondentInterviewType3")
   private String respondentInterviewType3;
 
   // // Respondent 4
