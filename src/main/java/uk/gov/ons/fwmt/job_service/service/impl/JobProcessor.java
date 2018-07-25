@@ -108,9 +108,10 @@ public class JobProcessor {
   protected Optional<UnprocessedCSVRow> sendJobToUser(int row, LegacySampleIngest ingest, UserDto userDto, boolean isReallocation) {
     String authNo = userDto.getAuthNo();
     String username = userDto.getTmUsername();
+    String lastUpdate   = ingest.getLastUpdated().replace(" ", "T");
     LocalDateTime lastUpdateParsed = null;
     try{
-      lastUpdateParsed = localDateTime.parse(ingest.getLastUpdated(),DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+      lastUpdateParsed = localDateTime.parse(lastUpdate,DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     } catch (Exception e) {
       return Optional.of(new UnprocessedCSVRow(row, "Last updated column cannot be parsed"));
     }
