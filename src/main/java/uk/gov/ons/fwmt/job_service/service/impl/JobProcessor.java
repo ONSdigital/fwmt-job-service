@@ -1,24 +1,11 @@
 package uk.gov.ons.fwmt.job_service.service.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
-import java.util.Optional;
-
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessage;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateJobHeaderRequestMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessage;
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateJobHeaderRequestMessage;
-
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.SampleFilenameComponents;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
@@ -32,6 +19,17 @@ import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 import uk.gov.ons.fwmt.job_service.utils.SampleFileUtils;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
+import java.util.Optional;
 
 import static uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException.JOB_ENTRY_FAILED_STRING;
 import static uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException.JOB_FAILED_STRING;
@@ -138,7 +136,8 @@ public class JobProcessor {
     LocalDateTime lastUpdateParsed = null;
 
     try {
-      lastUpdateParsed = LocalDateTime.parse(ingest.getLastUpdated(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+      String lastUpdate = ingest.getLastUpdated().replace(" ", "T");
+      lastUpdateParsed = LocalDateTime.parse(lastUpdate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     } catch (Exception e) {
       log.error(JOB_ENTRY_FAILED_STRING, ingest.getTmJobId(), "Last updated column cannot be parsed");
       return;
