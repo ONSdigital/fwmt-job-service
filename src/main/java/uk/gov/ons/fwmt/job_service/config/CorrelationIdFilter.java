@@ -21,6 +21,8 @@ import java.util.UUID;
 public class CorrelationIdFilter implements Filter {
   public static final String CORRELATION_ID_HEADER = "correlationId";
   public static final String CID_KEY = "CID";
+  //Added to enable the splunk report based on correlationid
+  private static final String CORRELATION_ID_SPLUNK = "correlationId:";
 
   /**
    * The paths listed below are ignored for the purposes of creating correlation IDs
@@ -67,7 +69,7 @@ public class CorrelationIdFilter implements Filter {
   }
 
   protected static String makeNewCid() {
-    return UUID.randomUUID().toString();
+    return CORRELATION_ID_SPLUNK + UUID.randomUUID().toString();
   }
 
   protected boolean isIgnoredPath(String path) {

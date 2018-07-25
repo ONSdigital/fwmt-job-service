@@ -33,6 +33,8 @@ import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 import uk.gov.ons.fwmt.job_service.utils.SampleFileUtils;
 
+import static uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException.JOB_FAILED_STRING;
+
 @Slf4j
 @Component
 public class JobProcessor {
@@ -62,29 +64,30 @@ public class JobProcessor {
     while (csvRowIterator.hasNext()) {
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
       if (row.isError()) {
-        log.error("Entry could not be processed", FWMTCommonException.makeCsvOtherException(row.getErrorMessage()));
+        log.error("Job Entry could not be processed", FWMTCommonException.makeCsvOtherException(row.getErrorMessage()));
         continue;
       }
 
       final LegacySampleIngest ingest = row.getResult();
       boolean isReallocation = jobResourceServiceClient.existsByTmJobId(ingest.getTmJobId());
+      //Don't change the jobtype string, this string is used in splunk report. if changing change splunk search query as well.
       String jobType = isReallocation ? "Reallocation" : "Allocation";
 
       final Optional<UserDto> user = findUser(ingest);
       if (!user.isPresent()) {
-        log.error(jobType + " could not be processed for job id: {} throwing error: {}", ingest.getTmJobId(), FWMTCommonException.makeUnknownUserIdException(ingest.getAuth()));
+        log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(), FWMTCommonException.makeUnknownUserIdException(ingest.getAuth()));
         continue;
       }
 
       if (!user.get().isActive()) {
-        log.error(jobType + " could not be processed for job id: {} throwing error: {}", ingest.getTmJobId(), FWMTCommonException.makeBadUserStateException(user.get(), "User was inactive"));
+        log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(), FWMTCommonException.makeBadUserStateException(user.get(), "User was inactive"));
         continue;
       }
 
       try {
         sendJobToUser(row.getRow(), ingest, user.get(), isReallocation);
       } catch (Exception e) {
-        log.error(jobType + " could not be processed for job id: {} throwing error: {}", ingest.getTmJobId(), ExceptionCode.UNKNOWN.toString(), FWMTCommonException.makeUnknownException(e));
+        log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(),ExceptionCode.UNKNOWN.toString(), FWMTCommonException.makeUnknownException(e));
       }
     }
   }
