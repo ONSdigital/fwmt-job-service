@@ -1,5 +1,7 @@
 package uk.gov.ons.fwmt.job_service.data.legacy_ingest;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.ons.fwmt.job_service.data.annotation.CSVColumn;
@@ -8,7 +10,9 @@ import uk.gov.ons.fwmt.job_service.data.annotation.JobAdditionalProperty;
 import java.time.LocalDate;
 
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class LegacySampleIngest {
   // TODO should this be 'TransmissionDate'?
   @CSVColumn(value = "Transmission_Date", mandatory = true)
