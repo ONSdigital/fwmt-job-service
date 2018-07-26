@@ -1,28 +1,26 @@
-
 language: java
 jdk: oraclejdk8
-
 services:
-  - docker
-
-#cache:
-#  directories:
-#  - $HOME/.cache
-#
-
-script: 
-  - "./gradlew check --stacktrace --info"
-
+- docker
+script:
+- "./gradlew check --stacktrace --info"
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
-
+- bash <(curl -s https://codecov.io/bash)
 env:
-  - "SPRING_PROFILES_ACTIVE=default,integration-tests"
-
+  matrix:
+  - SPRING_PROFILES_ACTIVE=default,integration-tests
+  - secure: yHGjsIjqarMQYsOZCMxlSS5T0hphsjp7PEwm/dHLnLcdZTiQLIAO/45g9PRweWbO4Q/4GQ/BGV0oHqDPpwCWc6l8Q/cJrE8i4qAR4PVJ3WFJVcbK+HrFitaV7lmNFb9l855+k68HgYDZ7K5z90XrdLTGZgazYqBJYAAVb6e/HoKNsV4ZquZgF6QSXHUNQZs8xxmqA22+y8f0vePgvPAZytW1hPem8fgQ9G22gzwe3dfru3x7vt05MAakv0+pe9+MDQwkazCRCJ705Y9BORITyrx7K1BJNwcxrf5nZWnM4PZnG2wulDX8aL2Jfld3fO5QV2C3rUsLkobG2Tt/BFFe83eJEdFF9A79qP4TsICfszmRhxRxr5OwrkehP2hLEdXnVArqGbHAzuniXxkEyw5fmvK9ubDySH60YCI+jIIsGicd6fkzaRnEY6UeKV5CImXkjUFl6+CtwbXdOhD61bEyeqKgjf5aPAVHs2qtcpbY+dwWhNNywDIyp7vlHAsmfj7jD1axKe1yWIuMSEnr9VklcZH1CD77doIKuqW8nKowVzjsrWbMyhis2Qj81FUs92xancEi8dv64h+3DH8w69FFVWk6cYZrh6S436PC6LIAONcjK5CKr9vw8RRZ9n1mJ61iqy8CKSqyABmNf4LqWRBTAw8N6tEKpiD5ZM8D6PAp8Vg=
+  - secure: K9suyt46bccfd5VWhuE7BxJsrfM971ePTPat1PgnxbPJHHqseRv1XKxvOBiYuu/LeRq/KSjmsQZph2AiJAPL2PWjHVPzsmghFmnycQXSibFpJk/Mi+MXMoFl/64gVbnkbYsJfN2bH5ORzYJjbnn7/b/XGrkFVCK/RAVhGx3Vfica6i7RgU5EEvHqifSUUrBAGWN5ura/wYriQsDuSQJzYITM+xx1UkwM1Nsu47RukX4DenIJfGAgdtMwwoeMdj0LS3DUKUWM+HAxKWAaRrZKb5oPI2WlMaqpDd11ZyFJnv1n5F4eGKIXcPyEYQpaKxDezpRE/3+TP5LI/7fU+r61C1DwYUOgRYwoyGpCHImcu5P3JQBlnfLJKlX/SFjAFKDHVG4rJYMcetlt2D8D58kHFf6azpffjFtfY5kixYkocPXm2Qc1Yf0tZFpEfQMHZRPlvRVslTnMa5YRuHzUzW+StiuK70w4pm4VXKEjmocF1sPZmbgI8AljnO1GePMNG8nrhdjkwuYXGoClpI34sWPkePZGokyWhSnYwt2HP4cYHZ3+PI+9ozuFPNLihgHuO5bYUexDd8qntNUgGEHmzIbMZXsyMhLApJK3DZ/Q6PmsLBmhxXxTai48hNuzOzvdTpIk4kVJAuWQkQpB/5tJptk393qixy1rC4TBiBA5r4HxWoo=
+  - secure: Wn44sO128TBsOqkj68C12tztqnQuIf4VZM14aoBTO8qjXBi+DXrQ1y1JqPO2hcXyQGPulEHfeWYamOoebvORrGEdVnuOB4aLNgEqouKPpFVNuoHiLgpY0PHb9DUTcemqfRnVvirgmDcmAKjJmJwm4mB+XP+KqIQ39K4YDklkGcEEBtLccGSOuY/92Yus2g4zJ/acDrHMSXkk2ODyOY2RrSy1nP3l6sshz6YazrTcs7qLNuwBv8UI2KtYQDLJn+rnoXy3+ddzjBy7PrlA/7FmDpzo6DsadThiSYY+R6Nz5hk60ty3O0PFyLXTIHyvQ/04gY7P3DvKaX6GPZmzN/yyHyCajt8/M+Z8U9eAOm4jUmschemadV16/oTKDPRusVefCSbciQFaJYnLzKm92j0pyLj5/dF5EYJmpWc0WzHeLsGteWPJDg7NIv0Ah68PPvmMkAiyxJDmwMTqpOXI24cDr5Lvmd7ShZPdQhYxUwcn8hNRc+jEUOA81FwmqA652+JTPSeDhyZ/JoLz3Wnqmxb1mT2swO5B2UXJu6E+h3sqXbqYvJaJsdLJ8MWDE5chRPrdIB93tiI51b8v2wd8l81xD4VJmoSgnv3kmRPGeB+ZIx1KfiH+WLdrb7ZUC/tij16+F81dROPxyTDtJcWYgdEbBvWWsiYxgvbFb1VPu2oN/EA=
 branches:
   only:
-    - master
-
+  - master
 notifications:
   slack:
     secure: zeLxHE+z8RXsge7imwHbv4HuqpsMWlnvDXovlZH3iQW//6TrsgYT4arEp/NDV6jTYtMgLWmm4ou2nLu+AaYLmXIkp4Pt8z0xKnx8NPT8UsZn7f6gqK7Abah4YnrB4uHwnVzzVNlb0jmjWClVCNxR73GI+324pnxOjOSP4In8iCwX+fm9yKAhlaE1VMTVsjE2oTl+ECECmG4fWmDthg1gb6edLquUX04fhc0gDBmQ4c0mxoBSfhAI3eV22IehOiRMBwElPAcfZ0bWDK19AniGfYeyWYX+a1v4Mxy880oxsFIeCqJBQTw7j0DslF0VoZeJw2GTsecC2FTB9JiYX24wy/hCsAtwIZB/JX4znx5CsyDbKpvL1bcfKLg0MuBbZAkqFLS6K0pppgMd1McH2Og+ZTZyIogbWtW4Hvvgn9fNoU3RosxM3xwRcI560DjGdEKjuZikxC5mcuMuiNKR7rFNL8wA5beHc+yNBoF2VHuuJOG4zTgG0FOfdn4Chd9b+NN23Jhdny0WwCOfFneVfOkgkAvlvtN73YImlKHYBb3rE9/+lqAuwxmpYumKrkOFt95WW4vEBW2mUi4txYNK8uuTVA7CM+/h8mkAcgX9f0uES+fRA5/vegPnZuRVcnGhgLEQZ4EgYts0jJtYI+RzPuSMiMDA2R/Prgq/SvPhTmBwWxE=
+    on_failure: always
+    on_success: never
+after_script:
+- if [ "$TRAVIS_BRANCH" = "master" ]; then echo "$DOCKER_PASSWORD" | docker login
+  -u "$DOCKER_USERNAME" --password-stdin; docker build -t fwmtjobsvc .; docker tag
+  fwmtjobsvc sdcplatform/fwmtjobsvc; docker push sdcplatform/fwmtjobsvc;fi
