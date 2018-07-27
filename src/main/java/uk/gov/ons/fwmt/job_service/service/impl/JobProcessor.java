@@ -1,6 +1,7 @@
 package uk.gov.ons.fwmt.job_service.service.impl;
 
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessage;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendDeleteJobRequestMessage;
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateJobHeaderRequestMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,11 @@ import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 import uk.gov.ons.fwmt.job_service.utils.SampleFileUtils;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -107,16 +111,27 @@ public class JobProcessor {
     }
   }
 
-  protected void sendJobToUser(int row, LegacySampleIngest ingest, UserDto userDto, boolean isReallocation) {
-    if (jobResourceServiceClient.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), userDto.getAuthNo())) {
-      log.error(JOB_ENTRY_FAILED_STRING, ingest.getTmJobId(),"Job has been sent previously");
-      return;
-    }
-
-    if (isReallocation) {
-      processReallocation(ingest, userDto);
-    } else {
-      processBySurveyType(ingest, userDto, row);
+  protected void sendJobToUser(int row, LegacySampleIngest ingest, UserDto userDto, boolean isReallocation)
+      throws IOException {
+//    if (jobResourceServiceClient.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), userDto.getAuthNo())) {
+//      log.error(JOB_ENTRY_FAILED_STRING, ingest.getTmJobId(),"Job has been sent previously");
+//      return;
+//    }
+//
+//    if (isReallocation) {
+//      processReallocation(ingest, userDto);
+//    } else {
+//      processBySurveyType(ingest, userDto, row);
+//    }
+    String file = "/Users/jacobharrison/fwmt-legacy-gateway/fwmt-job-service/src/main/resources/jobidsfordeletion.txt";
+    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+      String line;
+      while ((line = br.readLine()) != null) {
+        String tmJobId = line;
+        log.info("Deleting job id:{}", tmJobId);
+        final SendDeleteJobRequestMessage request = tmJobConverterService.createDeleteJobRequest(tmJobId.trim());
+        tmService.send(request);
+      }
     }
   }
 

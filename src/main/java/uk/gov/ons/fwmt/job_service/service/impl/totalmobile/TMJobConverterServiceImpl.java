@@ -3,8 +3,10 @@ package uk.gov.ons.fwmt.job_service.service.impl.totalmobile;
 import com.consiliumtechnologies.schemas.mobile._2009._03.visitstypes.AdditionalPropertyCollectionType;
 import com.consiliumtechnologies.schemas.mobile._2009._03.visitstypes.AdditionalPropertyType;
 import com.consiliumtechnologies.schemas.mobile._2015._05.optimisemessages.CreateJobRequest;
+import com.consiliumtechnologies.schemas.mobile._2015._05.optimisemessages.DeleteJobRequest;
 import com.consiliumtechnologies.schemas.mobile._2015._05.optimisemessages.UpdateJobHeaderRequest;
 import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.AddressDetailType;
+import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.AuditType;
 import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.ContactInfoType;
 import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.JobHeaderType;
 import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.JobIdentityType;
@@ -16,6 +18,7 @@ import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.Resource
 import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.SkillCollectionType;
 import com.consiliumtechnologies.schemas.mobile._2015._05.optimisetypes.WorldIdentityType;
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessage;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendDeleteJobRequestMessage;
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendMessageRequestInfo;
 import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateJobHeaderRequestMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -151,7 +154,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   }
 
   protected void checkNumberOfAddressLines(List<String> addressLines) {
-    if (addressLines.size() == 6 ) {
+    if (addressLines.size() == 6) {
       String addressConcat = addressLines.get(2) + " " + addressLines.get(3);
       addressLines.set(2, addressConcat);
       addressLines.remove(3);
@@ -203,6 +206,28 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
 
   public SendCreateJobRequestMessage createReissue(LegacySampleIngest ingest, String username) {
     return createJob(ingest, username);
+  }
+
+  public SendDeleteJobRequestMessage createDeleteJobRequest(String tmJobId) {
+
+    SendDeleteJobRequestMessage message = new SendDeleteJobRequestMessage();
+    DeleteJobRequest deleteJobRequest = new DeleteJobRequest();
+    JobIdentityType jobIdentityType = new JobIdentityType();
+    AuditType auditType = new AuditType();
+
+    jobIdentityType.setReference(tmJobId);
+
+    deleteJobRequest.setIdentity(jobIdentityType);
+    deleteJobRequest.setDeletionReason("Unique ID duplication");
+    deleteJobRequest.setDeletionNotes("Jobs deleted due to duplication of unique ID's in data extract");
+
+    auditType.setUsername("fwmt.gateway");
+    deleteJobRequest.setDeletedBy(auditType);
+
+    message.setSendMessageRequestInfo(makeSendMessageRequestInfo(tmJobId));
+    message.setDeleteJobRequest(deleteJobRequest);
+
+    return message;
   }
 }
 

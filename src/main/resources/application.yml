@@ -56,7 +56,7 @@ service:
   resource:
     username: "user"
     password: "password"
-    baseUrl: "http://localhost:9093/resources"
+    baseUrl: "http://localhost:9094/resources"
     operation:
       users:
         find:
