@@ -20,7 +20,7 @@ notifications:
     on_failure: always
     on_success: never
 after_script:
-  - if [ "$TRAVIS_BRANCH" = "master" ];
+  - if [ "$TRAVIS_BRANCH" = "master" && "$TRAVIS_PULL_REQUEST" == "false" ];
     then echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin;
     docker build -t fwmtjobsvc --build-arg jar=build/libs/fwmt-job-service-1.0.0.jar .;
     docker tag fwmtjobsvc sdcplatform/fwmtjobsvc:$TRAVIS_BUILD_NUMBER;
