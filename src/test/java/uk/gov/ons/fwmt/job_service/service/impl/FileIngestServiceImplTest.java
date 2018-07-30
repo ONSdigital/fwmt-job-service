@@ -1,272 +1,100 @@
 package uk.gov.ons.fwmt.job_service.service.impl;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType.GFF;
-import static uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType.LFS;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
-import org.junit.Rule;
+import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
+import uk.gov.ons.fwmt.job_service.data.dto.SampleSummaryDTO;
+import uk.gov.ons.fwmt.job_service.data.file_ingest.SampleFilenameComponents;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
-import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
-import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.utils.SampleFileUtils;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(SampleFileUtils.class)
 public class FileIngestServiceImplTest {
-  @Rule public ExpectedException expectedException = ExpectedException.none();
+  @InjectMocks private FileIngestServiceImpl fileIngestServiceImpl;
+  @Mock private CSVParsingServiceImpl csvParsingServiceImpl;
+  
+  @Test 
+  public void givenEmptyCSV_whenValitadateCSVRows_checkSampleSummaryDTOIndicatesThatItWasEmpty(){
+    final String expectedFilename = "emptyCSV.csv";
+    List<CSVParseResult<LegacySampleIngest>> emptyCsv = Collections.emptyList();
 
-  private final String[] validSampleFileNames = {
-      "sample_GFF_2018-04-24T19:09:54Z.csv",
-      "sample_GFF_2018-04-24T19-09-54Z.csv",
-      "sample_gff_2018-04-24T19-09-54Z.csv",
-      "sample_LFS_2018-04-24T19:31:25Z.csv",
-      "sample_LFS_2018-04-24T19-31-25Z.csv",
-      "sample_lfs_2018-04-24T19-31-25Z.csv",
-  };
-  private final String[] validStaffFileNames = {
-      "staff_2016-04-24T19:09:54Z.csv",
-      "staff_2018-04-24T19:31:25Z.csv",
-      "staff_2018-04-24T19-31-25Z.csv",
-  };
-  private final String[] invalidSampleFileNames = {
-      "BLAH_BLAH-THIS_IS_WRONG",
-      "sample_2018-04-24T19-31-25Z.csv",
-      "sample_LFS_2018-04-24T19-31-25Z.csp",
-  };
-  private final String[] invalidStaffFileNames = {
-      "BLAH_BLAH-THIS_IS_WRONG",
-      "staff_2018-04-24R19-31-25Z.csv",
-      "staff_EG_2018-04-24L19-31-25Z.csv",
-      "foo_LFS_2018-04-24L19-31-25Z.csv",
-      "staff_LFS_2018-04-24T19-31-25Z.csv",
-      "staff_2018-04-24T19:31:25Z.csp",
-  };
-
-  @Test
-  public void checkValidSampleFileNames() {
-    for (String filename : validSampleFileNames) {
-      assertNotNull(SampleFileUtils.buildSampleFilenameComponents(filename, "sample"));
-    }
+    SampleSummaryDTO dto = fileIngestServiceImpl.valitadateCSVRows(expectedFilename, emptyCsv.iterator());
+    
+    assertEquals(expectedFilename, dto.getFilename());
+    assertEquals(0, dto.getProcessedRows());
+    assertEquals(0, dto.getUnprocessedRows().size());
   }
-
-  @Test
-  public void checkValidStaffFileNames() {
-    for (String filename : validStaffFileNames) {
-      assertNotNull(SampleFileUtils.buildSampleFilenameComponents(filename, "staff"));
-    }
+  
+  @Test 
+  public void givenCSVWithNoErrors_whenValitadateCSVRows_checkSampleSummaryDTOIndicatesThatAllRowsWerProcessed(){
+    final String expectedFilename = "validCSV.csv";
+    List<CSVParseResult<LegacySampleIngest>> validCsv = new ArrayList<>();
+    validCsv.add(CSVParseResult.withResult(0,LegacySampleIngest.builder().build()));
+    validCsv.add(CSVParseResult.withResult(1,LegacySampleIngest.builder().build()));
+    
+    SampleSummaryDTO dto = fileIngestServiceImpl.valitadateCSVRows(expectedFilename, validCsv.iterator());
+    
+    assertEquals(expectedFilename, dto.getFilename());
+    assertEquals(2, dto.getProcessedRows());
+    assertEquals(0, dto.getUnprocessedRows().size());
   }
-
-  @Test
-  public void checkInvalidSampleFileNames() {
-    for (String filename : invalidSampleFileNames) {
-      try {
-        assertNotNull(SampleFileUtils.buildSampleFilenameComponents(filename, "sample"));
-      } catch (FWMTCommonException e) {
-        if (!e.getCode().equals(ExceptionCode.INVALID_FILE_NAME)) {
-          fail("Odd positive - filename '" + filename + "' failed for an unexpected reason");
-        } else {
-          continue;
-        }
-      }
-      // we should throw an INVALID_FILE_NAME exception before this point
-      fail("False negative - filename '" + filename + "' should be invalid");
-    }
+  
+  @Test 
+  public void givenCSVWithOneErrors_whenValitadateCSVRows_checkSampleSummaryDTOIndicatesThatTheErroredRowIsNotProcessed(){
+    final String expectedFilename = "withErrorCSV.csv";
+    final String errorMessage = "Row 1 has Error";
+    List<CSVParseResult<LegacySampleIngest>> validCsv = new ArrayList<>();
+    validCsv.add(CSVParseResult.withResult(0,LegacySampleIngest.builder().build()));
+    validCsv.add(CSVParseResult.withError(1, errorMessage));
+    validCsv.add(CSVParseResult.withResult(2,LegacySampleIngest.builder().build()));
+    
+    SampleSummaryDTO dto = fileIngestServiceImpl.valitadateCSVRows(expectedFilename, validCsv.iterator());
+    
+    assertEquals(expectedFilename, dto.getFilename());
+    assertEquals(2, dto.getProcessedRows());
+    assertEquals(1, dto.getUnprocessedRows().size());
+    assertTrue(dto.getUnprocessedRows().get(0).getMessage().contains(errorMessage));
+    assertEquals(1, dto.getUnprocessedRows().get(0).getRow());
   }
-
+  
+  
   @Test
-  public void checkInvalidStaffFileNames() {
-    for (String filename : invalidStaffFileNames) {
-      try {
-        assertNotNull(SampleFileUtils.buildSampleFilenameComponents(filename, "staff"));
-      } catch (FWMTCommonException e) {
-        if (!e.getCode().equals(ExceptionCode.INVALID_FILE_NAME)) {
-          fail("Odd positive - filename '" + filename + "' failed for an unexpected reason");
-        } else {
-          continue;
-        }
-      }
-      // we should throw an INVALID_FILE_NAME exception before this point
-      fail("False negative - filename '" + filename + "' should be invalid");
-    }
-  }
+  public void givenAnEmptyFile_whenValidateSampleIsInvoke_confirmSampleSummaryDTOcontainsfilenameAndNoUnprocessedRows() throws InvalidFileNameException, IOException{
+    SampleFilenameComponents sfc = SampleFilenameComponents.builder().tla(LegacySampleSurveyType.GFF).build();
+    File sampleFile = File.createTempFile("sample","csv");
+    List<CSVParseResult<LegacySampleIngest>> emptyCsv = Collections.emptyList();
+    Iterator<CSVParseResult<LegacySampleIngest>> i = emptyCsv.iterator();
+    
+    PowerMockito.mockStatic(SampleFileUtils.class);    
+    when(SampleFileUtils.buildSampleFilenameComponents(any(File.class))).thenReturn(sfc);
+    when(csvParsingServiceImpl.parseLegacySample(any(Reader.class), any(LegacySampleSurveyType.class))).thenReturn(i);
 
-  @Test
-  public void extractSampleEndpoint() {
-    //Given
-    String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.csv";
-    String expectedEndpoint = "sample";
-    String[] filenameSplitByUnderscore = {"sample", "GFF", "2018-04-24T19:09:54Z.csv"};
-
-    //When
-    String result = SampleFileUtils.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
-
-    //Then
-    assertEquals(expectedEndpoint, result);
-  }
-
-  @Test
-  public void extractStaffEndpoint() {
-    //Given
-    String rawFilename = "staff_2016-04-24T19:09:54Z.csv";
-    String expectedEndpoint = "staff";
-    String[] filenameSplitByUnderscore = {"staff", "2018-04-24T19:09:54Z.csv"};
-
-    //When
-    String result = SampleFileUtils.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
-
-    //Then
-    assertEquals(expectedEndpoint, result);
-  }
-
-  @Test
-  public void wrongEndpointInSampleFilename() {
-    //Given
-    String rawFilename = "wrong_GFF_2018-04-24T19:09:54Z.csv";
-    String expectedEndpoint = "sample";
-    String[] filenameSplitByUnderscore = {"wrong", "GFF", "2018-04-24T19:09:54Z.csv"};
-
-    expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getCode());
-
-    //When
-    SampleFileUtils.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
-  }
-
-  @Test
-  public void correctFilenameSentToWrongEndpoint() {
-    //Given
-    String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.csv";
-    String expectedEndpoint = "wrong";
-    String[] filenameSplitByUnderscore = {"wrong", "GFF", "2018-04-24T19:09:54Z.csv"};
-
-    expectedException.expect(IllegalArgumentException.class);
-
-    //When
-    SampleFileUtils.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
-  }
-
-  @Test
-  public void sampleFilenameFormattedIncorrectly() {
-    //Given
-    String rawFilename = "sample_GFF-2018-04-24T19:09:54Z.csv";
-    String expectedEndpoint = "sample";
-    String[] filenameSplitByUnderscore = {"sample", "GFF-2018-04-24T19:09:54Z.csv"};
-
-    expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getCode());
-
-    //When
-    SampleFileUtils.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
-  }
-
-  @Test
-  public void staffFilenameFormattedIncorrectly() {
-    //Given
-    String rawFilename = "staff__2016-04-24T19:09:54Z.csv";
-    String expectedEndpoint = "staff";
-    String[] filenameSplitByUnderscore = {"staff", "", "2018-04-24T19:09:54Z.csv"};
-
-    expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getCode());
-
-    //When
-    SampleFileUtils.extractEndpoint(rawFilename, expectedEndpoint, filenameSplitByUnderscore);
-  }
-
-  @Test
-  public void checkCorrectFileExtension() {
-    //Given
-    String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.csv";
-    String expectedFileName = "sample_GFF_2018-04-24T19:09:54Z";
-    String expectedExtension = "csv";
-
-    //When
-    String[] result = SampleFileUtils.checkFileExtension(rawFilename);
-
-    //Then
-    assertEquals(rawFilename, result[0] + "." + result[1]);
-    assertEquals(expectedFileName, result[0]);
-    assertEquals(expectedExtension, result[1]);
-  }
-
-  @Test
-  public void incorrectFileExtension() {
-    //Given
-    String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.jpg";
-
-    expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getCode());
-
-    //When
-    SampleFileUtils.checkFileExtension(rawFilename);
-  }
-
-  @Test
-  public void getLegacySampleSurveyTypeGFF() {
-    //Given
-    String[] filenameSplitByUnderscore = {"sample", "GFF", "2018-04-24T19:09:54Z.csv"};
-    String endpoint = "sample";
-
-    //When
-    LegacySampleSurveyType result = SampleFileUtils.getLegacySampleSurveyType(filenameSplitByUnderscore, endpoint);
-
-    //Then
-    assertEquals(GFF, result);
-  }
-
-  @Test
-  public void getLegacySampleSurveyTypeLFS() {
-    //Given
-    String[] filenameSplitByUnderscore = {"sample", "LFS", "2018-04-24T19:09:54Z.csv"};
-    String endpoint = "sample";
-
-    //When
-    LegacySampleSurveyType result = SampleFileUtils.getLegacySampleSurveyType(filenameSplitByUnderscore, endpoint);
-
-    //Then
-    assertEquals(LFS, result);
-  }
-
-  @Test
-  public void unrecognizedLegacySampleSurveyType() {
-    //Given
-    String[] filenameSplitByUnderscore = {"sample", "TLA", "2018-04-24T19:09:54Z.csv"};
-    String endpoint = "sample";
-
-    expectedException.expect(IllegalArgumentException.class);
-
-    //When
-    SampleFileUtils.getLegacySampleSurveyType(filenameSplitByUnderscore, endpoint);
-  }
-
-  @Test
-  public void getLocalDateTime() {
-    //Given
-    String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.csv";
-    String rawTimestamp = "2018-04-24T19:09:54Z";
-
-    //When
-    LocalDateTime result = SampleFileUtils.getLocalDateTime(rawFilename, rawTimestamp);
-
-    //Then
-    assertNotNull(result);
-  }
-
-  @Test
-  public void noEffortForACorrectDateTimeFormat() {
-    //Given
-    String rawFilename = "sample_GFF_2018-04-24T19:09:54Z.csv";
-    String rawTimestamp = "I am clearly not anything related to date or time";
-
-    expectedException.expect(FWMTCommonException.class);
-    expectedException.expectMessage(ExceptionCode.INVALID_FILE_NAME.getCode());
-
-    //When
-    SampleFileUtils.getLocalDateTime(rawFilename, rawTimestamp);
+    SampleSummaryDTO dto = fileIngestServiceImpl.validateSampleFile(sampleFile);
+    
+    assertEquals(sampleFile.getName(), dto.getFilename());
+    assertEquals(0, dto.getProcessedRows());
+    assertEquals(0, dto.getUnprocessedRows().size());
   }
 }
