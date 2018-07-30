@@ -26,6 +26,8 @@ import java.time.LocalDate;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
@@ -126,7 +128,7 @@ public class CSVParsingServiceImplTest {
     String result = csvParsingServiceImpl.constructTmJobId(csvParser.iterator().next(), GFF);
 
     //Then
-    assertNotNull(result);
+    assertThat(result, is("tla_1-quota_1-addressno_1-801"));
   }
 
   @Test
@@ -142,6 +144,7 @@ public class CSVParsingServiceImplTest {
 
     //Then
     assertNotNull(result);
+    assertThat(result, is("quota_1 week_1 w1yr_1 qrtr_1 addr_1 wavfnd_1 hhld_1 chklet_1 - 81K"));
   }
 
   @Test

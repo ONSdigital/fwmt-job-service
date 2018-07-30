@@ -1,24 +1,11 @@
 package uk.gov.ons.fwmt.job_service.service.impl;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
-import java.util.Optional;
-
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessage;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateJobHeaderRequestMessage;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessage;
-import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateJobHeaderRequestMessage;
-
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.SampleFilenameComponents;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
@@ -33,6 +20,18 @@ import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 import uk.gov.ons.fwmt.job_service.utils.SampleFileUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
+import java.util.Optional;
+
+import static uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException.JOB_ENTRY_FAILED_STRING;
 import static uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException.JOB_FAILED_STRING;
 
 @Slf4j
@@ -110,7 +109,7 @@ public class JobProcessor {
 
   protected void sendJobToUser(int row, LegacySampleIngest ingest, UserDto userDto, boolean isReallocation) {
     if (jobResourceServiceClient.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), userDto.getAuthNo())) {
-      log.error("Job Entry could not be processed for row: {}", row, FWMTCommonException.makeCsvOtherException("Job has been sent previously"));
+      log.error(JOB_ENTRY_FAILED_STRING, ingest.getTmJobId(),"Job has been sent previously");
       return;
     }
 
@@ -137,9 +136,10 @@ public class JobProcessor {
     LocalDateTime lastUpdateParsed = null;
 
     try {
-      lastUpdateParsed = LocalDateTime.parse(ingest.getLastUpdated(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+      String lastUpdate = ingest.getLastUpdated().replace(" ", "T");
+      lastUpdateParsed = LocalDateTime.parse(lastUpdate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     } catch (Exception e) {
-      log.error("Job Entry could not be processed for row: {}", row, FWMTCommonException.makeCsvOtherException("Last updated column cannot be parsed")); //Wierd shouldnt Exceptions be thrown
+      log.error(JOB_ENTRY_FAILED_STRING, ingest.getTmJobId(), "Last updated column cannot be parsed");
       return;
     }
 
@@ -157,7 +157,7 @@ public class JobProcessor {
 
   protected void processLFSSample(LegacySampleIngest ingest, UserDto userDto, LocalDateTime lastUpdateParsed) {
     final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, userDto.getTmUsername());
-    log.info("Reissuing GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
+    log.info("Creating LFS job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
     tmService.send(request);
     jobResourceServiceClient.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), lastUpdateParsed));
   }
@@ -169,7 +169,8 @@ public class JobProcessor {
       log.info("Reissuing GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
     } else {
        request = tmJobConverterService.createJob(ingest, userDto.getTmUsername());
-    }    
+       log.info("Creating GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
+    }
     tmService.send(request);
     jobResourceServiceClient.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), lastUpdateParsed));
   }
