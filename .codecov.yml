@@ -3,3 +3,7 @@ ignore:
   - ".*/entity/.*" # ignore folders and all its contents
   - ".*/ApplicationConfig.java"
   - ".*/WebConfig.java"
+  - "**/data/tm/*"
+  - "**/legacy_ingest/*"
+  - "**/dto/*"
+  
