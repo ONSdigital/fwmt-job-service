@@ -16,6 +16,8 @@ targetCompatibility = 1.8
 
 version = '1.0.0'
 
+String mockJarPath = "deps/" + "fwmt-service-mocks-" + version + ".jar"
+
 jar {
     group = 'uk.gov.ons.fwmt'
     baseName = 'fwmt-job-service'
@@ -39,6 +41,7 @@ repositories {
 
 configurations {
     jaxb
+    mocks
 }
 
 task genJaxb {
@@ -78,6 +81,10 @@ task genJaxb {
     }
 }
 
+task runMocks(type: JavaExec) {
+    main = "-jar"
+    args(mockJarPath)
+}
 
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.5.13.RELEASE'
@@ -117,6 +124,8 @@ dependencies {
     testCompile group: 'io.cucumber', name: 'cucumber-spring', version: '3.0.2'
     testCompile "junit:junit:4.12"
     testCompile("org.springframework.boot:spring-boot-starter-test")
+    
+    mocks files(mockJarPath)
 }
 
 processResources {
