@@ -16,8 +16,6 @@ targetCompatibility = 1.8
 
 version = '1.0.0'
 
-String mockJarPath = "deps/" + "fwmt-service-mocks-" + version + ".jar"
-
 jar {
     group = 'uk.gov.ons.fwmt'
     baseName = 'fwmt-job-service'
@@ -35,8 +33,11 @@ buildscript {
 
 repositories {
     mavenCentral()
-       maven { url "https://oss.sonatype.org/content/repositories/libs-snapshot" }
-       maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url "http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot" }
+    maven { url "http://artifactory-sdc.onsdigital.uk/artifactory/libs-release" }
+    maven { url "https://oss.sonatype.org/content/repositories/libs-snapshot" }
+    maven { url "http://repo.maven.apache.org/maven2" }
+    flatDir { dirs 'libs' }
 }
 
 configurations {
@@ -81,11 +82,6 @@ task genJaxb {
     }
 }
 
-task runMocks(type: JavaExec) {
-    main = "-jar"
-    args(mockJarPath)
-}
-
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.5.13.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web-services', version: '1.5.13.RELEASE'
@@ -98,9 +94,9 @@ dependencies {
     compile(group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3') {
         exclude(module: 'commons-logging')
     }
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-cloudfoundry-connector', version:'1.2.5.RELEASE'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version:'1.5.13.RELEASE'
-    compile(group: 'org.apache.httpcomponents', name: 'httpclient', version:'4.5.3') {
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-cloudfoundry-connector', version: '1.2.5.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '1.5.13.RELEASE'
+    compile(group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3') {
         exclude(module: 'commons-logging')
     }
     compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
@@ -124,18 +120,24 @@ dependencies {
     testCompile group: 'io.cucumber', name: 'cucumber-spring', version: '3.0.2'
     testCompile "junit:junit:4.12"
     testCompile("org.springframework.boot:spring-boot-starter-test")
-    
-    mocks files(mockJarPath)
+
+    mocks group: 'uk.gov.ons.fwmt', name: 'fwmt-service-mocks', version: '1.0.0'
+}
+
+task runMocks(type: JavaExec) {
+    String mockJarPath = configurations.mocks.find { it.name.startsWith("fwmt-service-mocks") }
+    main = "-jar"
+    args = [mockJarPath]
 }
 
 processResources {
     filter ReplaceTokens, tokens: [
             "project.artifactId": "name",
-            "project.version": "version",
-            "scm.url": "url",
-            "buildNumber": "buildnumber",
-            "scmBranch": "branch",
-            "timestamp": "timestamp",
+            "project.version"   : "version",
+            "scm.url"           : "url",
+            "buildNumber"       : "buildnumber",
+            "scmBranch"         : "branch",
+            "timestamp"         : "timestamp",
     ]
 }
 
