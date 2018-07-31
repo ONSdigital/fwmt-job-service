@@ -2,43 +2,50 @@ version: '3'
 services:
   job:
     container_name: job
-    image: sdcplatform/jobsvc
+    image: sdcplatform/fwmtjobsvc
     ports:
-     - "${JOB_PORT}:9091"
-    external_links:
-     - resource
-    environment: 
-       - service.resource.username=user
-       - service.resource.password=password
-       - service.resource.baseUrl=http://${RESOURCE_HOST}:9093/resources
+      - "${JOB_PORT}:9091"
+    links:
+      - resource
+    environment:
+      - service.resource.username=user
+      - service.resource.password=password
+      - service.resource.baseUrl=http://${RESOURCE_HOST}:${RESOURCE_PORT}/resources
+    links:
+      - postgres
+    networks:
+      - internal
   resource:
     container_name: resource
-    image: sdcplatform/resourcesvc
+    image: sdcplatform/fwmtresourcesvc
     ports:
-     - "${RESOURCE_PORT}:9093"
-    external_links:
-     - job
-     - staff
+      - "${RESOURCE_PORT}:9093"
     environment:
-     - spring.datasource.url=jdbc:postgresql://postgres:${POSTGRES_PORT}/${POSTGRES_HOST}?currentSchema=gateway
-     - liquibase.url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/postgres?currentSchema=gateway
+      - spring.datasource.url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_HOST}?currentSchema=gateway
+      - liquibase.url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_HOST}?currentSchema=gateway
+    networks:
+      - internal
   staff:
     container_name: staff
-    image: sdcplatform/staffsvc
+    image: sdcplatform/fwmtstaffsvc
     ports:
-     - "${STAFF_PORT}:9092"
-    external_links:
-     - resource
+      - "${STAFF_PORT}:9092"
+    environment:
+      - service.resource.username=user
+      - service.resource.password=password
+      - service.resource.baseUrl=http://${RESOURCE_HOST}:${RESOURCE_PORT}/resources
+    links:
+      - resource
+    networks:
+      - internal
   postgres:
     container_name: postgres
     image: postgres
     ports:
-     - "${POSTGRES_PORT}:5432"
-    environment: 
-     - service.resource.username=user
-     - service.resource.password=password
-     - service.resource.baseUrl=http://${RESOURCE_HOST}:9093/resources
+      - "${POSTGRES_PORT}:5432"
+    networks:
+      - internal
 networks:
-  default:
-    external:
-      name: rmdockerdev_default
+  internal:
+    driver: bridge
+
