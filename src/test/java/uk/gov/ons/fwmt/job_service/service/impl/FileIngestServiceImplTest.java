@@ -23,17 +23,18 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
+import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParserBuilder;
 import uk.gov.ons.fwmt.job_service.data.dto.SampleSummaryDTO;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.SampleFilenameComponents;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
+import uk.gov.ons.fwmt.job_service.rest.client.FieldPeriodResourceServiceClient;
 import uk.gov.ons.fwmt.job_service.utils.SampleFileUtils;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(SampleFileUtils.class)
+@PrepareForTest({SampleFileUtils.class, CSVParserBuilder.class})
 public class FileIngestServiceImplTest {
   @InjectMocks private FileIngestServiceImpl fileIngestServiceImpl;
-  @Mock private CSVParsingServiceImpl csvParsingServiceImpl;
   
   @Test 
   public void givenEmptyCSV_whenValitadateCSVRows_checkSampleSummaryDTOIndicatesThatItWasEmpty(){
@@ -89,7 +90,9 @@ public class FileIngestServiceImplTest {
     
     PowerMockito.mockStatic(SampleFileUtils.class);    
     when(SampleFileUtils.buildSampleFilenameComponents(any(File.class))).thenReturn(sfc);
-    when(csvParsingServiceImpl.parseLegacySample(any(Reader.class), any(LegacySampleSurveyType.class))).thenReturn(i);
+
+    PowerMockito.mockStatic(CSVParserBuilder.class);    
+    when(CSVParserBuilder.buildLegacySampleParserIterator(any(Reader.class), any(LegacySampleSurveyType.class), any(FieldPeriodResourceServiceClient.class))).thenReturn(i);
 
     SampleSummaryDTO dto = fileIngestServiceImpl.validateSampleFile(sampleFile);
     

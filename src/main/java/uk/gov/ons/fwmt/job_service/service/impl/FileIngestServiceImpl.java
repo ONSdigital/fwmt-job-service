@@ -15,12 +15,13 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParseResult;
+import uk.gov.ons.fwmt.job_service.data.csv_parser.CSVParserBuilder;
 import uk.gov.ons.fwmt.job_service.data.csv_parser.UnprocessedCSVRow;
 import uk.gov.ons.fwmt.job_service.data.dto.SampleSummaryDTO;
 import uk.gov.ons.fwmt.job_service.data.file_ingest.SampleFilenameComponents;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
-import uk.gov.ons.fwmt.job_service.service.CSVParsingService;
+import uk.gov.ons.fwmt.job_service.rest.client.FieldPeriodResourceServiceClient;
 import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 import uk.gov.ons.fwmt.job_service.utils.SampleFileUtils;
 
@@ -31,18 +32,15 @@ import uk.gov.ons.fwmt.job_service.utils.SampleFileUtils;
 @Slf4j
 @Service
 public class FileIngestServiceImpl implements FileIngestService {
-  private CSVParsingService csvParsingService;
   
   @Autowired
-  public FileIngestServiceImpl(CSVParsingService csvParsingService) {
-    this.csvParsingService = csvParsingService;
-  }
+  private FieldPeriodResourceServiceClient fieldPeriodResourceServiceClient;
   
   public SampleSummaryDTO validateSampleFile(File file) throws IOException{
     SampleFilenameComponents filename = SampleFileUtils.buildSampleFilenameComponents(file);
     final Reader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
     
-    Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = csvParsingService.parseLegacySample(reader, filename.getTla());
+    Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = CSVParserBuilder.buildLegacySampleParserIterator(reader, filename.getTla(), fieldPeriodResourceServiceClient);
     return valitadateCSVRows(file.getName(), csvRowIterator);
   }
 
