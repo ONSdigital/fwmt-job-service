@@ -1,4 +1,22 @@
+
 import org.apache.tools.ant.filters.ReplaceTokens
+
+import java.util.concurrent.Callable
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.2.RELEASE")
+    }
+}
+
+plugins {
+    id 'com.github.psxpaul.execfork' version '0.1.8'
+}
 
 apply plugin: 'java'
 apply plugin: 'idea'
@@ -22,23 +40,30 @@ jar {
     version = version
 }
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.2.RELEASE")
-    }
-}
-
 repositories {
     mavenCentral()
-       maven { url "https://oss.sonatype.org/content/repositories/libs-snapshot" }
-       maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url "http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot" }
+    maven { url "http://artifactory-sdc.onsdigital.uk/artifactory/libs-release" }
+    maven { url "https://oss.sonatype.org/content/repositories/libs-snapshot" }
+    maven { url "http://repo.maven.apache.org/maven2" }
+    flatDir { dirs 'libs' }
 }
 
 configurations {
     jaxb
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output
+            runtimeClasspath += main.output
+            srcDir file('src/integration-test/java')
+        }
+        resources.srcDir file('src/integration-test/resources')
+    }
 }
 
 task genJaxb {
@@ -78,7 +103,6 @@ task genJaxb {
     }
 }
 
-
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.5.13.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web-services', version: '1.5.13.RELEASE'
@@ -91,9 +115,9 @@ dependencies {
     compile(group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3') {
         exclude(module: 'commons-logging')
     }
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-cloudfoundry-connector', version:'1.2.5.RELEASE'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version:'1.5.13.RELEASE'
-    compile(group: 'org.apache.httpcomponents', name: 'httpclient', version:'4.5.3') {
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-cloudfoundry-connector', version: '1.2.5.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '1.5.13.RELEASE'
+    compile(group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3') {
         exclude(module: 'commons-logging')
     }
     compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
@@ -117,16 +141,62 @@ dependencies {
     testCompile group: 'io.cucumber', name: 'cucumber-spring', version: '3.0.2'
     testCompile "junit:junit:4.12"
     testCompile("org.springframework.boot:spring-boot-starter-test")
+
+    integrationTestCompile 'org.assertj:assertj-core:3.0.0'
+
+    integrationTestRuntime group: 'uk.gov.ons.fwmt', name: 'fwmt-service-mocks', version: '1.0.0'
 }
+
+class RunAsyncTask extends DefaultTask {
+    @TaskAction
+    def startAsync() {
+        ExecutorService es = Executors.newSingleThreadExecutor()
+        es.submit({
+            project.javaexec {
+                classpath = project.sourceSets.main.runtimeClasspath
+                main = "Main"
+            }
+        } as Callable)
+
+    }
+}
+
+task integrationTest(type: Test) {
+    jacoco {
+        destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+        classDumpDir = file("$buildDir/jacoco/classpathdumps")
+    }
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    outputs.upToDateWhen { false }
+}
+check.dependsOn integrationTest
+check.dependsOn jacocoTestReport
+integrationTest.mustRunAfter test
+
+task runMocks(type: com.github.psxpaul.task.JavaExecFork) {
+    String mockJarPath = configurations.integrationTestRuntime.find { it.name.startsWith("fwmt-service-mocks") }
+    classpath = sourceSets.main.runtimeClasspath
+    main = '-jar'
+    args = [ mockJarPath ]
+    jvmArgs = [ '-Xmx500m' ]
+    workingDir = "$buildDir"
+    standardOutput = "$buildDir/fwmt-service-mocks.log"
+    errorOutput = "$buildDir/fwmt-service-mocks-errors.log"
+    stopAfter = integrationTest
+    waitForPort = 9099
+    waitForOutput = 'Started Application'
+}
+integrationTest.dependsOn runMocks
 
 processResources {
     filter ReplaceTokens, tokens: [
             "project.artifactId": "name",
-            "project.version": "version",
-            "scm.url": "url",
-            "buildNumber": "buildnumber",
-            "scmBranch": "branch",
-            "timestamp": "timestamp",
+            "project.version"   : "version",
+            "scm.url"           : "url",
+            "buildNumber"       : "buildnumber",
+            "scmBranch"         : "branch",
+            "timestamp"         : "timestamp",
     ]
 }
 
