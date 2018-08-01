@@ -5,7 +5,7 @@ import org.springframework.core.task.TaskDecorator;
 
 import java.util.Map;
 
-public class CorrelationIdTaskDecorator implements TaskDecorator {
+public class MDCTaskDecorator implements TaskDecorator {
   @Override
   public Runnable decorate(Runnable runnable) {
     // Get the logging MDC context

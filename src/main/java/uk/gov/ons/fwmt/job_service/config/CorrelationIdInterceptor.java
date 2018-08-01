@@ -9,7 +9,8 @@ import org.springframework.http.client.ClientHttpResponse;
 
 import java.io.IOException;
 
-import static uk.gov.ons.fwmt.job_service.config.CorrelationIdFilter.CID_KEY;
+import static uk.gov.ons.fwmt.job_service.config.MDCHelper.CID_HEADER;
+import static uk.gov.ons.fwmt.job_service.config.MDCHelper.CID_KEY;
 
 public class CorrelationIdInterceptor implements ClientHttpRequestInterceptor {
   @Override
@@ -18,7 +19,7 @@ public class CorrelationIdInterceptor implements ClientHttpRequestInterceptor {
     HttpHeaders headers = request.getHeaders();
     String correlationId = MDC.get(CID_KEY);
     if (correlationId != null) {
-      headers.add(CorrelationIdFilter.CORRELATION_ID_HEADER, correlationId);
+      headers.add(CID_HEADER, correlationId);
     }
     return execution.execute(request, body);
   }
