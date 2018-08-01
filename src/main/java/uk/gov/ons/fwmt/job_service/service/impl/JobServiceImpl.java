@@ -3,7 +3,6 @@ package uk.gov.ons.fwmt.job_service.service.impl;
 import java.io.File;
 import java.io.IOException;
 
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,8 +14,6 @@ import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 import uk.gov.ons.fwmt.job_service.service.JobService;
 import uk.gov.ons.fwmt.job_service.utils.SampleFileUtils;
 
-import static uk.gov.ons.fwmt.job_service.config.MDCHelper.FILENAME_KEY;
-import static uk.gov.ons.fwmt.job_service.config.MDCHelper.FILENAME_PREFIX;
 
 @Slf4j
 @Service
@@ -40,9 +37,6 @@ public class JobServiceImpl implements JobService {
           throws IOException{
     log.debug("Handling file with name '{}'", multipartFile.getOriginalFilename());
     File regularFile = SampleFileUtils.convertToRegularFile(multipartFile);
-
-    // log the file name we're working with
-    MDC.put(FILENAME_KEY, FILENAME_PREFIX + regularFile.getName());
 
     log.info("Validation began");
     SampleSummaryDTO sampleSummaryDTO = fileIngestService.validateSampleFile(regularFile);
