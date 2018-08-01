@@ -6,7 +6,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,7 +19,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
@@ -31,7 +30,7 @@ import uk.gov.ons.fwmt.job_service.rest.client.dto.UserDto;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class JobProcessorTests {
   @InjectMocks @Spy private JobProcessor jobProcessor;
   @Mock private UserResourceServiceClient userResourceServiceClient;
@@ -106,6 +105,7 @@ public class JobProcessorTests {
     UserDto userDto = UserDto.builder().build();
     when(jobResourceServiceClient.existsByTmJobIdAndLastAuthNo(lsi.getTmJobId(), userDto.getAuthNo())).thenReturn(false);
     when(jobResourceServiceClient.findByTmJobId(anyString())).thenReturn(Optional.empty());
+    
     jobProcessor.sendJobToUser(0, lsi, userDto, false);
 
     verify(jobProcessor, times(0)).processReallocation(any(LegacySampleIngest.class), any(UserDto.class));
@@ -114,10 +114,11 @@ public class JobProcessorTests {
   
   @Test
   public void givenJobJobExisitsInJobResource_processReallocation_confirmJobIsUpdated(){
-    LegacySampleIngest lsi = LegacySampleIngest.builder().build();
-    UserDto userDto = UserDto.builder().build();
+    LegacySampleIngest lsi = LegacySampleIngest.builder().tmJobId("123").build();
+    UserDto userDto = UserDto.builder().tmUsername("dummy").build();
     Optional<JobDto> oJ = Optional.of(JobDto.builder().build());
     when(jobResourceServiceClient.findByTmJobId(anyString())).thenReturn(oJ);
+   
     jobProcessor.processReallocation(lsi, userDto);
 
     verify(jobResourceServiceClient, times(1)).updateJob(oJ.get());
@@ -125,9 +126,10 @@ public class JobProcessorTests {
   
   @Test
   public void givenJobJobDosNotExisitsInJobResource_processReallocation_confirmJobIsNotUpdated(){
-    LegacySampleIngest lsi = LegacySampleIngest.builder().build();
+    LegacySampleIngest lsi = LegacySampleIngest.builder().tmJobId("123").build();
     UserDto userDto = UserDto.builder().build();
     when(jobResourceServiceClient.findByTmJobId(anyString())).thenReturn(Optional.empty());
+    
     jobProcessor.processReallocation(lsi, userDto);
 
     verify(jobResourceServiceClient, times(0)).updateJob(any(JobDto.class));
@@ -188,7 +190,7 @@ public class JobProcessorTests {
     String validDate ="2014-11-03T11:15:30";
     LocalDateTime localDateTime = LocalDateTime.parse(validDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     LegacySampleIngest lsi = LegacySampleIngest.builder().lastUpdated(validDate).legacySampleSurveyType(LegacySampleSurveyType.GFF).stage("333").build();
-    UserDto userDto = UserDto.builder().build();
+    UserDto userDto = UserDto.builder().tmUsername("dummy").build();
         
     jobProcessor.processGFFSample(lsi, userDto, localDateTime);
     verify(tmJobConverterService, times(1)).createReissue(any(LegacySampleIngest.class), anyString());
@@ -200,7 +202,7 @@ public class JobProcessorTests {
     String validDate ="2014-11-03T11:15:30";
     LocalDateTime localDateTime = LocalDateTime.parse(validDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     LegacySampleIngest lsi = LegacySampleIngest.builder().lastUpdated(validDate).legacySampleSurveyType(LegacySampleSurveyType.GFF).stage("000").build();
-    UserDto userDto = UserDto.builder().build();
+    UserDto userDto = UserDto.builder().tmUsername("dummy").build();
         
     jobProcessor.processGFFSample(lsi, userDto, localDateTime);
     verify(tmJobConverterService, times(0)).createReissue(any(LegacySampleIngest.class), anyString());

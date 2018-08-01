@@ -1,7 +1,6 @@
 package uk.gov.ons.fwmt.job_service.data.csv_parser.legacysample;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -13,14 +12,14 @@ import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleLFSDataIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.client.FieldPeriodResourceServiceClient;
-import uk.gov.ons.fwmt.job_service.rest.client.dto.FieldPeriodDto;
 
 public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
   private LegacySampleSurveyType legacySampleSurveyType;
- 
+
   private FieldPeriodResourceServiceClient fieldPeriodResourceServiceClient;
 
-  public LegacySampleIterator(CSVParser parser, LegacySampleSurveyType legacySampleSurveyType, FieldPeriodResourceServiceClient fieldPeriodResourceServiceClient) {
+  public LegacySampleIterator(CSVParser parser, LegacySampleSurveyType legacySampleSurveyType,
+      FieldPeriodResourceServiceClient fieldPeriodResourceServiceClient) {
     super(parser);
     this.legacySampleSurveyType = legacySampleSurveyType;
     this.fieldPeriodResourceServiceClient = fieldPeriodResourceServiceClient;
@@ -40,6 +39,11 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     default:
       throw new IllegalArgumentException("Unknown survey type");
     }
+    parseLegacySampleCommonData(instance, record);
+    return instance;
+  }
+
+  protected void parseLegacySampleCommonData(LegacySampleIngest instance, CSVRecord record) {
     // derive the TM job id
     instance.setTmJobId(LegacySampleUtils.constructTmJobId(record, legacySampleSurveyType));
     // derive the coordinates, if we were given a non-null non-empty grid ref
@@ -52,11 +56,9 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
       instance.setGeoX(Float.parseFloat(osGridRefSplit[0]));
       instance.setGeoY(Float.parseFloat(osGridRefSplit[1]));
     }
-    return instance;
   }
-  
-  
-  private void parseLegacySampleGFFData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException {
+
+  protected void parseLegacySampleGFFData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException {
     // set normal fields
     LegacySampleAnnotationProcessor.process(instance, record, "GFF");
     // set derived due date
@@ -70,7 +72,7 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     LegacySampleAnnotationProcessor.process(instance.getGffData(), record, null);
   }
 
-  private void parseLegacySampleLFSData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException {
+  protected void parseLegacySampleLFSData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException {
     // set normal fields
     LegacySampleAnnotationProcessor.process(instance, record, "LFS");
     // set derived due date
@@ -83,7 +85,5 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     instance.setLfsData(new LegacySampleLFSDataIngest());
     LegacySampleAnnotationProcessor.process(instance.getLfsData(), record, null);
   }
-
- 
 
 }

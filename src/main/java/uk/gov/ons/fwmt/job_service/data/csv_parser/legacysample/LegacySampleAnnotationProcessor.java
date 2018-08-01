@@ -13,6 +13,8 @@ import uk.gov.ons.fwmt.job_service.data.annotation.CSVColumn;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 
 public final class LegacySampleAnnotationProcessor {
+  private LegacySampleAnnotationProcessor() {}
+  
 
   public static <T> void process(T instance, CSVRecord record, String pivot)
       throws FWMTCommonException {

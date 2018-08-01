@@ -12,14 +12,14 @@ import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class ResourceRESTHelperTest {
 
   //GET//////////////////////////////
@@ -29,7 +29,7 @@ public class ResourceRESTHelperTest {
     String expectedBody = "The Rock";
     String url = "http://nowwhere.com";
     RestTemplate mockRestTemplate = mock(RestTemplate.class);
-    ResponseEntity<String> mockResposeEntity = mock(ResponseEntity.class);
+    ResponseEntity<String> mockResposeEntity =  mock(ResponseEntity.class);
 
     when(mockRestTemplate.getForEntity(url, String.class)).thenReturn(mockResposeEntity);
     when(mockResposeEntity.getStatusCode()).thenReturn(HttpStatus.ACCEPTED);
