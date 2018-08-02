@@ -99,7 +99,7 @@ public class CSVParsingServiceImpl implements CSVParsingService {
     switch (surveyType) {
     case GFF:
       // quota '-' addr '-' stage
-      return record.get("Quota") + "-" + record.get("AddressNo") + "-" + record.get("Stage");
+      return record.get("TLA") + "-" + record.get("Quota") + "-" + record.get("AddressNo") + "-" + record.get("Stage");
     case LFS:
       // quota week w1yr qrtr addr wavfnd hhld chklet
       if (!record.get("Issue_No").equals("1")) {
