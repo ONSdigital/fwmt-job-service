@@ -18,15 +18,22 @@ import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 
 @Slf4j
 public final class SampleFileUtils {
+
   private static final String SAMPLE_ENDPOINT_VALUE = "sample";
+
   public static final DateTimeFormatter TIMESTAMP_FORMAT_LINUX = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
   public static final DateTimeFormatter TIMESTAMP_FORMAT_WINDOWS = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH-mm-ss'Z'");
-  
+
+  private SampleFileUtils() {
+  }
+
   public static final SampleFilenameComponents buildSampleFilenameComponents(File file) throws IOException, InvalidFileNameException {
     final SampleFilenameComponents filename = buildSampleFilenameComponents(file.getName(), SAMPLE_ENDPOINT_VALUE);
     return filename;
   }
-    public final static SampleFilenameComponents buildSampleFilenameComponents(String rawFilename, String expectedEndpoint) {
+  
+  public final static SampleFilenameComponents buildSampleFilenameComponents(String rawFilename, String expectedEndpoint) {
     log.debug("Began a filename parse for " + rawFilename);
 
     String[] filenameSplitByDot = checkFileExtension(rawFilename);

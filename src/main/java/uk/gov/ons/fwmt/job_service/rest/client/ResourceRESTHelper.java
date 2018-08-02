@@ -11,7 +11,9 @@ import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import java.util.Optional;
 
 @Slf4j
-public class ResourceRESTHelper {
+public final class ResourceRESTHelper {
+  private ResourceRESTHelper() {}
+  
   public static <T> Optional<T> get(RestTemplate restTemplate, String url, Class<T> klass, Object... parameters) {
     try {
       final ResponseEntity<T> responseEntity = restTemplate.getForEntity(url, klass, parameters);
