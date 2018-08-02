@@ -120,7 +120,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     GregorianCalendar dueDateCalendar = GregorianCalendar
         .from(ingest.getDueDate().atTime(23, 59, 59).atZone(ZoneId.of("UTC")));
     request.getJob().setDueDate(datatypeFactory.newXMLGregorianCalendar(dueDateCalendar));
-    request.getJob().setDescription(ingest.getTla());
+    request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
     request.getJob().getAllocatedTo().setUsername(username);
 
     // additional properties

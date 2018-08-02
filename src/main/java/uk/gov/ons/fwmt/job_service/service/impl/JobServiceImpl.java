@@ -14,6 +14,7 @@ import uk.gov.ons.fwmt.job_service.service.FileIngestService;
 import uk.gov.ons.fwmt.job_service.service.JobService;
 import uk.gov.ons.fwmt.job_service.utils.SampleFileUtils;
 
+
 @Slf4j
 @Service
 public class JobServiceImpl implements JobService {
@@ -36,14 +37,18 @@ public class JobServiceImpl implements JobService {
           throws IOException{
     log.debug("Handling file with name '{}'", multipartFile.getOriginalFilename());
     File regularFile = SampleFileUtils.convertToRegularFile(multipartFile);
+
     log.info("Validation began");
     SampleSummaryDTO sampleSummaryDTO = fileIngestService.validateSampleFile(regularFile);
     log.info("Validation passed");
+
     log.info("Storing CSV in resource service");
     jobResourceServiceClient.storeCSVFile(regularFile, sampleSummaryDTO.getUnprocessedRows().isEmpty());
     log.info("CSV stored successfully");
+
     jobProcessor.processSampleFile(regularFile); // This is an async call
     log.info("Queued asynchronous call to JobProcessor::processSampleFile");
+
     return sampleSummaryDTO;
   }
 }

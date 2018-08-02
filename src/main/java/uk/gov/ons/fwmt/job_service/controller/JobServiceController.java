@@ -7,6 +7,7 @@ package uk.gov.ons.fwmt.job_service.controller;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,9 @@ import uk.gov.ons.fwmt.job_service.data.dto.SampleSummaryDTO;
 import uk.gov.ons.fwmt.job_service.service.JobService;
 
 import java.io.IOException;
+
+import static uk.gov.ons.fwmt.job_service.config.MDCHelper.FILENAME_KEY;
+import static uk.gov.ons.fwmt.job_service.config.MDCHelper.FILENAME_PREFIX;
 
 /**
  * Class for file upload controller
@@ -50,6 +54,8 @@ public class JobServiceController {
       RedirectAttributes redirectAttributes)
       throws IOException {
     SampleSummaryDTO summary = null;
+    // log the file name we're working with
+    MDC.put(FILENAME_KEY, FILENAME_PREFIX + file.getOriginalFilename());
     log.info("Entered with file name {}", file.getOriginalFilename());
     if(!"sample_LFS_2018-07-30T14-14-10Z.csv".equals(file.getOriginalFilename())) {
       summary = jobService.processSampleFile(file);

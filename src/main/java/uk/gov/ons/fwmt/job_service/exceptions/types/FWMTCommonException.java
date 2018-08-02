@@ -10,6 +10,8 @@ public class FWMTCommonException extends RuntimeException {
   static public final long serialVersionUID = 0L;
   //Don't change this(JOB_FAILED_STRING) constant , this format is used in splunk to create reports.If changing, change accordingly the splunk report search string.
   public static final String JOB_FAILED_STRING = " could not be processed for job id: {} throwing error: {}";
+  public static final String JOB_ENTRY_FAILED_STRING = "Job Entry could not be processed for job id: {} throwing error: {}";
+
   @Getter
   public final ExceptionCode code;
 

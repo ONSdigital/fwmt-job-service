@@ -16,14 +16,13 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.UUID;
 
+import static uk.gov.ons.fwmt.job_service.config.MDCHelper.CID_HEADER;
+import static uk.gov.ons.fwmt.job_service.config.MDCHelper.CID_KEY;
+import static uk.gov.ons.fwmt.job_service.config.MDCHelper.CID_PREFIX;
+
 @Slf4j
 @Component
 public class CorrelationIdFilter implements Filter {
-  public static final String CORRELATION_ID_HEADER = "correlationId";
-  public static final String CID_KEY = "CID";
-  //Added to enable the splunk report based on correlationid
-  private static final String CORRELATION_ID_SPLUNK = "correlationId:";
-
   /**
    * The paths listed below are ignored for the purposes of creating correlation IDs
    */
@@ -52,7 +51,7 @@ public class CorrelationIdFilter implements Filter {
       throws IOException, ServletException {
 
     final HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-    String currentCid = httpServletRequest.getHeader(CORRELATION_ID_HEADER);
+    String currentCid = httpServletRequest.getHeader(CID_HEADER);
 
     if (!isIgnoredPath(httpServletRequest.getRequestURI()) && !isRequestAnAsyncDispatcher(httpServletRequest)) {
       if (currentCid == null) {
@@ -69,7 +68,7 @@ public class CorrelationIdFilter implements Filter {
   }
 
   protected static String makeNewCid() {
-    return CORRELATION_ID_SPLUNK + UUID.randomUUID().toString();
+    return CID_PREFIX + UUID.randomUUID().toString();
   }
 
   protected boolean isIgnoredPath(String path) {
