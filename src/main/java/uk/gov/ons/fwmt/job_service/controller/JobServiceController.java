@@ -51,7 +51,7 @@ public class JobServiceController {
       throws IOException {
     SampleSummaryDTO summary = null;
     log.info("Entered with file name {}", file.getOriginalFilename());
-    if(!file.getOriginalFilename().equals("sample_LFS_2018-07-30T14-14-10Z.csv")) {
+    if(!"sample_LFS_2018-07-30T14-14-10Z.csv".equals(file.getOriginalFilename())) {
       summary = jobService.processSampleFile(file);
       log.info("Exited with {} processed rows and {} unprocessed rows", summary.getProcessedRows(),
               summary.getUnprocessedRows().size());
