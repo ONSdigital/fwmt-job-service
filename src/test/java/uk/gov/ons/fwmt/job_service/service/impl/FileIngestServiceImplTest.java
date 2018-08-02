@@ -43,7 +43,7 @@ public class FileIngestServiceImplTest {
     final String expectedFilename = "emptyCSV.csv";
     List<CSVParseResult<LegacySampleIngest>> emptyCsv = Collections.emptyList();
 
-    SampleSummaryDTO dto = fileIngestServiceImpl.valitadateCSVRows(expectedFilename, emptyCsv.iterator());
+    SampleSummaryDTO dto = fileIngestServiceImpl.validateCSVRows(expectedFilename, emptyCsv.iterator());
     
     assertEquals(expectedFilename, dto.getFilename());
     assertEquals(0, dto.getProcessedRows());
@@ -57,7 +57,7 @@ public class FileIngestServiceImplTest {
     validCsv.add(CSVParseResult.withResult(0,LegacySampleIngest.builder().build()));
     validCsv.add(CSVParseResult.withResult(1,LegacySampleIngest.builder().build()));
     
-    SampleSummaryDTO dto = fileIngestServiceImpl.valitadateCSVRows(expectedFilename, validCsv.iterator());
+    SampleSummaryDTO dto = fileIngestServiceImpl.validateCSVRows(expectedFilename, validCsv.iterator());
     
     assertEquals(expectedFilename, dto.getFilename());
     assertEquals(2, dto.getProcessedRows());
@@ -73,7 +73,7 @@ public class FileIngestServiceImplTest {
     validCsv.add(CSVParseResult.withError(1, errorMessage));
     validCsv.add(CSVParseResult.withResult(2,LegacySampleIngest.builder().build()));
     
-    SampleSummaryDTO dto = fileIngestServiceImpl.valitadateCSVRows(expectedFilename, validCsv.iterator());
+    SampleSummaryDTO dto = fileIngestServiceImpl.validateCSVRows(expectedFilename, validCsv.iterator());
     
     assertEquals(expectedFilename, dto.getFilename());
     assertEquals(2, dto.getProcessedRows());

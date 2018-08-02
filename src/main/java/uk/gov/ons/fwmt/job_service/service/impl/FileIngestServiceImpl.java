@@ -41,10 +41,10 @@ public class FileIngestServiceImpl implements FileIngestService {
     final Reader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
     
     Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = CSVParserBuilder.buildLegacySampleParserIterator(reader, filename.getTla(), fieldPeriodResourceServiceClient);
-    return valitadateCSVRows(file.getName(), csvRowIterator);
+    return validateCSVRows(file.getName(), csvRowIterator);
   }
 
-  protected SampleSummaryDTO valitadateCSVRows(String filename, Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator) {
+  protected SampleSummaryDTO validateCSVRows(String filename, Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator) {
     int parsed = 0;
     List<UnprocessedCSVRow> unprocessed = new ArrayList<>();
 
