@@ -1,4 +1,4 @@
-infok
+info:
 #  name: @project.artifactId@
 #  version: @project.version@
 #  origin: @scm.url@
@@ -28,8 +28,8 @@ logging:
     org.apache.commons.dbcp2: ERROR
   file: target/SpringErrors/spring.log
   pattern:
-    console: "%d{yyyy-MMM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{15} - %msg%n"
-    file: "%d{yyyy-MMM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{15} - %msg%n"
+    console: "%d{yyyy-MMM-dd HH:mm:ss.SSS} %-5level [%thread] [%X{CID}] [%X{FILENAME}] %logger{1}::%M - %msg%n"
+    file:    "%d{yyyy-MMM-dd HH:mm:ss.SSS} %-5level [%thread] [%X{CID}] [%X{FILENAME}] %logger{1}::%M - %msg%n"
 
 security.user:
   name: user
