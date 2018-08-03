@@ -9,3 +9,11 @@ Service to create and reallocate jobs to users
 
 ## Copyright
 Copyright (C) 2018 Crown Copyright (Office for National Statistics)
+
+## Docker
+    
+    docker run --name jobservice -p:9091:9091 sdcplatform/fwmtjobssvc
+    
+Or to bring all fwmt services up
+
+    docker-compose up -d
