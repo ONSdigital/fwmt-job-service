@@ -144,7 +144,9 @@ dependencies {
 	testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '1.7.0'
 	testCompile group: 'org.mockito', name: 'mockito-core', version: '2.7.1'
     testCompile "junit:junit:4.12"
-    testCompile("org.springframework.boot:spring-boot-starter-test")
+    testCompile("org.springframework.boot:spring-boot-starter-test") {
+        exclude(module: 'android-json')
+    }
 
     integrationTestCompile 'org.assertj:assertj-core:3.0.0'
 
