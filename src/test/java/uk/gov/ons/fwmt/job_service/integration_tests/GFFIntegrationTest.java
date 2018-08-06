@@ -19,7 +19,7 @@ import java.util.Base64;
 @ActiveProfiles("integration")
 public class GFFIntegrationTest {
   @Test
-  public void lfsIntegrationTest() {
+  public void gffIntegrationTest() {
     RestTemplate restTemplate = new RestTemplate();
 
     LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
