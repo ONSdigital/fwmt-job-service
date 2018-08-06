@@ -1,0 +1,69 @@
+server:
+  contextPath: /jobs
+  port: 9091
+
+spring:
+  application:
+    name: fwmt-job-service
+  http.multipart:
+    max-file-size: 12800MB
+    max-request-size: 12800MB
+  jackson:
+      serialization:
+        WRITE_DATES_AS_TIMESTAMPS: false
+
+management.endpoint.health.show-details: always
+
+logging:
+  level:
+    root: WARN
+    uk.gov.ons.fwmt: DEBUG
+    org.springframework.security: ERROR
+    org.springframework.web: ERROR
+    org.hibernate: ERROR
+    org.apache.commons.dbcp2: ERROR
+  file: target/SpringErrors/spring.log
+  pattern:
+    console: "%d{yyyy-MMM-dd HH:mm:ss.SSS} %-5level [%thread] [%X{CID}] [%X{FILENAME}] %logger{1}::%M - %msg%n"
+    file:    "%d{yyyy-MMM-dd HH:mm:ss.SSS} %-5level [%thread] [%X{CID}] [%X{FILENAME}] %logger{1}::%M - %msg%n"
+
+security.user:
+  name: "user"
+  password: "password"
+
+totalmobile:
+  username: ""
+  password: ""
+  url: "http://localhost:9099/tm/Mock"
+  message-queue-path: "/Services/TM/v20/Messaging/MessageQueueWs.asmx"
+  message-queue-wsdl-path: "src/main/resources/wsdl/Messaging_MessageQueueWs.wsdl"
+  message-queue-namespace: "http://schemas.consiliumtechnologies.com/wsdl/mobile/2007/07/messaging/"
+  message-queue-package: "com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging"
+  outgoing-ws-namespace: "http://schemas.consiliumtechnologies.com/services/mobile/2009/03/messaging"
+  web:
+    login-url: "/WebAdmin/Login"
+    save-user-url: "/WebAdmin/Administration/Users/SaveUser"
+
+service:
+  resource:
+    username: "user"
+    password: "password"
+    baseUrl: "http://localhost:9099/resources"
+    operation:
+      users:
+        find:
+          path: "/users/auth/{authNo}"
+        findAlt:
+          path: "/users/alternative/{altAuthNo}"
+      jobs:
+        find:
+          path: "/jobs/{tmJobId}"
+        create:
+          path: "/jobs/"
+        update:
+          path: "/jobs/"
+        sendcsv:
+          path: "/jobFile/upload"
+      fieldPeriods:
+        find:
+          path: "/fieldPeriods/{fieldPeriod}"
