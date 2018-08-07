@@ -105,19 +105,25 @@ public class LocationConverterHelper {
   }
 
   protected static CartesianCoordinate helmertTransform(CartesianCoordinate input, DatumParameters datum) {
+    // normalise parts-per-million to (s+1)
+    double scale = datum.scale / 1e6 + 1;
+
+    // normalize arcseconds to radians
     double rx = toRadians(datum.rx / 3600);
     double ry = toRadians(datum.ry / 3600);
     double rz = toRadians(datum.rz / 3600);
 
-    double x_prime = datum.tx + ((1 + datum.scale) * input.x) - (rz * input.y) + (datum.ry * input.z);
-    double y_prime = datum.ty + (rz * input.x) + ((1 + datum.scale) * input.y) - (datum.rx * input.z);
-    double z_prime = datum.tz - (ry * input.x) + (datum.rx * input.y) + ((1 + datum.scale) * input.z);
+    // apply the transformation
+    double x_prime = datum.tx + input.x * scale - input.y * rz + input.z * ry;
+    double y_prime = datum.ty + input.x * rz + input.y * scale - input.z * rx;
+    double z_prime = datum.tz - input.x * ry + input.y * rx + input.z * scale;
+
     return new CartesianCoordinate(x_prime, y_prime, z_prime);
   }
 
-//  protected static LatLong convertLatLong(LatLong input, DatumParameters source, DatumParameters destination) {
-//
-//  }
+  protected static LatLong convertLatLong(LatLong input, DatumParameters destination) {
+
+  }
 
   protected static CartesianCoordinate latLongToOsGridRef(LatLong input) {
     double psi = toRadians(input.lat);
