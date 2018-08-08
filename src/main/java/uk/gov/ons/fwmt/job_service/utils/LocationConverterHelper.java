@@ -9,6 +9,7 @@ package uk.gov.ons.fwmt.job_service.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -19,7 +20,7 @@ public class LocationConverterHelper {
   protected final static EllipsoidParameters AIRY1830_ELLIPSOID =
       new EllipsoidParameters(6377563.396, 6356256.909, 1 / 299.3249646);
   protected final static EllipsoidParameters WGS84_ELLIPSOID =
-      new EllipsoidParameters(6377563.396, 6356256.909, 1 / 299.3249646);
+      new EllipsoidParameters(6378137, 6356752.314245, 1 / 298.257223563);
 
   protected final static DatumParameters OSGB36_DATUM = new DatumParameters(AIRY1830_ELLIPSOID,
       -446.448, 125.157, -542.060, 20.4894, -0.1502, -0.2470, -0.8421);
@@ -27,8 +28,9 @@ public class LocationConverterHelper {
       0, 0, 0, 0, 0, 0, 0);
 
   protected final static double NAT_GRID_SCALE_FACTOR = 0.9996012717;
-  protected final static CartesianCoordinate NAT_GRID_ORIGIN_CARTESIAN = new CartesianCoordinate(-10000, 400000, 0);
-  protected final static PolarCoordinate NAT_GRID_ORIGIN_POLAR = new PolarCoordinate(toRadians(49), toRadians(-2), 0);
+  protected final static CartesianCoordinate NAT_GRID_ORIGIN_CARTESIAN = new CartesianCoordinate(-100000, 400000, 0);
+  protected final static PolarCoordinate NAT_GRID_ORIGIN_POLAR =
+      new PolarCoordinate(WGS84_DATUM, toRadians(49), toRadians(-2), 0);
 
   protected static double round(double value, int places) {
     if (places < 0)
@@ -47,11 +49,12 @@ public class LocationConverterHelper {
     return input * (180 / Math.PI);
   }
 
-  protected static CartesianCoordinate toCartesian(LatLong input) {
-    double phi = toRadians(input.lat);
-    double lambda = toRadians(input.lon);
+  protected static CartesianCoordinate toCartesian(PolarCoordinate input) {
+    double phi = toRadians(input.phi);
+    double lambda = toRadians(input.lambda);
     double h = 0; // height above ellipsoid - not currently used
-    double a = input.datum.ellipsoid.a, f = input.datum.ellipsoid.f;
+    double a = input.datum.ellipsoid.a;
+    double f = input.datum.ellipsoid.f;
 
     double sin_phi = Math.sin(phi);
     double cos_phi = Math.cos(phi);
@@ -70,7 +73,7 @@ public class LocationConverterHelper {
     return new CartesianCoordinate(x, y, z);
   }
 
-  protected static LatLong toLatLong(CartesianCoordinate input, DatumParameters datum) {
+  protected static PolarCoordinate toLatLong(CartesianCoordinate input, DatumParameters datum) {
     double x = input.x;
     double y = input.y;
     double z = input.z;
@@ -101,7 +104,7 @@ public class LocationConverterHelper {
     double nu = a / Math.sqrt(1 - e2 * pow(Math.sin(phi), 2));
     double h = p * Math.cos(phi) + z * Math.sin(phi) - (pow(a, 2) / nu);
 
-    return new LatLong(datum, toDegrees(phi), toDegrees(lambda));
+    return new PolarCoordinate(datum, toDegrees(phi), toDegrees(lambda), 0);
   }
 
   protected static CartesianCoordinate helmertTransform(CartesianCoordinate input, DatumParameters datum) {
@@ -121,13 +124,29 @@ public class LocationConverterHelper {
     return new CartesianCoordinate(x_prime, y_prime, z_prime);
   }
 
-  protected static LatLong convertLatLong(LatLong input, DatumParameters destination) {
+  protected static PolarCoordinate convertLatLong(PolarCoordinate input, DatumParameters target) {
+    if (input.datum == target) {
+      return input;
+    } else if (input.datum == WGS84_DATUM) {
+      // converting from WGS 84
+    } else if (target == WGS84_DATUM) {
+      // converting to WGS 84; use inverse transform
+      target = target.inverse;
+    } else {
+      // neither this.datum nor toDatum are WGS84: convert this to WGS84 first
+      input = convertLatLong(input, WGS84_DATUM);
+    }
 
+    CartesianCoordinate oldCartesian = toCartesian(input);
+    CartesianCoordinate newCartesian = helmertTransform(oldCartesian, target);
+    return toLatLong(newCartesian, target);
   }
 
-  protected static CartesianCoordinate latLongToOsGridRef(LatLong input) {
-    double psi = toRadians(input.lat);
-    double lambda = toRadians(input.lon);
+  protected static CartesianCoordinate latLongToOsGridRef(PolarCoordinate input) {
+    PolarCoordinate translated = convertLatLong(input, OSGB36_DATUM);
+
+    double phi = toRadians(translated.phi);
+    double lambda = toRadians(translated.lambda);
 
     // elipsoid parameters
     double a = AIRY1830_ELLIPSOID.a;
@@ -136,7 +155,7 @@ public class LocationConverterHelper {
     double F0 = NAT_GRID_SCALE_FACTOR;
 
     // origin
-    double psi_0 = NAT_GRID_ORIGIN_POLAR.psi;
+    double phi_0 = NAT_GRID_ORIGIN_POLAR.phi;
     double lambda_0 = NAT_GRID_ORIGIN_POLAR.lambda;
     double northings_origin = NAT_GRID_ORIGIN_CARTESIAN.x;
     double eastings_origin = NAT_GRID_ORIGIN_CARTESIAN.y;
@@ -145,29 +164,29 @@ public class LocationConverterHelper {
     double e2 = 1 - pow(b, 2) / pow(a, 2);
     double n = (a - b) / (a + b);
 
-    double cos_psi = Math.cos(psi);
-    double sin_psi = Math.sin(psi);
-    double tan_psi = Math.tan(psi);
+    double cos_phi = Math.cos(phi);
+    double sin_phi = Math.sin(phi);
+    double tan_phi = Math.tan(phi);
 
-    double v = a * F0 / Math.sqrt(1 - e2 * pow(sin_psi, 2));
-    double rho = a * F0 * (1 - e2) / pow(1 - e2 * pow(sin_psi, 2), 1.5);
+    double v = a * F0 / Math.sqrt(1 - e2 * pow(sin_phi, 2));
+    double rho = a * F0 * (1 - e2) / pow(1 - e2 * pow(sin_phi, 2), 1.5);
     double eta_2 = v / rho - 1;
 
-    double Ma = (1 + n + (5 / 4) * pow(n, 2) + (5 / 4) * pow(n, 3)) * (psi - psi_0);
-    double Mb = (3 * n + 3 * n * n + (21 / 8) * pow(n, 3)) * Math.sin(psi - psi_0) * Math.cos(psi + psi_0);
+    double Ma = (1 + n + (5.0 / 4.0) * pow(n, 2) + (5.0 / 4.0) * pow(n, 3)) * (phi - phi_0);
+    double Mb = (3 * n + 3 * n * n + (21.0 / 8.0) * pow(n, 3)) * Math.sin(phi - phi_0) * Math.cos(phi + phi_0);
     double Mc =
-        ((15 / 8) * pow(n, 2) + (15 / 8) * pow(n, 3)) * Math.sin(2 * (psi - psi_0)) * Math.cos(2 * (psi + psi_0));
-    double Md = (35 / 24) * pow(n, 3) * Math.sin(3 * (psi - psi_0)) * Math.cos(3 * (psi + psi_0));
+        ((15.0 / 8.0) * pow(n, 2) + (15.0 / 8.0) * pow(n, 3)) * Math.sin(2 * (phi - phi_0)) * Math.cos(2 * (phi + phi_0));
+    double Md = (35.0 / 24.0) * pow(n, 3) * Math.sin(3 * (phi - phi_0)) * Math.cos(3 * (phi + phi_0));
     double M = b * F0 * (Ma - Mb + Mc - Md);
 
     double I = M + northings_origin;
-    double II = (v / 2) * sin_psi * cos_psi;
-    double III = (v / 24) * sin_psi * pow(cos_psi, 3) * (5 - pow(tan_psi, 2) + 9 * eta_2);
-    double IIIA = (v / 720) * sin_psi * pow(cos_psi, 5) * (61 - 58 * pow(tan_psi, 2) + pow(tan_psi, 4));
-    double IV = v * cos_psi;
-    double V = (v / 6) * pow(cos_psi, 3) * (v / rho - pow(tan_psi, 2));
+    double II = (v / 2.0) * sin_phi * cos_phi;
+    double III = (v / 24.0) * sin_phi * pow(cos_phi, 3) * (5 - pow(tan_phi, 2) + 9 * eta_2);
+    double IIIA = (v / 720.0) * sin_phi * pow(cos_phi, 5) * (61 - 58 * pow(tan_phi, 2) + pow(tan_phi, 4));
+    double IV = v * cos_phi;
+    double V = (v / 6.0) * pow(cos_phi, 3) * (v / rho - pow(tan_phi, 2));
     double VI =
-        (v / 120) * pow(cos_psi, 5) * (5 - 18 * pow(tan_psi, 2) + pow(tan_psi, 4) + 14 * eta_2 - 58 * pow(tan_psi, 2)
+        (v / 120.0) * pow(cos_phi, 5) * (5 - 18 * pow(tan_phi, 2) + pow(tan_phi, 4) + 14 * eta_2 - 58 * pow(tan_phi, 2)
             * eta_2);
 
     double delta_lambda = lambda - lambda_0;
@@ -181,15 +200,7 @@ public class LocationConverterHelper {
     return new CartesianCoordinate(eastings, northings, 0);
   }
 
-  //  private CartesianCoordinate polarToCartesian(PolarCoordinate input) {
-  //
-  //  }
-
-  //  private PolarCoordinate cartesianToPolar(CartesianCoordinate input) {
-  //
-  //  }
-
-  protected static LatLong osGridRefToLatLong(CartesianCoordinate input) {
+  protected static PolarCoordinate osGridRefToLatLong(CartesianCoordinate input) {
     double eastings = input.x;
     double northings = input.y;
 
@@ -200,7 +211,7 @@ public class LocationConverterHelper {
     double F0 = NAT_GRID_SCALE_FACTOR;
 
     // origin
-    double psi_0 = NAT_GRID_ORIGIN_POLAR.psi;
+    double phi_0 = NAT_GRID_ORIGIN_POLAR.phi;
     double lambda_0 = NAT_GRID_ORIGIN_POLAR.lambda;
     double northings_origin = NAT_GRID_ORIGIN_CARTESIAN.x;
     double eastings_origin = NAT_GRID_ORIGIN_CARTESIAN.y;
@@ -209,74 +220,89 @@ public class LocationConverterHelper {
     double e2 = 1 - pow(b, 2) / pow(a, 2);
     double n = (a - b) / (a + b);
 
-    double psi = psi_0;
+    double phi = phi_0;
     double M = 0;
     do {
-      psi = (northings - northings_origin - M) / (a * F0) + psi;
+      phi = (northings - northings_origin - M) / (a * F0) + phi;
 
-      double Ma = (1 + n + (5 / 4) * pow(n, 2) + (5 / 4) * pow(n, 3)) * (psi - psi_0);
-      double Mb = (3 * n + 3 * n * n + (21 / 8) * pow(n, 3)) * Math.sin(psi - psi_0) * Math.cos(psi + psi_0);
+      double Ma = (1 + n + (5.0 / 4.0) * pow(n, 2) + (5.0 / 4.0) * pow(n, 3)) * (phi - phi_0);
+      double Mb = (3 * n + 3 * n * n + (21.0 / 8.0) * pow(n, 3)) * Math.sin(phi - phi_0) * Math.cos(phi + phi_0);
       double Mc =
-          ((15 / 8) * pow(n, 2) + (15 / 8) * pow(n, 3)) * Math.sin(2 * (psi - psi_0)) * Math.cos(2 * (psi + psi_0));
-      double Md = (35 / 24) * pow(n, 3) * Math.sin(3 * (psi - psi_0)) * Math.cos(3 * (psi + psi_0));
+          ((15.0 / 8.0) * pow(n, 2) + (15.0 / 8.0) * pow(n, 3)) * Math.sin(2 * (phi - phi_0)) * Math.cos(2 * (phi + phi_0));
+      double Md = (35.0 / 24.0) * pow(n, 3) * Math.sin(3 * (phi - phi_0)) * Math.cos(3 * (phi + phi_0));
       M = b * F0 * (Ma - Mb + Mc - Md);              // meridional arc
     } while (northings - northings_origin - M >= 0.00001);  // ie until < 0.01mm
 
-    double sin_psi = Math.sin(psi);
+    double sin_phi = Math.sin(phi);
     // nu: transverse radius of curvature
-    double nu = a * F0 / Math.sqrt(1 - e2 * pow(sin_psi, 2));
+    double nu = a * F0 / Math.sqrt(1 - e2 * pow(sin_phi, 2));
     // rho = meridional radius of curvature
-    double rho = a * F0 * (1 - e2) / Math.pow(1 - e2 * pow(sin_psi, 2), 1.5);
+    double rho = a * F0 * (1 - e2) / Math.pow(1 - e2 * pow(sin_phi, 2), 1.5);
     double eta_2 = nu / rho - 1;
 
-    double tan_psi = Math.tan(psi);
-    double sec_psi = 1 / Math.cos(psi);
-    double VII = tan_psi / (2 * rho * nu);
-    double VIII = tan_psi / (24 * rho * pow(nu, 3)) * (5 + 3 * pow(tan_psi, 2) + eta_2 - 9 * pow(tan_psi, 2) * eta_2);
-    double IX = tan_psi / (720 * rho * pow(nu, 5)) * (61 + 90 * pow(tan_psi, 2) + 45 * pow(tan_psi, 4));
-    double X = sec_psi / nu;
-    double XI = sec_psi / (6 * pow(nu, 3)) * (nu / rho + 2 * pow(tan_psi, 2));
-    double XII = sec_psi / (120 * pow(nu, 5)) * (5 + 28 * pow(tan_psi, 2) + 24 * pow(tan_psi, 4));
+    double tan_phi = Math.tan(phi);
+    double sec_phi = 1 / Math.cos(phi);
+    double VII = tan_phi / (2 * rho * nu);
+    double VIII = tan_phi / (24 * rho * pow(nu, 3)) * (5 + 3 * pow(tan_phi, 2) + eta_2 - 9 * pow(tan_phi, 2) * eta_2);
+    double IX = tan_phi / (720 * rho * pow(nu, 5)) * (61 + 90 * pow(tan_phi, 2) + 45 * pow(tan_phi, 4));
+    double X = sec_phi / nu;
+    double XI = sec_phi / (6 * pow(nu, 3)) * (nu / rho + 2 * pow(tan_phi, 2));
+    double XII = sec_phi / (120 * pow(nu, 5)) * (5 + 28 * pow(tan_phi, 2) + 24 * pow(tan_phi, 4));
     double XIIA =
-        sec_psi / (5040 * pow(nu, 7)) * (61 + 662 * pow(tan_psi, 2) + 1320 * pow(tan_psi, 4) + 720 * pow(tan_psi, 6));
+        sec_phi / (5040 * pow(nu, 7)) * (61 + 662 * pow(tan_phi, 2) + 1320 * pow(tan_phi, 4) + 720 * pow(tan_phi, 6));
 
     double dE = (eastings - eastings_origin);
-    psi = psi - VII * pow(dE, 2) + VIII * pow(dE, 4) - IX * pow(dE, 6);
+    phi = phi - VII * pow(dE, 2) + VIII * pow(dE, 4) - IX * pow(dE, 6);
     double lambda = lambda_0 + X * dE - XI * pow(dE, 3) + XII * pow(dE, 5) - XIIA * pow(dE, 7);
 
-    return new LatLong(WGS84_DATUM, toDegrees(psi), toDegrees(lambda));
+    return new PolarCoordinate(WGS84_DATUM, toDegrees(phi), toDegrees(lambda), 0);
   }
 
   @Data
   @AllArgsConstructor
-  private static class CartesianCoordinate {
+  public static class CartesianCoordinate {
     double x, y, z;
   }
 
   @Data
   @AllArgsConstructor
-  private static class PolarCoordinate {
-    double psi, lambda, h;
-  }
-
-  @Data
-  @AllArgsConstructor
-  private static class LatLong {
+  public static class PolarCoordinate {
     DatumParameters datum;
-    double lat, lon;
+    double phi, lambda, h;
   }
 
   @Data
   @AllArgsConstructor
-  private static class EllipsoidParameters {
+  public static class EllipsoidParameters {
     double a, b, f;
   }
 
   @Data
-  @AllArgsConstructor
+  @ToString(exclude = "inverse")
   private static class DatumParameters {
     EllipsoidParameters ellipsoid;
     double tx, ty, tz, scale, rx, ry, rz;
+    DatumParameters inverse;
+
+    private DatumParameters(EllipsoidParameters ellipsoid,
+        double tx, double ty, double tz, double scale, double rx, double ry, double rz, DatumParameters inverse) {
+      this.ellipsoid = ellipsoid;
+      this.tx = tx;
+      this.ty = ty;
+      this.tz = tz;
+      this.scale = scale;
+      this.rx = rx;
+      this.ry = ry;
+      this.rz = rz;
+      this.inverse = inverse;
+    }
+
+    public DatumParameters(EllipsoidParameters ellipsoid,
+        double tx, double ty, double tz, double scale, double rx, double ry, double rz) {
+      this(ellipsoid, tx, ty, tz, scale, rx, ry, rz, null);
+      this.inverse = new DatumParameters(ellipsoid, -tx, -ty, -tz, -scale, -rx, -ry, -rz, this);
+    }
+
   }
 
 }
