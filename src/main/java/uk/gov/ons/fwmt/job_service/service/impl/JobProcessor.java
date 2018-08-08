@@ -76,8 +76,7 @@ public class JobProcessor {
     }
   }
 
-
-  private boolean rowIsValid(CSVParseResult<LegacySampleIngest> row, LegacySampleIngest ingest, boolean isExistingJob, Optional<UserDto> user) {
+  protected boolean rowIsValid(CSVParseResult<LegacySampleIngest> row, LegacySampleIngest ingest, boolean isExistingJob, Optional<UserDto> user) {
     if (row.isError()) {
       log.error("Job Entry could not be processed", FWMTCommonException.makeCsvOtherException(row.getErrorMessage()));
       return false;
@@ -98,12 +97,12 @@ public class JobProcessor {
     return true;
  }
 
-  private String findJobType(boolean isExistingJob) {
+  protected String findJobType(boolean isExistingJob) {
     String jobType = isExistingJob ? "Reallocation" : "Allocation";
     return jobType;
   }
 
-  private void processRow(CSVParseResult<LegacySampleIngest> row, LegacySampleIngest ingest, boolean isReallocation, Optional<UserDto> user) {
+  protected void processRow(CSVParseResult<LegacySampleIngest> row, LegacySampleIngest ingest, boolean isReallocation, Optional<UserDto> user) {
     try {
       Optional<JobDto> oJob = jobResourceServiceClient.findByTmJobId(ingest.getTmJobId());
       if(oJob.isPresent()){
@@ -123,17 +122,17 @@ public class JobProcessor {
     }
   }
 
-  private boolean isUsersTheSame(LegacySampleIngest ingest, JobDto jobDto) {
+  protected boolean isUsersTheSame(LegacySampleIngest ingest, JobDto jobDto) {
     return ingest.getAuth().equals(jobDto.getLastAuthNo());
   }
   
-  private boolean ingestIsLatestTransaction(LegacySampleIngest ingest, JobDto jobDto) {
+  protected boolean ingestIsLatestTransaction(LegacySampleIngest ingest, JobDto jobDto) {
     if (jobDto.getLastUpdated()==null) return true;
     LocalDateTime ingestDateTime = getIngestLastUpdateAsLocalDateTime(ingest);
     return ingestDateTime.isAfter(jobDto.getLastUpdated());
   }
 
-  private void updateLegacyLastUpdated(LegacySampleIngest ingest, JobDto jobDto) {
+  protected void updateLegacyLastUpdated(LegacySampleIngest ingest, JobDto jobDto) {
     LocalDateTime ingestDateTime = getIngestLastUpdateAsLocalDateTime(ingest);
     jobDto.setLastUpdated(ingestDateTime);
     jobResourceServiceClient.updateJob(jobDto);
@@ -181,12 +180,11 @@ public class JobProcessor {
   }
 
   protected LocalDateTime getIngestLastUpdateAsLocalDateTime(LegacySampleIngest ingest){
-//    LocalDateTime lastUpdateParsed = null;
-//
-//    String lastUpdate = ingest.getLastUpdated().replace(" ", "T");
-//    lastUpdateParsed = LocalDateTime.parse(lastUpdate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-//  return lastUpdateParsed;
-  return LocalDateTime.now();
+    LocalDateTime lastUpdateParsed = null;
+
+    String lastUpdate = ingest.getLastUpdated().replace(" ", "T");
+    lastUpdateParsed = LocalDateTime.parse(lastUpdate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    return lastUpdateParsed;
   }
   
   protected void processBySurveyType(LegacySampleIngest ingest, UserDto userDto, int row) {

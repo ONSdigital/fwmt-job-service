@@ -3,9 +3,9 @@ package uk.gov.ons.fwmt.job_service.service.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,8 +18,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendCreateJobRequestMessage;
+import com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging.SendUpdateJobHeaderRequestMessage;
 
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
@@ -33,7 +35,7 @@ import uk.gov.ons.fwmt.job_service.service.totalmobile.TMService;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class JobProcessorTests {
-  @InjectMocks @Spy private JobProcessor jobProcessor;
+  @InjectMocks private JobProcessor jobProcessor;
   @Mock private UserResourceServiceClient userResourceServiceClient;
   @Mock private JobResourceServiceClient jobResourceServiceClient;
   @Mock private TMJobConverterService tmJobConverterService;
@@ -84,35 +86,44 @@ public class JobProcessorTests {
     // How to verify logger is called? Static methods
     // verify(log).error(anyString(), an());
 
-    verify(jobProcessor, times(0)).processReallocation(any(LegacySampleIngest.class), any(UserDto.class));
-    verify(jobProcessor, times(0)).processBySurveyType(any(LegacySampleIngest.class), any(UserDto.class), anyInt());
+    verify(tmJobConverterService, never()).updateJob(any(LegacySampleIngest.class), anyString());
   }
 
   @Test
   public void givenJobHasntAlreadyBeenSentAndIsRelloactionIsTrue_whenSendingJobToUser_confirmProcessRellocationIsCalled(){
     LegacySampleIngest lsi = LegacySampleIngest.builder().build();
-    UserDto userDto = UserDto.builder().build();
+    UserDto userDto = UserDto.builder().tmUsername("bob").build();
+    SendUpdateJobHeaderRequestMessage msg = new SendUpdateJobHeaderRequestMessage();
+
     when(jobResourceServiceClient.existsByTmJobIdAndLastAuthNo(lsi.getTmJobId(), userDto.getAuthNo())).thenReturn(false);
     when(jobResourceServiceClient.findByTmJobId(anyString())).thenReturn(Optional.empty());
+    when(tmJobConverterService.updateJob(lsi, "bob")).thenReturn(msg);
 
     jobProcessor.sendJobToUser(0, lsi, userDto, true);
 
-    verify(jobProcessor, times(1)).processReallocation(any(LegacySampleIngest.class), any(UserDto.class));
-    verify(jobProcessor, times(0)).processBySurveyType(any(LegacySampleIngest.class), any(UserDto.class), anyInt());
+    verify(tmJobConverterService, times(1)).updateJob(eq(lsi), eq("bob"));
+    verify(tmService, times(1)).send(eq(msg));
   }
-  
+
   @Test
-  public void givenJobHasntAlreadyBeenSentAndIsRelloactionIsFrue_whenSendingJobToUser_confirmProcessBySurveyTypeIsCalled(){
-    LegacySampleIngest lsi = LegacySampleIngest.builder().build();
+  public void givenJobHasntAlreadyBeenSentAndIsRelloactionIsTrue_whenSendingJobToUser_confirmProcessBySurveyTypeIsCalled(){
     UserDto userDto = UserDto.builder().build();
+    String validDate ="2014-11-03T11:15:30";
+    LocalDateTime lastUpdateParsed = LocalDateTime.parse(validDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    LegacySampleIngest lsi = LegacySampleIngest.builder().lastUpdated(validDate).legacySampleSurveyType(LegacySampleSurveyType.GFF).stage("333").build();
+
     when(jobResourceServiceClient.existsByTmJobIdAndLastAuthNo(lsi.getTmJobId(), userDto.getAuthNo())).thenReturn(false);
     when(jobResourceServiceClient.findByTmJobId(anyString())).thenReturn(Optional.empty());
-    
+
+    JobDto expectedDto = new JobDto(lsi.getTmJobId(), lsi.getAuth(), lastUpdateParsed);
+    SendCreateJobRequestMessage msg = new SendCreateJobRequestMessage();
+    when(tmJobConverterService.createJob(any(LegacySampleIngest.class), anyString())).thenReturn(msg);
+
     jobProcessor.sendJobToUser(0, lsi, userDto, false);
 
-    verify(jobProcessor, times(0)).processReallocation(any(LegacySampleIngest.class), any(UserDto.class));
-    verify(jobProcessor, times(1)).processBySurveyType(any(LegacySampleIngest.class), any(UserDto.class), anyInt());
+    verify(jobResourceServiceClient, times(1)).createJob(eq(expectedDto));
   }
+
   
   @Test
   public void givenJobJobExisitsInJobResource_processReallocation_confirmJobIsUpdated(){
@@ -143,10 +154,13 @@ public class JobProcessorTests {
     LegacySampleIngest lsi = LegacySampleIngest.builder().lastUpdated(invalidDate).build();
     UserDto userDto = UserDto.builder().build();
     
-    jobProcessor.processBySurveyType(lsi, userDto, 0);
-
-    verify(jobProcessor, times(0)).processGFFSample(any(LegacySampleIngest.class), any(UserDto.class), any(LocalDateTime.class));
-    verify(jobProcessor, times(0)).processLFSSample(any(LegacySampleIngest.class), any(UserDto.class), any(LocalDateTime.class));
+    try {
+      jobProcessor.processBySurveyType(lsi, userDto, 0);
+    } catch (Exception e) {
+    }
+   
+    verify(tmJobConverterService, never()).createJob(any(LegacySampleIngest.class), anyString());
+    verify(tmService, never()).send(any(SendUpdateJobHeaderRequestMessage.class));
   }
   
   @Test
@@ -155,36 +169,44 @@ public class JobProcessorTests {
     LegacySampleIngest lsi = LegacySampleIngest.builder().lastUpdated(invalidDate).build();
     UserDto userDto = UserDto.builder().build();
     
-    jobProcessor.processBySurveyType(lsi, userDto, 0);
-
-    verify(jobProcessor, times(0)).processGFFSample(any(LegacySampleIngest.class), any(UserDto.class), any(LocalDateTime.class));
-    verify(jobProcessor, times(0)).processLFSSample(any(LegacySampleIngest.class), any(UserDto.class), any(LocalDateTime.class));
+    try {
+      jobProcessor.processBySurveyType(lsi, userDto, 0);
+    } catch (Exception e) {
+    }
+   
+    verify(tmJobConverterService, never()).createJob(any(LegacySampleIngest.class), anyString());
+    verify(tmService, never()).send(any(SendUpdateJobHeaderRequestMessage.class));
   }
   
   @Test
   public void givenJobIsOfTypeGFF_whenProcessByServiceTypeIsCalled_confirmThatTheJobIsProcessedAsGFF(){
     String validDate ="2014-11-03T11:15:30";
-    LegacySampleIngest lsi = LegacySampleIngest.builder().lastUpdated(validDate).legacySampleSurveyType(LegacySampleSurveyType.GFF).build();
-    UserDto userDto = UserDto.builder().build();
-    
-    doNothing().when(jobProcessor).processGFFSample(any(LegacySampleIngest.class), any(UserDto.class), any(LocalDateTime.class));
+    LegacySampleIngest lsi = LegacySampleIngest.builder().lastUpdated(validDate).legacySampleSurveyType(LegacySampleSurveyType.GFF).stage("333").build();
+    UserDto userDto = UserDto.builder().tmUsername("bob").build();
+    SendCreateJobRequestMessage msg = new SendCreateJobRequestMessage();
+
+    when(tmJobConverterService.createReissue(lsi, "bob")).thenReturn(msg);
     
     jobProcessor.processBySurveyType(lsi, userDto, 0);
 
-    verify(jobProcessor, times(1)).processGFFSample(any(LegacySampleIngest.class), any(UserDto.class), any(LocalDateTime.class));
-    verify(jobProcessor, times(0)).processLFSSample(any(LegacySampleIngest.class), any(UserDto.class), any(LocalDateTime.class));
+    verify(tmJobConverterService, times(1)).createReissue(eq(lsi), eq("bob"));
+    verify(tmService, times(1)).send(eq(msg));
   }
   
   @Test
   public void givenJobIsOfTypeLFS_whenProcessByServiceTypeIsCalled_confirmThatTheJobIsProcessedAsLFS(){
     String validDate ="2014-11-03T11:15:30";
+    LocalDateTime lastUpdateParsed = LocalDateTime.parse(validDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     LegacySampleIngest lsi = LegacySampleIngest.builder().lastUpdated(validDate).legacySampleSurveyType(LegacySampleSurveyType.LFS).build();
     UserDto userDto = UserDto.builder().build();
     
+    JobDto expectedDto = new JobDto(lsi.getTmJobId(), lsi.getAuth(), lastUpdateParsed);
+    SendCreateJobRequestMessage msg = new SendCreateJobRequestMessage();
+    when(tmJobConverterService.createJob(any(LegacySampleIngest.class), anyString())).thenReturn(msg);
+
     jobProcessor.processBySurveyType(lsi, userDto, 0);
 
-    verify(jobProcessor, times(0)).processGFFSample(any(LegacySampleIngest.class), any(UserDto.class), any(LocalDateTime.class));
-    verify(jobProcessor, times(1)).processLFSSample(any(LegacySampleIngest.class), any(UserDto.class), any(LocalDateTime.class));
+    verify(jobResourceServiceClient, times(1)).createJob(eq(expectedDto));
   }
 
   @Test
@@ -211,6 +233,97 @@ public class JobProcessorTests {
     verify(tmJobConverterService, times(1)).createJob(any(LegacySampleIngest.class), anyString());
   }
   
+  @Test
+  public void givenIngestHasValidDate_whenUpdateLegacyLastUpdatedIsCalled_confimThatJobDtoHasTheSameDate(){
+    String validDate ="2014-11-03T11:15:30";
+    LocalDateTime expectedDate = LocalDateTime.parse(validDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
+    LegacySampleIngest ingest = LegacySampleIngest.builder().lastUpdated(validDate).build();
+    JobDto jobDto = JobDto.builder().build();
+    
+    jobProcessor.updateLegacyLastUpdated(ingest, jobDto);
+    
+    assertEquals(expectedDate, jobDto.getLastUpdated());
+  }
 
+  @Test
+  public void givenJobDtoLastUpdateDateIsNull_confirmIngestIsLatestTransactionReturnsTrue(){
+    String ingestDate ="2014-11-03T11:15:30";
+    LocalDateTime jobDtoDate =null;
+    
+    LegacySampleIngest ingest = LegacySampleIngest.builder().lastUpdated(ingestDate).build();
+    JobDto jobDto = JobDto.builder().lastUpdated(jobDtoDate).build();
+
+    boolean isLatest = jobProcessor.ingestIsLatestTransaction(ingest, jobDto);
+    
+    assertEquals(true, isLatest);
+  }
+  
+  public void givenIngestLastUpdatedIsAfterJobDtoLastUpdateDate_confirmIngestIsLatestTransactionReturnsTrue(){
+    String ingestDate ="2014-11-03T11:15:30";
+    String jobDtoDate ="2014-10-03T11:15:30";
+    
+    LegacySampleIngest ingest = LegacySampleIngest.builder().lastUpdated(ingestDate).build();
+    JobDto jobDto = JobDto.builder().lastUpdated(LocalDateTime.parse(jobDtoDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME)).build();
+
+    boolean isLatest = jobProcessor.ingestIsLatestTransaction(ingest, jobDto);
+    
+    assertEquals(true, isLatest);
+  }
+  
+  @Test
+  public void givenIngestLastUpdatedIsBeforeJobDtoLastUpdateDate_confirmIngestIsLatestTransactionReturnsFalse(){
+    String ingestDate ="2014-11-03T11:15:30";
+    String jobDtoDate ="2014-12-03T11:15:30";
+    
+    LegacySampleIngest ingest = LegacySampleIngest.builder().lastUpdated(ingestDate).build();
+    JobDto jobDto = JobDto.builder().lastUpdated(LocalDateTime.parse(jobDtoDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME)).build();
+
+    boolean isLatest = jobProcessor.ingestIsLatestTransaction(ingest, jobDto);
+    
+    assertEquals(false, isLatest);
+  }
+  
+  @Test 
+  public void givenIngestAndJobDtosHaveTheSameAuthNo_confirmIsUsersTheSameReturnsTrue(){
+    String ingestAuthNo = "Bob123";
+    String jobDtoAuthNo = "Bob123";
+
+    LegacySampleIngest ingest = LegacySampleIngest.builder().auth(ingestAuthNo).build();
+    JobDto jobDto = JobDto.builder().lastAuthNo(jobDtoAuthNo).build();
+    
+    boolean isSame = jobProcessor.isUsersTheSame(ingest, jobDto);
+
+    assertEquals(true, isSame);
+  }
+
+  @Test 
+  public void givenIngestAndJobDtosHaveDifferentAuthNo_confirmIsUsersTheSameReturnsFalse(){
+    String ingestAuthNo = "Angel123";
+    String jobDtoAuthNo = "Bob123";
+
+    LegacySampleIngest ingest = LegacySampleIngest.builder().auth(ingestAuthNo).build();
+    JobDto jobDto = JobDto.builder().lastAuthNo(jobDtoAuthNo).build();
+    
+    boolean isSame = jobProcessor.isUsersTheSame(ingest, jobDto);
+
+    assertEquals(false, isSame);
+  }
+
+  @Test
+  public void givenJobExists_confirmJobTypeIsReallocation(){
+    boolean isExistingJob = true;
+    String jobType = jobProcessor.findJobType(isExistingJob);
+    
+    assertEquals("Reallocation", jobType);
+  }
+  
+  @Test
+  public void givenJobDoesntExists_confirmJobTypeIsAllocation(){
+    boolean isExistingJob = false;
+    String jobType = jobProcessor.findJobType(isExistingJob);
+    
+    assertEquals("Allocation", jobType);
+  }
+  
 }
