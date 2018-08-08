@@ -64,34 +64,79 @@ public class JobProcessor {
     Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = CSVParserBuilder.buildLegacySampleParserIterator(reader, filename.getTla(), fieldPeriodResourceServiceClient);
 
     while (csvRowIterator.hasNext()) {
+      
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
-      if (row.isError()) {
-        log.error("Job Entry could not be processed", FWMTCommonException.makeCsvOtherException(row.getErrorMessage()));
-        continue;
-      }
-
       final LegacySampleIngest ingest = row.getResult();
-      boolean isReallocation = jobResourceServiceClient.existsByTmJobId(ingest.getTmJobId());
-      //Don't change the jobtype string, this string is used in splunk report. if changing change splunk search query as well.
-      String jobType = isReallocation ? "Reallocation" : "Allocation";
-
+      boolean isExistingJob = jobResourceServiceClient.existsByTmJobId(ingest.getTmJobId());
       final Optional<UserDto> user = findUser(ingest);
-      if (!user.isPresent()) {
-        log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(), FWMTCommonException.makeUnknownUserIdException(ingest.getAuth()));
-        continue;
-      }
 
-      if (!user.get().isActive()) {
-        log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(), FWMTCommonException.makeBadUserStateException(user.get(), "User was inactive"));
-        continue;
-      }
-
-      try {
-        sendJobToUser(row.getRow(), ingest, user.get(), isReallocation);
-      } catch (Exception e) {
-        log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(),ExceptionCode.UNKNOWN.toString(), FWMTCommonException.makeUnknownException(e));
+      if (rowIsValid(row, ingest, isExistingJob, user)){
+        processRow(row, ingest, isExistingJob, user);
       }
     }
+  }
+
+
+  private boolean rowIsValid(CSVParseResult<LegacySampleIngest> row, LegacySampleIngest ingest, boolean isExistingJob, Optional<UserDto> user) {
+    if (row.isError()) {
+      log.error("Job Entry could not be processed", FWMTCommonException.makeCsvOtherException(row.getErrorMessage()));
+      return false;
+    }
+    
+    //Don't change the jobtype string, this string is used in splunk report. if changing change splunk search query as well.
+    String jobType = findJobType(isExistingJob);
+
+    if (!user.isPresent()) {
+      log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(), FWMTCommonException.makeUnknownUserIdException(ingest.getAuth()));
+      return false;
+    }
+
+    if (!user.get().isActive()) {
+      log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(), FWMTCommonException.makeBadUserStateException(user.get(), "User was inactive"));
+      return false;
+    }
+    return true;
+ }
+
+  private String findJobType(boolean isExistingJob) {
+    String jobType = isExistingJob ? "Reallocation" : "Allocation";
+    return jobType;
+  }
+
+  private void processRow(CSVParseResult<LegacySampleIngest> row, LegacySampleIngest ingest, boolean isReallocation, Optional<UserDto> user) {
+    try {
+      Optional<JobDto> oJob = jobResourceServiceClient.findByTmJobId(ingest.getTmJobId());
+      if(oJob.isPresent()){
+        JobDto jobDto = oJob.get();
+        if (ingestIsLatestTransaction(ingest, jobDto)){
+          if (isUsersTheSame(ingest,jobDto)){
+            updateLegacyLastUpdated(ingest, jobDto);
+          }else{
+            sendJobToUser(row.getRow(), ingest, user.get(), true);
+          }
+        }
+      }else{
+        sendJobToUser(row.getRow(), ingest, user.get(), isReallocation);
+      }
+    } catch (Exception e) {
+      log.error(findJobType(isReallocation) + JOB_FAILED_STRING, ingest.getTmJobId(),ExceptionCode.UNKNOWN.toString(), FWMTCommonException.makeUnknownException(e));
+    }
+  }
+
+  private boolean isUsersTheSame(LegacySampleIngest ingest, JobDto jobDto) {
+    return ingest.getAuth().equals(jobDto.getLastAuthNo());
+  }
+  
+  private boolean ingestIsLatestTransaction(LegacySampleIngest ingest, JobDto jobDto) {
+    if (jobDto.getLastUpdated()==null) return true;
+    LocalDateTime ingestDateTime = getIngestLastUpdateAsLocalDateTime(ingest);
+    return ingestDateTime.isAfter(jobDto.getLastUpdated());
+  }
+
+  private void updateLegacyLastUpdated(LegacySampleIngest ingest, JobDto jobDto) {
+    LocalDateTime ingestDateTime = getIngestLastUpdateAsLocalDateTime(ingest);
+    jobDto.setLastUpdated(ingestDateTime);
+    jobResourceServiceClient.updateJob(jobDto);
   }
 
   protected Optional<UserDto> findUser(LegacySampleIngest ingest) {
@@ -135,26 +180,30 @@ public class JobProcessor {
     });
   }
 
-  protected void processBySurveyType(LegacySampleIngest ingest, UserDto userDto, int row) {
+  protected LocalDateTime getIngestLastUpdateAsLocalDateTime(LegacySampleIngest ingest){
     LocalDateTime lastUpdateParsed = null;
 
-    try {
-      String lastUpdate = ingest.getLastUpdated().replace(" ", "T");
-      lastUpdateParsed = LocalDateTime.parse(lastUpdate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    String lastUpdate = ingest.getLastUpdated().replace(" ", "T");
+    lastUpdateParsed = LocalDateTime.parse(lastUpdate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    return lastUpdateParsed;
+  }
+  
+  protected void processBySurveyType(LegacySampleIngest ingest, UserDto userDto, int row) {
+    try{
+       LocalDateTime lastUpdateParsed = getIngestLastUpdateAsLocalDateTime(ingest);
+      switch (ingest.getLegacySampleSurveyType()) {
+      case GFF:
+        processGFFSample(ingest, userDto, lastUpdateParsed);
+        break;
+      case LFS:
+        processLFSSample(ingest, userDto, lastUpdateParsed);
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown survey type");
+      }
     } catch (Exception e) {
       log.error(JOB_ENTRY_FAILED_STRING, ingest.getTmJobId(), "Last updated column cannot be parsed");
-      return;
-    }
-
-    switch (ingest.getLegacySampleSurveyType()) {
-    case GFF:
-      processGFFSample(ingest, userDto, lastUpdateParsed);
-      break;
-    case LFS:
-      processLFSSample(ingest, userDto, lastUpdateParsed);
-      break;
-    default:
-      throw new IllegalArgumentException("Unknown survey type");
+      throw e;
     }
   }
 
