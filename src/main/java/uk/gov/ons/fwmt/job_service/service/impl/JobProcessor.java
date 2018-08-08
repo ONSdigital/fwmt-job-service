@@ -181,11 +181,12 @@ public class JobProcessor {
   }
 
   protected LocalDateTime getIngestLastUpdateAsLocalDateTime(LegacySampleIngest ingest){
-    LocalDateTime lastUpdateParsed = null;
-
-    String lastUpdate = ingest.getLastUpdated().replace(" ", "T");
-    lastUpdateParsed = LocalDateTime.parse(lastUpdate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-    return lastUpdateParsed;
+//    LocalDateTime lastUpdateParsed = null;
+//
+//    String lastUpdate = ingest.getLastUpdated().replace(" ", "T");
+//    lastUpdateParsed = LocalDateTime.parse(lastUpdate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+//  return lastUpdateParsed;
+  return LocalDateTime.now();
   }
   
   protected void processBySurveyType(LegacySampleIngest ingest, UserDto userDto, int row) {
