@@ -14,6 +14,9 @@ import lombok.ToString;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import org.apfloat.Apfloat;
+import org.apfloat.ApfloatMath;
+
 import static java.lang.Math.pow;
 
 public class LocationConverterHelper {
@@ -125,20 +128,23 @@ public class LocationConverterHelper {
   }
 
   protected static PolarCoordinate convertLatLong(PolarCoordinate input, DatumParameters target) {
+    DatumParameters transformation;
     if (input.datum == target) {
       return input;
     } else if (input.datum == WGS84_DATUM) {
       // converting from WGS 84
+      transformation = target;
     } else if (target == WGS84_DATUM) {
       // converting to WGS 84; use inverse transform
-      target = target.inverse;
+      transformation = input.datum.inverse;
     } else {
-      // neither this.datum nor toDatum are WGS84: convert this to WGS84 first
+      // neither this.datum nor toDatum are WGS84: convert the input to WGS84 first
       input = convertLatLong(input, WGS84_DATUM);
+      transformation = target;
     }
 
     CartesianCoordinate oldCartesian = toCartesian(input);
-    CartesianCoordinate newCartesian = helmertTransform(oldCartesian, target);
+    CartesianCoordinate newCartesian = helmertTransform(oldCartesian, transformation);
     return toLatLong(newCartesian, target);
   }
 
@@ -240,7 +246,8 @@ public class LocationConverterHelper {
     double rho = a * F0 * (1 - e2) / Math.pow(1 - e2 * pow(sin_phi, 2), 1.5);
     double eta_2 = nu / rho - 1;
 
-    double tan_phi = Math.tan(phi);
+//    double tan_phi = Math.tan(phi);
+    double tan_phi = ApfloatMath.tan(new Apfloat(phi)).doubleValue();
     double sec_phi = 1 / Math.cos(phi);
     double VII = tan_phi / (2 * rho * nu);
     double VIII = tan_phi / (24 * rho * pow(nu, 3)) * (5 + 3 * pow(tan_phi, 2) + eta_2 - 9 * pow(tan_phi, 2) * eta_2);
@@ -255,7 +262,7 @@ public class LocationConverterHelper {
     phi = phi - VII * pow(dE, 2) + VIII * pow(dE, 4) - IX * pow(dE, 6);
     double lambda = lambda_0 + X * dE - XI * pow(dE, 3) + XII * pow(dE, 5) - XIIA * pow(dE, 7);
 
-    return new PolarCoordinate(WGS84_DATUM, toDegrees(phi), toDegrees(lambda), 0);
+    return new PolarCoordinate(OSGB36_DATUM, toDegrees(phi), toDegrees(lambda), 0);
   }
 
   @Data
