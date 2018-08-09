@@ -64,8 +64,12 @@ public class JobProcessor {
     Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = CSVParserBuilder.buildLegacySampleParserIterator(reader, filename.getTla(), fieldPeriodResourceServiceClient);
 
     while (csvRowIterator.hasNext()) {
-      
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
+      if (row.isError()) {
+        log.error("Job Entry could not be processed", FWMTCommonException.makeCsvOtherException(row.getErrorMessage()));
+        continue;
+      }
+      
       final LegacySampleIngest ingest = row.getResult();
       boolean isExistingJob = jobResourceServiceClient.existsByTmJobId(ingest.getTmJobId());
       final Optional<UserDto> user = findUser(ingest);
@@ -78,10 +82,6 @@ public class JobProcessor {
 
 
   private boolean rowIsValid(CSVParseResult<LegacySampleIngest> row, LegacySampleIngest ingest, boolean isExistingJob, Optional<UserDto> user) {
-    if (row.isError()) {
-      log.error("Job Entry could not be processed", FWMTCommonException.makeCsvOtherException(row.getErrorMessage()));
-      return false;
-    }
     
     //Don't change the jobtype string, this string is used in splunk report. if changing change splunk search query as well.
     String jobType = findJobType(isExistingJob);
