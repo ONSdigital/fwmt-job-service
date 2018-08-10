@@ -81,11 +81,6 @@ public class JobProcessor {
   }
 
   protected boolean rowIsValid(CSVParseResult<LegacySampleIngest> row, LegacySampleIngest ingest, boolean isExistingJob, Optional<UserDto> user) {
-    if (row.isError()) {
-      log.error("Job Entry could not be processed", FWMTCommonException.makeCsvOtherException(row.getErrorMessage()));
-      return false;
-    }
-    
     //Don't change the jobtype string, this string is used in splunk report. if changing change splunk search query as well.
     String jobType = findJobType(isExistingJob);
 
