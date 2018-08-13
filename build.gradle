@@ -6,6 +6,7 @@ apply plugin: 'application'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'jacoco'
 apply plugin: "findbugs"
+apply plugin: "com.jfrog.artifactory"
 
 mainClassName = 'uk.gov.ons.fwmt.job_service.ApplicationConfig'
 
@@ -25,16 +26,18 @@ jar {
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.2.RELEASE")
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
     }
 }
 
 repositories {
     mavenCentral()
-       maven { url "https://oss.sonatype.org/content/repositories/libs-snapshot" }
-       maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url "https://oss.sonatype.org/content/repositories/libs-snapshot" }
+    maven { url "http://repo.maven.apache.org/maven2" }
 }
 
 configurations {
@@ -75,6 +78,24 @@ task genJaxb {
                 }
             }
         }
+    }
+}
+
+
+artifactory {
+    contextUrl = System.getenv("artifactory_url")
+    publish {
+        contextUrl = System.getenv("artifactory_url")   //The base Artifactory URL for the publisher
+        //A closure defining publishing information
+        repository {
+            repoKey = 'uk.gov.ons.fwmt.fwmtrmadapter.service'   //The Artifactory repository key to publish to
+            username = System.getenv("artifactory_user")
+            password = System.getenv("artifactory_password")      //The publisher password
+        }
+        publishBuildInfo = true   //Publish build-info to Artifactory (true by default)
+        publishArtifacts = true   //Publish artifacts to Artifactory (true by default)
+        publishPom = true   //Publish generated POM files to Artifactory (true by default).
+        publishIvy = false   //Publish generated Ivy descriptor files to Artifactory (true by default).
     }
 }
 
