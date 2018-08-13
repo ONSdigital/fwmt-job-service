@@ -173,6 +173,8 @@ public class JobProcessor {
     final Optional<JobDto> jobDto = jobResourceServiceClient.findByTmJobId(ingest.getTmJobId());
 
     jobDto.ifPresent(jobDto1 -> {
+      LocalDateTime lastUpdateParsed = getIngestLastUpdateAsLocalDateTime(ingest);
+      jobDto1.setLastUpdated(lastUpdateParsed);
       jobDto1.setLastAuthNo(ingest.getAuth());
       jobResourceServiceClient.updateJob(jobDto1);
     });
@@ -188,13 +190,12 @@ public class JobProcessor {
   
   protected void processBySurveyType(LegacySampleIngest ingest, UserDto userDto, int row) {
     try{
-       LocalDateTime lastUpdateParsed = getIngestLastUpdateAsLocalDateTime(ingest);
       switch (ingest.getLegacySampleSurveyType()) {
       case GFF:
-        processGFFSample(ingest, userDto, lastUpdateParsed);
+        processGFFSample(ingest, userDto);
         break;
       case LFS:
-        processLFSSample(ingest, userDto, lastUpdateParsed);
+        processLFSSample(ingest, userDto);
         break;
       default:
         throw new IllegalArgumentException("Unknown survey type");
@@ -205,14 +206,16 @@ public class JobProcessor {
     }
   }
 
-  protected void processLFSSample(LegacySampleIngest ingest, UserDto userDto, LocalDateTime lastUpdateParsed) {
+  protected void processLFSSample(LegacySampleIngest ingest, UserDto userDto) {
+    LocalDateTime lastUpdateParsed = getIngestLastUpdateAsLocalDateTime(ingest);
     final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, userDto.getTmUsername());
     log.info("Creating LFS job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
     tmService.send(request);
     jobResourceServiceClient.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), lastUpdateParsed));
   }
 
-  protected void processGFFSample(LegacySampleIngest ingest, UserDto userDto, LocalDateTime lastUpdateParsed) {
+  protected void processGFFSample(LegacySampleIngest ingest, UserDto userDto) {
+    LocalDateTime lastUpdateParsed = getIngestLastUpdateAsLocalDateTime(ingest);
     SendCreateJobRequestMessage request = null;
     if (ingest.isGffReissue()) {
       request  = tmJobConverterService.createReissue(ingest, userDto.getTmUsername());
