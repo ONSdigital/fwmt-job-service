@@ -3,7 +3,6 @@ package uk.gov.ons.fwmt.job_service.integration_tests;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.task.TaskExecutor;
@@ -11,24 +10,26 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.fwmt.job_service.mock_logging.MockMessage;
 
 import java.util.Base64;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {"spring.profiles.active=integration"})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @RunWith(SpringRunner.class)
+@ActiveProfiles("integration")
 public class GFFIntegrationTest {
-  @Autowired
-  @Qualifier("processExecutor")
-  TaskExecutor executor;
+  @Autowired TaskExecutor taskExecutor;
 
   @Test
   public void gffIntegrationTest() {
+    // // // Create request
+
     RestTemplate restTemplate = new RestTemplate();
 
     LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
@@ -40,18 +41,26 @@ public class GFFIntegrationTest {
     headers.add("Authorization", "Basic " + new String(encodedBytes));
 
     HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
+
+    // // // Send request
+
     restTemplate.postForEntity("http://localhost:9091/jobs/samples", requestEntity, Void.class);
 
-    long startTime = System.currentTimeMillis();
+    // // // Wait for results
+
     long timeout = 10000;
-    while (((ThreadPoolTaskExecutor) executor).getActiveCount() > 0 ||
-        (System.currentTimeMillis() - startTime < timeout)) {
+
+    long startTime = System.currentTimeMillis();
+    while (((ThreadPoolTaskExecutor) taskExecutor).getActiveCount() > 0) {
+      if (startTime > System.currentTimeMillis() + timeout) {
+        fail("Timed out waiting for all tasks to finish");
+      }
       // wait
     }
 
-    if (((ThreadPoolTaskExecutor) executor).getActiveCount() > 0) {
-      fail("The application failed to process the request within " + Long.toString(timeout) + " milliseconds");
-    }
+    // // // Verify results
+    MockMessage[] messages = restTemplate.getForObject("http://localhost:9099/logger/allMessages", MockMessage[].class);
 
+    System.out.println(messages[0]);
   }
 }
