@@ -123,11 +123,11 @@ public class JobProcessorTests {
 
     verify(jobResourceServiceClient, times(1)).createJob(eq(expectedDto));
   }
-
   
   @Test
   public void givenJobJobExisitsInJobResource_processReallocation_confirmJobIsUpdated(){
-    LegacySampleIngest lsi = LegacySampleIngest.builder().tmJobId("123").build();
+    String validDate ="2014-11-03T11:15:30";
+    LegacySampleIngest lsi = LegacySampleIngest.builder().tmJobId("123").lastUpdated(validDate).build();
     UserDto userDto = UserDto.builder().tmUsername("dummy").build();
     Optional<JobDto> oJ = Optional.of(JobDto.builder().build());
     when(jobResourceServiceClient.findByTmJobId(anyString())).thenReturn(oJ);
@@ -212,11 +212,10 @@ public class JobProcessorTests {
   @Test
   public void givenGFFJobIsAReissue_whenprocessGFFSampleIsCalled_confirmThatCreateReissueIsCalled(){
     String validDate ="2014-11-03T11:15:30";
-    LocalDateTime localDateTime = LocalDateTime.parse(validDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     LegacySampleIngest lsi = LegacySampleIngest.builder().lastUpdated(validDate).legacySampleSurveyType(LegacySampleSurveyType.GFF).stage("333").build();
     UserDto userDto = UserDto.builder().tmUsername("dummy").build();
         
-    jobProcessor.processGFFSample(lsi, userDto, localDateTime);
+    jobProcessor.processGFFSample(lsi, userDto);
     verify(tmJobConverterService, times(1)).createReissue(any(LegacySampleIngest.class), anyString());
     verify(tmJobConverterService, times(0)).createJob(any(LegacySampleIngest.class), anyString());
   }
@@ -224,11 +223,10 @@ public class JobProcessorTests {
   @Test
   public void givenGFFJobIsNotAReissue_whenprocessGFFSampleIsCalled_confirmThatCreateReissueIsCalled(){
     String validDate ="2014-11-03T11:15:30";
-    LocalDateTime localDateTime = LocalDateTime.parse(validDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     LegacySampleIngest lsi = LegacySampleIngest.builder().lastUpdated(validDate).legacySampleSurveyType(LegacySampleSurveyType.GFF).stage("000").build();
     UserDto userDto = UserDto.builder().tmUsername("dummy").build();
         
-    jobProcessor.processGFFSample(lsi, userDto, localDateTime);
+    jobProcessor.processGFFSample(lsi, userDto);
     verify(tmJobConverterService, times(0)).createReissue(any(LegacySampleIngest.class), anyString());
     verify(tmJobConverterService, times(1)).createJob(any(LegacySampleIngest.class), anyString());
   }
