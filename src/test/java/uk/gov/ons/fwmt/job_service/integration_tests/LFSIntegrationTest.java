@@ -9,13 +9,18 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.fwmt.job_service.mock_logging.MockMessage;
 
 import java.util.Base64;
+
+import static org.assertj.core.api.Fail.fail;
+import static org.junit.Assert.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @RunWith(SpringRunner.class)
@@ -25,6 +30,8 @@ public class LFSIntegrationTest {
 
   @Test
   public void lfsIntegrationTest() {
+    // // // Create request
+
     RestTemplate restTemplate = new RestTemplate();
 
     LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
@@ -36,7 +43,30 @@ public class LFSIntegrationTest {
     headers.add("Authorization", "Basic " + new String(encodedBytes));
 
     HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
+
+    // // // Reset mock
+
+    restTemplate.getForObject("http://localhost:9099/logger/reset", Void.class);
+
+    // // // Send request
+
     restTemplate.postForEntity("http://localhost:9091/jobs/samples", requestEntity, Void.class);
 
+    // // // Wait for results
+
+    long timeout = 10000;
+
+    long startTime = System.currentTimeMillis();
+    while (((ThreadPoolTaskExecutor) taskExecutor).getActiveCount() > 0) {
+      if (startTime > System.currentTimeMillis() + timeout) {
+        fail("Timed out waiting for all tasks to finish");
+      }
+      // wait
+    }
+
+    // // // Verify results
+    MockMessage[] messages = restTemplate.getForObject("http://localhost:9099/logger/allMessages", MockMessage[].class);
+
+    assertEquals(3, messages.length);
   }
 }

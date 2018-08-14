@@ -19,6 +19,7 @@ import uk.gov.ons.fwmt.job_service.mock_logging.MockMessage;
 import java.util.Base64;
 
 import static org.assertj.core.api.Assertions.fail;
+import static org.junit.Assert.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @RunWith(SpringRunner.class)
@@ -42,6 +43,10 @@ public class GFFIntegrationTest {
 
     HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
 
+    // // // Reset mock
+
+    restTemplate.getForObject("http://localhost:9099/logger/reset", Void.class);
+
     // // // Send request
 
     restTemplate.postForEntity("http://localhost:9091/jobs/samples", requestEntity, Void.class);
@@ -61,6 +66,6 @@ public class GFFIntegrationTest {
     // // // Verify results
     MockMessage[] messages = restTemplate.getForObject("http://localhost:9099/logger/allMessages", MockMessage[].class);
 
-    System.out.println(messages[0]);
+    assertEquals(3, messages.length);
   }
 }
