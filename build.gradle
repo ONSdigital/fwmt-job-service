@@ -141,7 +141,7 @@ dependencies {
 
     integrationTestCompile 'org.assertj:assertj-core:3.0.0'
 
-    integrationTestRuntime group: 'uk.gov.ons.fwmt', name: 'fwmt-service-mocks', version: '1.0.1'
+    integrationTestRuntime group: 'uk.gov.ons.fwmt', name: 'fwmt-service-mocks', version: '1.0.1-SNAPSHOT'
 }
 
 task integrationTest(type: Test) {
