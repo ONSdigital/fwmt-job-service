@@ -58,10 +58,7 @@ public class GFFIntegrationTest {
     HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
 
     // // // Reset mock
-
-    restTemplate.getForObject("http://localhost:9099/logger/reset", Void.class);
-
-    // // // Send request
+    restTemplate.getForObject(mockUrl + "/logger/reset", Void.class);
 
     // // // Send request to the DEFINED_PORT
     restTemplate.postForEntity(url + "/jobs/samples", requestEntity, Void.class);
@@ -80,10 +77,33 @@ public class GFFIntegrationTest {
     // // // Verify results
     MockMessage[] messages = restTemplate.getForObject(mockUrl + "/logger/allMessages", MockMessage[].class);
 
-    assertEquals(1, messages.length);
+    assertEquals(3, messages.length);
+
+    // first line, auth="1234", quota="100", id="tla_1-REISS1-001-100"
+    // allocation
     assertFalse(messages[0].isFault);
-    assertEquals(messages[0].endpoint, "MessageQueueWs");
-    assertEquals(messages[0].method, "sendUpdateJobHeaderRequestMessage");
-    assertTrue(messages[0].requestRawHtml.contains("tla_1-REISS1-001-826"));
+    assertEquals("MessageQueueWs", messages[0].endpoint);
+    assertEquals("sendCreateJobRequestMessage", messages[0].method);
+    assertTrue(messages[0].requestRawHtml.contains("tla_1-REISS1-001-100"));
+
+    // second line, auth="1234", quota="200", id="tla_1-REISS1-001-200"
+    // reallocation
+    assertFalse(messages[1].isFault);
+    assertEquals("MessageQueueWs", messages[1].endpoint);
+    assertEquals("sendUpdateJobHeaderRequestMessage", messages[1].method);
+    assertTrue(messages[1].requestRawHtml.contains("tla_1-REISS1-001-200"));
+
+    // third line, auth="1234", quota="300", id="tla_1-REISS1-001-300"
+    // allocation
+    assertFalse(messages[2].isFault);
+    assertEquals("MessageQueueWs", messages[2].endpoint);
+    assertEquals("sendCreateJobRequestMessage", messages[2].method);
+    assertTrue(messages[2].requestRawHtml.contains("tla_1-REISS1-001-300"));
+
+    // fourth line, auth="5555", quota="100", id=""
+    // invalid auth
+
+    // fifth line, auth="1111", quota="400", id=""
+    // invalid quota
   }
 }
