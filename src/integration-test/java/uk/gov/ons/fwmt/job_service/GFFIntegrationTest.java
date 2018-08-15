@@ -20,6 +20,7 @@ import uk.gov.ons.fwmt.job_service.mock_logging.MockMessage;
 
 import javax.annotation.PostConstruct;
 import java.util.Base64;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertEquals;
@@ -44,7 +45,7 @@ public class GFFIntegrationTest {
   }
 
   @Test
-  public void gffIntegrationTest() {
+  public void gffIntegrationTest() throws InterruptedException {
     // // // Create request
     RestTemplate restTemplate = new RestTemplate();
 
@@ -74,6 +75,9 @@ public class GFFIntegrationTest {
       }
       // wait
     }
+
+    // Sleep to ensure that all requests have landed
+    TimeUnit.SECONDS.sleep(1);
 
     // // // Verify results
     MockMessage[] messages = restTemplate.getForObject(mockUrl + "/logger/allMessages", MockMessage[].class);

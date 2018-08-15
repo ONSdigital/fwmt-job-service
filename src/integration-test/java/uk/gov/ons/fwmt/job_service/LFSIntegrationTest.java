@@ -20,6 +20,7 @@ import uk.gov.ons.fwmt.job_service.mock_logging.MockMessage;
 
 import javax.annotation.PostConstruct;
 import java.util.Base64;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -45,7 +46,7 @@ public class LFSIntegrationTest {
   }
 
   @Test
-  public void lfsIntegrationTest() {
+  public void lfsIntegrationTest() throws InterruptedException {
     // // // Create request
     RestTemplate restTemplate = new RestTemplate();
 
@@ -75,6 +76,9 @@ public class LFSIntegrationTest {
       }
       // wait
     }
+
+    // Sleep to ensure that all requests have landed
+    TimeUnit.SECONDS.sleep(1);
 
     // // // Verify results
     MockMessage[] messages = restTemplate.getForObject(mockUrl + "/logger/allMessages", MockMessage[].class);
