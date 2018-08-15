@@ -42,10 +42,11 @@ jar {
 
 repositories {
     mavenCentral()
+    maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url "https://oss.sonatype.org/content/repositories/libs-snapshot" }
     maven { url "http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot" }
     maven { url "http://artifactory-sdc.onsdigital.uk/artifactory/libs-release" }
-    maven { url "https://oss.sonatype.org/content/repositories/libs-snapshot" }
-    maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url "http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot-local" }
     flatDir { dirs 'libs' }
 }
 
