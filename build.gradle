@@ -58,8 +58,8 @@ configurations {
 sourceSets {
     integrationTest {
         java {
-            compileClasspath += main.output
-            runtimeClasspath += main.output
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
             srcDir file('src/integration-test/java')
         }
         resources.srcDir file('src/integration-test/resources')
@@ -104,38 +104,32 @@ task genJaxb {
 }
 
 dependencies {
+    jaxb "com.sun.xml.bind:jaxb-xjc:2.1.7"
+    compile(files(genJaxb.classesDir).builtBy(genJaxb))
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.5.13.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web-services', version: '1.5.13.RELEASE'
     compile(group: 'org.springframework.cloud', name: 'spring-cloud-spring-service-connector', version: '1.2.5.RELEASE') {
         exclude(module: 'log4j')
     }
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-cloudfoundry-connector', version: '1.2.5.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '1.5.13.RELEASE'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
-    compile(group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3') {
-        exclude(module: 'commons-mock_logging')
-    }
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-cloudfoundry-connector', version: '1.2.5.RELEASE'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '1.5.13.RELEASE'
+    compile group: 'org.apache.commons', name: 'commons-csv', version: '1.5'
     compile(group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3') {
         exclude(module: 'commons-mock_logging')
     }
     compile group: 'org.jsoup', name: 'jsoup', version: '1.11.3'
-    compile group: 'org.json', name: 'json', version: '20180130'
     compile group: 'org.projectlombok', name: 'lombok', version: '1.16.8'
+    compile group: 'org.json', name: 'json', version: '20180130'
     compile group: 'org.yaml', name: 'snakeyaml', version: '1.21'
-    compile group: 'org.apache.commons', name: 'commons-csv', version: '1.5'
     compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.1'
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.1'
-    compile(files(genJaxb.classesDir).builtBy(genJaxb))
-    jaxb "com.sun.xml.bind:jaxb-xjc:2.1.7"
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.5'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.9.5'
 
     testCompile(group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.9.RELEASE') {
         exclude(module: 'android-json')
     }
-    testCompile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'io.cucumber', name: 'cucumber-java8', version: '3.0.2'
     testCompile group: 'io.cucumber', name: 'cucumber-junit', version: '3.0.2'
     testCompile group: 'io.cucumber', name: 'cucumber-spring', version: '3.0.2'
@@ -143,28 +137,10 @@ dependencies {
     testCompile group: 'org.powermock', name: 'powermock-core', version: '1.7.0'
 	testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '1.7.0'
 	testCompile group: 'org.mockito', name: 'mockito-core', version: '2.7.1'
-    testCompile "junit:junit:4.12"
-    testCompile("org.springframework.boot:spring-boot-starter-test") {
-        exclude(module: 'android-json')
-    }
 
     integrationTestCompile 'org.assertj:assertj-core:3.0.0'
 
     integrationTestRuntime group: 'uk.gov.ons.fwmt', name: 'fwmt-service-mocks', version: '1.0.0'
-}
-
-class RunAsyncTask extends DefaultTask {
-    @TaskAction
-    def startAsync() {
-        ExecutorService es = Executors.newSingleThreadExecutor()
-        es.submit({
-            project.javaexec {
-                classpath = project.sourceSets.main.runtimeClasspath
-                main = "Main"
-            }
-        } as Callable)
-
-    }
 }
 
 task integrationTest(type: Test) {
