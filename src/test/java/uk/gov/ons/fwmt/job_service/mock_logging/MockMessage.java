@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class MockMessage {
 
   public String endpoint;
+  public String method;
 
   public LocalDateTime requestTimestamp;
   public String requestRawHeaders;
