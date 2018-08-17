@@ -1,5 +1,6 @@
 package uk.gov.ons.fwmt.job_service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,6 +31,7 @@ import static org.junit.Assert.fail;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @RunWith(SpringRunner.class)
 @ActiveProfiles("integration")
+@Slf4j
 public class LFSIntegrationTest {
   @Value("${server.port}") int port;
   @Value("${mock.port}") int mockPort;
@@ -83,7 +85,11 @@ public class LFSIntegrationTest {
     // // // Verify results
     MockMessage[] messages = restTemplate.getForObject(mockUrl + "/logger/allMessages", MockMessage[].class);
 
-    assertEquals(2, messages.length);
+    log.info("Mocked Messages:==>{}",messages.toString());
+    log.info("Mocked Messages1:==>{}",messages[0]);
+    log.info("Mocked Messages1:==>{}",messages[1]);
+    log.info("Mocked Messages1:==>{}",messages[2]);
+    assertEquals(3, messages.length);
 
     // first line, auth="1234", quota="A", id="quota_1 1 1 1 1 1 1 1 - A [Rissue_no_1]"
     // allocation
