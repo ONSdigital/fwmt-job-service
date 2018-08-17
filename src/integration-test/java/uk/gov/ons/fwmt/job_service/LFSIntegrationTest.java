@@ -83,7 +83,7 @@ public class LFSIntegrationTest {
     // // // Verify results
     MockMessage[] messages = restTemplate.getForObject(mockUrl + "/logger/allMessages", MockMessage[].class);
 
-    assertEquals(3, messages.length);
+    assertEquals(2, messages.length);
 
     // first line, auth="1234", quota="A", id="quota_1 1 1 1 1 1 1 1 - A [Rissue_no_1]"
     // allocation
