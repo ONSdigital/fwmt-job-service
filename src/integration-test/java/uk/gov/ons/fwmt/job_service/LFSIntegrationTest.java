@@ -1,7 +1,6 @@
 package uk.gov.ons.fwmt.job_service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +32,13 @@ import static org.junit.Assert.fail;
 @ActiveProfiles("integration")
 @Slf4j
 public class LFSIntegrationTest {
-  @Value("${server.port}") int port;
-  @Value("${mock.port}") int mockPort;
+  @Value("${server.port}")
+  private int port;
+  @Value("${mock.port}")
+  private int mockPort;
 
-  @Autowired TaskExecutor taskExecutor;
+  @Autowired
+  private TaskExecutor taskExecutor;
 
   private String url;
   private String mockUrl;
@@ -94,22 +96,22 @@ public class LFSIntegrationTest {
     // first line, auth="1234", quota="A", id="quota_1 1 1 1 1 1 1 1 - A [Rissue_no_1]"
     // allocation
     assertFalse(messages[0].isFault);
-    Assert.assertEquals("MessageQueueWs", messages[0].endpoint);
-    Assert.assertEquals("sendCreateJobRequestMessage", messages[0].method);
+    assertEquals("MessageQueueWs", messages[0].endpoint);
+    assertEquals("sendCreateJobRequestMessage", messages[0].method);
     assertTrue(messages[0].requestRawHtml.contains("quota_1 1 1 1 1 1 1 1 - A [Rissue_no_1]"));
 
     // second line, auth="1234", quota="B", id="quota_1 1 1 1 1 1 1 1 - B [Rissue_no_1]"
     // reallocation
     assertFalse(messages[1].isFault);
-    Assert.assertEquals("MessageQueueWs", messages[1].endpoint);
-    Assert.assertEquals("sendUpdateJobHeaderRequestMessage", messages[1].method);
+    assertEquals("MessageQueueWs", messages[1].endpoint);
+    assertEquals("sendUpdateJobHeaderRequestMessage", messages[1].method);
     assertTrue(messages[1].requestRawHtml.contains("quota_1 1 1 1 1 1 1 1 - B [Rissue_no_1]"));
 
     // third line, auth="1234", quota="C", id="quota_1 1 1 1 1 1 1 1 - C [Rissue_no_1]"
     // allocation
     assertFalse(messages[2].isFault);
-    Assert.assertEquals("MessageQueueWs", messages[2].endpoint);
-    Assert.assertEquals("sendCreateJobRequestMessage", messages[2].method);
+    assertEquals("MessageQueueWs", messages[2].endpoint);
+    assertEquals("sendCreateJobRequestMessage", messages[2].method);
     assertTrue(messages[2].requestRawHtml.contains("quota_1 1 1 1 1 1 1 1 - C [Rissue_no_1]"));
 
     // fourth line, auth="5555", quota="C", id=""

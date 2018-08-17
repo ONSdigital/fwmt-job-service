@@ -1,6 +1,5 @@
 package uk.gov.ons.fwmt.job_service;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,9 +32,12 @@ import static org.junit.Assert.assertTrue;
 @ActiveProfiles("integration")
 @Ignore
 public class GFFIntegrationTest {
-  @Value("${server.port}") int port;
-  @Value("${mock.port}") int mockPort;
-  @Autowired TaskExecutor taskExecutor;
+  @Value("${server.port}")
+ private  int port;
+  @Value("${mock.port}")
+  private int mockPort;
+  @Autowired
+  private TaskExecutor taskExecutor;
 
   private String url;
   private String mockUrl;
@@ -89,22 +91,22 @@ public class GFFIntegrationTest {
     // first line, auth="1234", quota="100", id="tla_1-REISS1-001-100"
     // allocation
     assertFalse(messages[0].isFault);
-    Assert.assertEquals("MessageQueueWs", messages[0].endpoint);
-    Assert.assertEquals("sendCreateJobRequestMessage", messages[0].method);
+    assertEquals("MessageQueueWs", messages[0].endpoint);
+    assertEquals("sendCreateJobRequestMessage", messages[0].method);
     assertTrue(messages[0].requestRawHtml.contains("tla_1-REISS1-001-100"));
 
     // second line, auth="1234", quota="200", id="tla_1-REISS1-001-200"
     // reallocation
     assertFalse(messages[1].isFault);
-    Assert.assertEquals("MessageQueueWs", messages[1].endpoint);
-    Assert.assertEquals("sendUpdateJobHeaderRequestMessage", messages[1].method);
+    assertEquals("MessageQueueWs", messages[1].endpoint);
+    assertEquals("sendUpdateJobHeaderRequestMessage", messages[1].method);
     assertTrue(messages[1].requestRawHtml.contains("tla_1-REISS1-001-200"));
 
     // third line, auth="1234", quota="300", id="tla_1-REISS1-001-300"
     // allocation
     assertFalse(messages[2].isFault);
-    Assert.assertEquals("MessageQueueWs", messages[2].endpoint);
-    Assert.assertEquals("sendCreateJobRequestMessage", messages[2].method);
+    assertEquals("MessageQueueWs", messages[2].endpoint);
+    assertEquals("sendCreateJobRequestMessage", messages[2].method);
     assertTrue(messages[2].requestRawHtml.contains("tla_1-REISS1-001-300"));
 
     // fourth line, auth="5555", quota="100", id=""
