@@ -1,6 +1,7 @@
 package uk.gov.ons.fwmt.job_service;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @RunWith(SpringRunner.class)
 @ActiveProfiles("integration")
+@Ignore
 public class GFFIntegrationTest {
   @Value("${server.port}") int port;
   @Value("${mock.port}") int mockPort;
