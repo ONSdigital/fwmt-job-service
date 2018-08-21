@@ -52,7 +52,7 @@ public class JobProcessor {
 
   @Autowired
   private TMService tmService;
-  
+
   @Autowired
   private FieldPeriodResourceServiceClient fieldPeriodResourceServiceClient;
 
@@ -61,7 +61,8 @@ public class JobProcessor {
     SampleFilenameComponents filename = SampleFileUtils.buildSampleFilenameComponents(file);
     final Reader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
 
-    Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = CSVParserBuilder.buildLegacySampleParserIterator(reader, filename.getTla(), fieldPeriodResourceServiceClient);
+    Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = CSVParserBuilder
+        .buildLegacySampleParserIterator(reader, filename.getTla(), fieldPeriodResourceServiceClient);
 
     while (csvRowIterator.hasNext()) {
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
@@ -69,64 +70,74 @@ public class JobProcessor {
         log.error("Job Entry could not be processed", FWMTCommonException.makeCsvOtherException(row.getErrorMessage()));
         continue;
       }
-      
+
       final LegacySampleIngest ingest = row.getResult();
       boolean isExistingJob = jobResourceServiceClient.existsByTmJobId(ingest.getTmJobId());
       final Optional<UserDto> user = findUser(ingest);
 
-      if (rowIsValid(row, ingest, isExistingJob, user)){
-        processRow(row, ingest, isExistingJob, user);
+      if (rowIsValid(row, ingest, isExistingJob, user)) {
+        log.debug("Processing row: " + row.getRow());
+        processRow(row, ingest, isExistingJob, user.get());
       }
     }
   }
 
-  protected boolean rowIsValid(CSVParseResult<LegacySampleIngest> row, LegacySampleIngest ingest, boolean isExistingJob, Optional<UserDto> user) {
+  protected boolean rowIsValid(CSVParseResult<LegacySampleIngest> row, LegacySampleIngest ingest, boolean isExistingJob,
+      Optional<UserDto> user) {
     //Don't change the jobtype string, this string is used in splunk report. if changing change splunk search query as well.
     String jobType = findJobType(isExistingJob);
 
     if (!user.isPresent()) {
-      log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(), FWMTCommonException.makeUnknownUserIdException(ingest.getAuth()));
+      log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(),
+          FWMTCommonException.makeUnknownUserIdException(ingest.getAuth()));
       return false;
     }
 
     if (!user.get().isActive()) {
-      log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(), FWMTCommonException.makeBadUserStateException(user.get(), "User was inactive"));
+      log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(),
+          FWMTCommonException.makeBadUserStateException(user.get(), "User was inactive"));
       return false;
     }
-    return true;
- }
 
-  protected String findJobType(boolean isExistingJob) {
-    String jobType = isExistingJob ? "Reallocation" : "Allocation";
-    return jobType;
+    return true;
   }
 
-  protected void processRow(CSVParseResult<LegacySampleIngest> row, LegacySampleIngest ingest, boolean isReallocation, Optional<UserDto> user) {
+  protected String findJobType(boolean isExistingJob) {
+    return isExistingJob ? "Reallocation" : "Allocation";
+  }
+
+  protected void processRow(CSVParseResult<LegacySampleIngest> row, LegacySampleIngest ingest, boolean isReallocation,
+      UserDto user) {
     try {
       Optional<JobDto> oJob = jobResourceServiceClient.findByTmJobId(ingest.getTmJobId());
-      if(oJob.isPresent()){
+      if (oJob.isPresent()) {
         JobDto jobDto = oJob.get();
-        if (ingestIsLatestTransaction(ingest, jobDto)){
-          if (isUsersTheSame(ingest,jobDto)){
+        if (ingestIsLatestTransaction(ingest, jobDto)) {
+          if (isUsersTheSame(ingest, jobDto)) {
             updateLegacyLastUpdated(ingest, jobDto);
-          }else{
-            sendJobToUser(row.getRow(), ingest, user.get(), true);
+          } else {
+            sendJobToUser(row.getRow(), ingest, user, true);
           }
+        } else {
+          log.warn("Not latest transaction: ingest.lastUpdated={}, jobDto.lastUpdated={}",
+              getIngestLastUpdateAsLocalDateTime(ingest), jobDto.getLastUpdated());
         }
-      }else{
-        sendJobToUser(row.getRow(), ingest, user.get(), isReallocation);
+      } else {
+        sendJobToUser(row.getRow(), ingest, user, isReallocation);
       }
     } catch (Exception e) {
-      log.error(findJobType(isReallocation) + JOB_FAILED_STRING, ingest.getTmJobId(),ExceptionCode.UNKNOWN.toString(), FWMTCommonException.makeUnknownException(e));
+      log.error(findJobType(isReallocation) + JOB_FAILED_STRING, ingest.getTmJobId(), ExceptionCode.UNKNOWN.toString(),
+          FWMTCommonException.makeUnknownException(e));
     }
   }
 
   protected boolean isUsersTheSame(LegacySampleIngest ingest, JobDto jobDto) {
     return ingest.getAuth().equals(jobDto.getLastAuthNo());
   }
-  
+
   protected boolean ingestIsLatestTransaction(LegacySampleIngest ingest, JobDto jobDto) {
-    if (jobDto.getLastUpdated()==null) return true;
+    if (jobDto.getLastUpdated() == null)
+      return true;
     LocalDateTime ingestDateTime = getIngestLastUpdateAsLocalDateTime(ingest);
     return ingestDateTime.isAfter(jobDto.getLastUpdated());
   }
@@ -155,7 +166,7 @@ public class JobProcessor {
 
   protected void sendJobToUser(int row, LegacySampleIngest ingest, UserDto userDto, boolean isReallocation) {
     if (jobResourceServiceClient.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), userDto.getAuthNo())) {
-      log.error(JOB_ENTRY_FAILED_STRING, ingest.getTmJobId(),"Job has been sent previously");
+      log.error(JOB_ENTRY_FAILED_STRING, ingest.getTmJobId(), "Job has been sent previously");
       return;
     }
 
@@ -180,16 +191,13 @@ public class JobProcessor {
     });
   }
 
-  protected LocalDateTime getIngestLastUpdateAsLocalDateTime(LegacySampleIngest ingest){
-    LocalDateTime lastUpdateParsed = null;
-
+  protected LocalDateTime getIngestLastUpdateAsLocalDateTime(LegacySampleIngest ingest) {
     String lastUpdate = ingest.getLastUpdated().replace(" ", "T");
-    lastUpdateParsed = LocalDateTime.parse(lastUpdate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-    return lastUpdateParsed;
+    return LocalDateTime.parse(lastUpdate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
   }
-  
+
   protected void processBySurveyType(LegacySampleIngest ingest, UserDto userDto, int row) {
-    try{
+    try {
       switch (ingest.getLegacySampleSurveyType()) {
       case GFF:
         processGFFSample(ingest, userDto);
@@ -218,11 +226,11 @@ public class JobProcessor {
     LocalDateTime lastUpdateParsed = getIngestLastUpdateAsLocalDateTime(ingest);
     SendCreateJobRequestMessage request = null;
     if (ingest.isGffReissue()) {
-      request  = tmJobConverterService.createReissue(ingest, userDto.getTmUsername());
+      request = tmJobConverterService.createReissue(ingest, userDto.getTmUsername());
       log.info("Reissuing GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
     } else {
-       request = tmJobConverterService.createJob(ingest, userDto.getTmUsername());
-       log.info("Creating GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
+      request = tmJobConverterService.createJob(ingest, userDto.getTmUsername());
+      log.info("Creating GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
     }
     tmService.send(request);
     jobResourceServiceClient.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), lastUpdateParsed));

@@ -6,6 +6,9 @@ script:
 - "./gradlew check --info"
 after_success:
 - bash <(curl -s https://codecov.io/bash)
+after_failure:
+- if [ -f build/fwmt-service-mocks.log ]; then cat build/fwmt-service-mocks.log; fi
+- if [ -f build/fwmt-service-mocks-errors.log ]; then cat build/fwmt-service-mocks-errors.log; fi
 env:
   global:
     - SPRING_PROFILES_ACTIVE=default,integration-tests

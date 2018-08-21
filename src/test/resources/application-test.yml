@@ -1,4 +1,4 @@
-info:
+infok
 #  name: @project.artifactId@
 #  version: @project.version@
 #  origin: @scm.url@
@@ -36,36 +36,38 @@ security.user:
   password: password
 
 totalmobile:
-  username: "..."
-  password: "..."
-  url: "https://ons.totalmobile.co.uk"
-  message-queue-path: "/Live/Services/TM/v20/Messaging/MessageQueueWs.asmx"
+  username: "user"
+  password: "password"
+  url: "http://localhost:9099/tm"
+  message-queue-path: "/Dev/Services/TM/v20/Messaging/MessageQueueWs.asmx"
   message-queue-wsdl-path: "src/main/resources/wsdl/Messaging_MessageQueueWs.wsdl"
   message-queue-namespace: "http://schemas.consiliumtechnologies.com/wsdl/mobile/2007/07/messaging/"
   message-queue-package: "com.consiliumtechnologies.schemas.services.mobile._2009._03.messaging"
   outgoing-ws-namespace: "http://schemas.consiliumtechnologies.com/services/mobile/2009/03/messaging"
   web:
-    login-url: "/Live/WebAdmin/Login"
-    save-user-url: "/Live/WebAdmin/Administration/Users/SaveUser"
+    login-url: "/Dev/WebAdmin/Login"
+    save-user-url: "/Dev/WebAdmin/Administration/Users/SaveUser"
 
 service:
   resource:
-    username: "username"
+    username: "user"
     password: "password"
-    users:
-      operation:
+    baseUrl: "http://localhost:9099/resources"
+    operation:
+      users:
         find:
-          authUrl: "http://localhost:9095/users/auth/{authNo}"
-          altAuthUrl: "http://localhost:9095/users/alternative/{altAuthNo}"
-    jobs:
-      operation:
+          path: "/users/auth/{authNo}"
+        findAlt:
+          path: "/users/alternative/{altAuthNo}"
+      jobs:
         find:
-          jobUrl: "http://localhost:9095/jobs/{authNo}"
+          path: "/jobs/{tmJobId}"
         create:
-          url: "http://localhost:9095/jobs/"
+          path: "/jobs/"
         update:
-          url: "http://localhost:9095/jobs/"
-    fieldPeriod:
-      operation:
+          path: "/jobs/"
+        sendcsv:
+          path: "/jobFile/upload"
+      fieldPeriods:
         find:
-          fieldPeriodUrl: "http://localhost:9095/fieldperiods"
+          path: "/fieldPeriods/{fieldPeriod}"
