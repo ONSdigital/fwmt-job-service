@@ -76,6 +76,7 @@ public class JobProcessor {
       final Optional<UserDto> user = findUser(ingest);
 
       if (rowIsValid(row, ingest, isExistingJob, user)) {
+        log.debug("Processing row: " + row.getRow());
         processRow(row, ingest, isExistingJob, user.get());
       }
     }
@@ -117,6 +118,8 @@ public class JobProcessor {
           } else {
             sendJobToUser(row.getRow(), ingest, user, true);
           }
+        } else {
+          log.warn("Not latest transaction");
         }
       } else {
         sendJobToUser(row.getRow(), ingest, user, isReallocation);
