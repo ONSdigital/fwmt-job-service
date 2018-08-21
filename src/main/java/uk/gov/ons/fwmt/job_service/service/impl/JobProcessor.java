@@ -52,7 +52,7 @@ public class JobProcessor {
 
   @Autowired
   private TMService tmService;
-  
+
   @Autowired
   private FieldPeriodResourceServiceClient fieldPeriodResourceServiceClient;
 
@@ -61,7 +61,8 @@ public class JobProcessor {
     SampleFilenameComponents filename = SampleFileUtils.buildSampleFilenameComponents(file);
     final Reader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
 
-    Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = CSVParserBuilder.buildLegacySampleParserIterator(reader, filename.getTla(), fieldPeriodResourceServiceClient);
+    Iterator<CSVParseResult<LegacySampleIngest>> csvRowIterator = CSVParserBuilder
+        .buildLegacySampleParserIterator(reader, filename.getTla(), fieldPeriodResourceServiceClient);
 
     while (csvRowIterator.hasNext()) {
       CSVParseResult<LegacySampleIngest> row = csvRowIterator.next();
@@ -77,19 +78,22 @@ public class JobProcessor {
 
       final Optional<UserDto> user = findUser(ingest);
       if (!user.isPresent()) {
-        log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(), FWMTCommonException.makeUnknownUserIdException(ingest.getAuth()));
+        log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(),
+            FWMTCommonException.makeUnknownUserIdException(ingest.getAuth()));
         continue;
       }
 
       if (!user.get().isActive()) {
-        log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(), FWMTCommonException.makeBadUserStateException(user.get(), "User was inactive"));
+        log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(),
+            FWMTCommonException.makeBadUserStateException(user.get(), "User was inactive"));
         continue;
       }
 
       try {
         sendJobToUser(row.getRow(), ingest, user.get(), isReallocation);
       } catch (Exception e) {
-        log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(),ExceptionCode.UNKNOWN.toString(), FWMTCommonException.makeUnknownException(e));
+        log.error(jobType + JOB_FAILED_STRING, ingest.getTmJobId(), ExceptionCode.UNKNOWN.toString(),
+            FWMTCommonException.makeUnknownException(e));
       }
     }
   }
@@ -112,20 +116,22 @@ public class JobProcessor {
 
   protected void sendJobToUser(int row, LegacySampleIngest ingest, UserDto userDto, boolean isReallocation) {
     if (jobResourceServiceClient.existsByTmJobIdAndLastAuthNo(ingest.getTmJobId(), userDto.getAuthNo())) {
-      log.error(JOB_ENTRY_FAILED_STRING, ingest.getTmJobId(),"Job has been sent previously");
+      log.error(JOB_ENTRY_FAILED_STRING, ingest.getTmJobId(), "Job has been sent previously");
       return;
     }
 
     if (isReallocation) {
+      log.debug("Reallocation job");
       processReallocation(ingest, userDto);
     } else {
+      log.debug("Allocation job");
       processBySurveyType(ingest, userDto, row);
     }
   }
 
   protected void processReallocation(LegacySampleIngest ingest, UserDto userDto) {
-    final SendUpdateJobHeaderRequestMessage request = tmJobConverterService.updateJob(ingest, userDto.getTmUsername());
     log.info("Reallocating job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
+    final SendUpdateJobHeaderRequestMessage request = tmJobConverterService.updateJob(ingest, userDto.getTmUsername());
     tmService.send(request);
     final Optional<JobDto> jobDto = jobResourceServiceClient.findByTmJobId(ingest.getTmJobId());
 
@@ -136,7 +142,8 @@ public class JobProcessor {
   }
 
   protected void processBySurveyType(LegacySampleIngest ingest, UserDto userDto, int row) {
-    LocalDateTime lastUpdateParsed = null;
+    LocalDateTime lastUpdateParsed;
+    log.info("Allocating job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
 
     try {
       String lastUpdate = ingest.getLastUpdated().replace(" ", "T");
@@ -159,20 +166,21 @@ public class JobProcessor {
   }
 
   protected void processLFSSample(LegacySampleIngest ingest, UserDto userDto, LocalDateTime lastUpdateParsed) {
-    final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, userDto.getTmUsername());
     log.info("Creating LFS job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
+    final SendCreateJobRequestMessage request = tmJobConverterService.createJob(ingest, userDto.getTmUsername());
     tmService.send(request);
     jobResourceServiceClient.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), lastUpdateParsed));
   }
 
   protected void processGFFSample(LegacySampleIngest ingest, UserDto userDto, LocalDateTime lastUpdateParsed) {
-    SendCreateJobRequestMessage request = null;
+    log.info("Creating GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
+    SendCreateJobRequestMessage request;
     if (ingest.isGffReissue()) {
-      request  = tmJobConverterService.createReissue(ingest, userDto.getTmUsername());
-      log.info("Reissuing GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
+      log.info("GFF job is reissue", ingest.getTmJobId(), userDto.toString());
+      request = tmJobConverterService.createReissue(ingest, userDto.getTmUsername());
     } else {
-       request = tmJobConverterService.createJob(ingest, userDto.getTmUsername());
-       log.info("Creating GFF job with ID {} to user {}", ingest.getTmJobId(), userDto.toString());
+      log.info("GFF job is non reissue", ingest.getTmJobId(), userDto.toString());
+      request = tmJobConverterService.createJob(ingest, userDto.getTmUsername());
     }
     tmService.send(request);
     jobResourceServiceClient.createJob(new JobDto(ingest.getTmJobId(), ingest.getAuth(), lastUpdateParsed));
