@@ -187,21 +187,23 @@ jacocoTestReport {
         xml.enabled true
         html.enabled false
     }
-    afterEvaluate {
-        classDirectories = files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: [
-                    '**/legacy_ingest/*',
-                    '**/dto/*',
-                    '**/data/tm/*',
-                    '**/config/*',
-                    '**/CSVParseFinalResult.java',
-  					'**/ApplicationConfig.java',
-  					'**/WebConfig.java'
-            ])
-        })
-    }
-}	
-test.finalizedBy(project.tasks.jacocoTestReport)
+}
+    //Un comment below lines to run the Jacaco test report locally, commented so that Codacy runs.
+//    afterEvaluate {
+//        classDirectories = files(classDirectories.files.collect {
+//            fileTree(dir: it, exclude: [
+//                    '**/legacy_ingest/*',
+//                    '**/dto/*',
+//                    '**/data/tm/*',
+//                    '**/config/*',
+//                    '**/CSVParseFinalResult.java',
+//  					'**/ApplicationConfig.java',
+//  					'**/WebConfig.java'
+//            ])
+//        })
+//    }
+//}
+//test.finalizedBy(project.tasks.jacocoTestReport)
 
 check.dependsOn jacocoTestReport
 

@@ -7,5 +7,18 @@ Service to create and reallocate jobs to users
 ## Running
     ./gradlew bootRun
 
-## Copyright
+## Docker
+    
+    docker run --name jobservice -p:9091:9091 sdcplatform/fwmtjobssvc
+    
+Or to bring all fwmt services up
+
+    docker-compose up -d
+
+## Docker build
+
+    docker build -t sdcplatform/fwmtjobsvc --build-args jar=PATH_TO_JAR .
+    docker push sdcplatform/fwmtjobsvc
+    
+ ## Copyright
 Copyright (C) 2018 Crown Copyright (Office for National Statistics)
