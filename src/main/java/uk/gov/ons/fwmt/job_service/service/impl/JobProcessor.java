@@ -119,7 +119,8 @@ public class JobProcessor {
             sendJobToUser(row.getRow(), ingest, user, true);
           }
         } else {
-          log.warn("Not latest transaction");
+          log.warn("Not latest transaction: ingest.lastUpdated={}, jobDto.lastUpdated={}",
+              getIngestLastUpdateAsLocalDateTime(ingest), jobDto.getLastUpdated());
         }
       } else {
         sendJobToUser(row.getRow(), ingest, user, isReallocation);
@@ -191,11 +192,8 @@ public class JobProcessor {
   }
 
   protected LocalDateTime getIngestLastUpdateAsLocalDateTime(LegacySampleIngest ingest) {
-    LocalDateTime lastUpdateParsed = null;
-
     String lastUpdate = ingest.getLastUpdated().replace(" ", "T");
-    lastUpdateParsed = LocalDateTime.parse(lastUpdate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-    return lastUpdateParsed;
+    return LocalDateTime.parse(lastUpdate, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
   }
 
   protected void processBySurveyType(LegacySampleIngest ingest, UserDto userDto, int row) {

@@ -30,7 +30,6 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @RunWith(SpringRunner.class)
 @ActiveProfiles("integration")
-@Ignore
 public class GFFIntegrationTest {
   @Value("${server.port}")
  private  int port;
