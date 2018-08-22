@@ -14,9 +14,6 @@ import lombok.ToString;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-import org.apfloat.Apfloat;
-import org.apfloat.ApfloatMath;
-
 import static java.lang.Math.pow;
 
 public class LocationConverterHelper {
@@ -246,8 +243,7 @@ public class LocationConverterHelper {
     double rho = a * F0 * (1 - e2) / Math.pow(1 - e2 * pow(sin_phi, 2), 1.5);
     double eta_2 = nu / rho - 1;
 
-//    double tan_phi = Math.tan(phi);
-    double tan_phi = ApfloatMath.tan(new Apfloat(phi)).doubleValue();
+    double tan_phi = Math.tan(phi);
     double sec_phi = 1 / Math.cos(phi);
     double VII = tan_phi / (2 * rho * nu);
     double VIII = tan_phi / (24 * rho * pow(nu, 3)) * (5 + 3 * pow(tan_phi, 2) + eta_2 - 9 * pow(tan_phi, 2) * eta_2);
