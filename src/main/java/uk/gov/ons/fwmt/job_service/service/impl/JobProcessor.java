@@ -72,7 +72,7 @@ public class JobProcessor {
       }
 
       final LegacySampleIngest ingest = row.getResult();
-      boolean isExistingJob = jobResourceServiceClient.existsByTmJobId(ingest.getTmJobId());
+      boolean isExistingJob = isExistingJob(ingest);
       final Optional<UserDto> user = findUser(ingest);
 
       if (rowIsValid(row, ingest, isExistingJob, user)) {
@@ -80,6 +80,17 @@ public class JobProcessor {
         processRow(row, ingest, isExistingJob, user.get());
       }
     }
+  }
+
+  protected boolean isExistingJob(LegacySampleIngest ingest) {
+    final String doubleSpacedJobId = ingest.getTmJobId();
+    final String singleSpacedJobId = doubleSpacedJobId.replaceAll("\\s{2,}", " ");
+    boolean isExistingJob = jobResourceServiceClient.existsByTmJobId(doubleSpacedJobId);
+    if(!isExistingJob){
+      isExistingJob = jobResourceServiceClient.existsByTmJobId(singleSpacedJobId);
+      ingest.setTmJobId(singleSpacedJobId);
+    }
+    return isExistingJob;
   }
 
   protected boolean rowIsValid(CSVParseResult<LegacySampleIngest> row, LegacySampleIngest ingest, boolean isExistingJob,
