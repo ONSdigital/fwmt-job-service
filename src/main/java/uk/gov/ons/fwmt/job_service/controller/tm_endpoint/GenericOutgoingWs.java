@@ -27,6 +27,8 @@ public class GenericOutgoingWs {
     msg.setId(value.getId());
     jaxbElement.setValue(msg);
     log.info("Incoming message received. Id:" + value.getId());
+    log.debug("Incoming Content: {}", value.getContent());
+    log.debug("Incoming Format: {}", value.getFormat());
     return jaxbElement;
   }
 }
