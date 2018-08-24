@@ -45,7 +45,7 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
 
   protected void parseLegacySampleCommonData(LegacySampleIngest instance, CSVRecord record) {
     // derive the TM job id
-    instance.setTmJobId(LegacySampleUtils.constructTmJobId(record, legacySampleSurveyType));
+    instance.setTmJobId(LegacySampleUtils.constructTmJobId(record, legacySampleSurveyType).trim());
     // derive the coordinates, if we were given a non-null non-empty grid ref
     if (instance.getOsGridRef() != null && instance.getOsGridRef().length() > 0) {
       String[] osGridRefSplit = instance.getOsGridRef().split(",", 2);

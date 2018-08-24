@@ -1,7 +1,10 @@
 package uk.gov.ons.fwmt.job_service.service.impl;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -322,6 +325,20 @@ public class JobProcessorTests {
     String jobType = jobProcessor.findJobType(isExistingJob);
     
     assertEquals("Allocation", jobType);
+  }
+
+  @Test
+  public void isExistingJobTest() {
+    String jobId = "123    4  5   6  87          6";
+    String trimmedJobId = "123 4 5 6 87 6";
+    LegacySampleIngest ingest = LegacySampleIngest.builder().tmJobId(jobId).build();
+
+
+    when(jobResourceServiceClient.existsByTmJobId(trimmedJobId)).thenReturn(true);
+    when(jobResourceServiceClient.existsByTmJobId(not(eq(trimmedJobId)))).thenReturn(false);
+
+    assertThat(jobProcessor.isExistingJob(ingest), is(true));
+
   }
   
 }
