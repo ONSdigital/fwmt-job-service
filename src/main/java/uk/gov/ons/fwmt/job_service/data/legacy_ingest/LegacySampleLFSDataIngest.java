@@ -15,7 +15,8 @@ public class LegacySampleLFSDataIngest {
   @JobAdditionalProperty("referenceDate")
   private String refDate;
 
-  @CSVColumn("LSTHO")
+  //The field lstho is mapped to csv HOUT, not to csv LSTHO as you would expect
+  @CSVColumn("HOUT")
   @JobAdditionalProperty("lstHo")
   private String lstho;
 
@@ -612,8 +613,9 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "MO", ignored = true)
   private String mo;
 
-  @CSVColumn(value = "HOUT", ignored = true)
-  private String hOut;
+  //The field lstho is mapped to csv HOUT, this has been added for completeness
+  @CSVColumn(value = "LSTHO", ignored = true)
+  private String lstho_ignored;
 
   // duplicate LSTHO
 
