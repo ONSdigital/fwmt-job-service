@@ -1,14 +1,17 @@
 package uk.gov.ons.fwmt.job_service.data.csv_parser.legacysample;
 
-import java.time.LocalDate;
-import java.util.Optional;
-
 import org.apache.commons.csv.CSVRecord;
-
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
+import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleLFSDataIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.client.FieldPeriodResourceServiceClient;
 import uk.gov.ons.fwmt.job_service.rest.client.dto.FieldPeriodDto;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.time.LocalDate;
+import java.util.Optional;
 
 public final class LegacySampleUtils {
   private LegacySampleUtils() {}
@@ -51,5 +54,60 @@ public final class LegacySampleUtils {
     } else {
       throw FWMTCommonException.makeUnknownFieldPeriodException(stage);
     }
+  }
+
+  public static LegacySampleLFSDataIngest checkSetLookingForWorkIndicator (LegacySampleIngest instance, CSVRecord record) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+
+    String workIndicator;
+    String jbaway;
+    String ownbus;
+    String relbus;
+    String look4;
+    String difJob;
+
+    System.out.println(record);
+
+    LegacySampleLFSDataIngest lfs = instance.getLfsData();
+    Class lfsClass =lfs.getClass();
+
+    Method workIndicatorMethod;
+    Method look4WorkMethod;
+
+    for (int i = 1; i <= 16; i++) {
+
+      workIndicator = record.get("QINDIV_" + i + "_WRKING");
+      jbaway = record.get("QINDIV_" + i + "_JBAWAY");
+      ownbus = record.get("QINDIV_" + i + "_OWNBUS");
+      relbus = record.get("QINDIV_" + i + "_RELBUS");
+      look4 = record.get("QINDIV_" + i + "_LOOK4");
+      difJob = record.get("QINDIV_" + i + "_DIFJOB");
+
+      try {
+        workIndicatorMethod = lfsClass.getDeclaredMethod("setRespondentWorkIndicator" + i, String.class);
+        look4WorkMethod = lfsClass.getDeclaredMethod("setRespondentLookingForWork" + i, String.class);
+      } catch (NoSuchMethodException e) {
+        throw e;
+      }
+
+      try {
+        if (workIndicator.equals("1") || jbaway.equals("1") || ownbus.equals("1") || relbus.equals("1")) {
+          workIndicatorMethod.invoke(lfs, "W");
+        } else {
+          workIndicatorMethod.invoke(lfs,"N");
+        }
+
+        if (look4.equals("1") || difJob.equals("1")) {
+          look4WorkMethod.invoke(lfs,"L");
+        } else {
+          look4WorkMethod.invoke(lfs,"N");
+        }
+      }
+       catch(IllegalAccessException e){
+        throw e;
+      } catch(InvocationTargetException e) {
+        throw e;
+      }
+    }
+    return lfs;
   }
 }

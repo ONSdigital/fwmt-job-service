@@ -167,7 +167,6 @@ public class LegacySampleLFSDataIngest {
 
   // // Respondent 1
 
-  @CSVColumn("QINDIV_1_WRKING")
   @JobAdditionalProperty("respondentWorkIndicator1")
   private String respondentWorkIndicator1;
 
@@ -180,7 +179,6 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "QINDIV_1_RELBUS", ignored = true)
   private String qindiv1Relbus;
 
-  @CSVColumn("QINDIV_1_LOOK4")
   @JobAdditionalProperty("respondentLookingForWork1")
   private String respondentLookingForWork1;
 
@@ -193,7 +191,7 @@ public class LegacySampleLFSDataIngest {
 
   // // Respondent 2
 
-  @CSVColumn("QINDIV_2_WRKING")
+
   @JobAdditionalProperty("respondentWorkIndicator2")
   private String respondentWorkIndicator2;
 
@@ -206,7 +204,7 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "QINDIV_2_RELBUS", ignored = true)
   private String qindiv2Relbus;
 
-  @CSVColumn("QINDIV_2_LOOK4")
+
   @JobAdditionalProperty("respondentLookingForWork2")
   private String respondentLookingForWork2;
 
@@ -219,7 +217,6 @@ public class LegacySampleLFSDataIngest {
 
   // // Respondent 3
 
-  @CSVColumn("QINDIV_3_WRKING")
   @JobAdditionalProperty("respondentWorkIndicator3")
   private String respondentWorkIndicator3;
 
@@ -232,7 +229,6 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "QINDIV_3_RELBUS", ignored = true)
   private String qindiv3Relbus;
 
-  @CSVColumn("QINDIV_3_LOOK4")
   @JobAdditionalProperty("respondentLookingForWork3")
   private String respondentLookingForWork3;
 
@@ -245,7 +241,6 @@ public class LegacySampleLFSDataIngest {
 
   // // Respondent 4
 
-  @CSVColumn("QINDIV_4_WRKING")
   @JobAdditionalProperty("respondentWorkIndicator4")
   private String respondentWorkIndicator4;
 
@@ -258,7 +253,6 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "QINDIV_4_RELBUS", ignored = true)
   private String qindiv4Relbus;
 
-  @CSVColumn("QINDIV_4_LOOK4")
   @JobAdditionalProperty("respondentLookingForWork4")
   private String respondentLookingForWork4;
 
@@ -271,7 +265,6 @@ public class LegacySampleLFSDataIngest {
 
   // // Respondent 5
 
-  @CSVColumn("QINDIV_5_WRKING")
   @JobAdditionalProperty("respondentWorkIndicator5")
   private String respondentWorkIndicator5;
 
@@ -284,7 +277,6 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "QINDIV_5_RELBUS", ignored = true)
   private String qindiv5Relbus;
 
-  @CSVColumn("QINDIV_5_LOOK4")
   @JobAdditionalProperty("respondentLookingForWork5")
   private String respondentLookingForWork5;
 
@@ -297,7 +289,6 @@ public class LegacySampleLFSDataIngest {
 
   // // Respondent 6
 
-  @CSVColumn("QINDIV_6_WRKING")
   @JobAdditionalProperty("respondentWorkIndicator6")
   private String respondentWorkIndicator6;
 
@@ -310,7 +301,6 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "QINDIV_6_RELBUS", ignored = true)
   private String qindiv6Relbus;
 
-  @CSVColumn("QINDIV_6_LOOK4")
   @JobAdditionalProperty("respondentLookingForWork6")
   private String respondentLookingForWork6;
 
@@ -323,7 +313,6 @@ public class LegacySampleLFSDataIngest {
 
   // // Respondent 7
 
-  @CSVColumn("QINDIV_7_WRKING")
   @JobAdditionalProperty("respondentWorkIndicator7")
   private String respondentWorkIndicator7;
 
@@ -336,7 +325,6 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "QINDIV_7_RELBUS", ignored = true)
   private String qindiv7Relbus;
 
-  @CSVColumn("QINDIV_7_LOOK4")
   @JobAdditionalProperty("respondentLookingForWork7")
   private String respondentLookingForWork7;
 
@@ -349,7 +337,6 @@ public class LegacySampleLFSDataIngest {
 
   // // Respondent 8
 
-  @CSVColumn("QINDIV_8_WRKING")
   @JobAdditionalProperty("respondentWorkIndicator8")
   private String respondentWorkIndicator8;
 
@@ -362,7 +349,6 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "QINDIV_8_RELBUS", ignored = true)
   private String qindiv8Relbus;
 
-  @CSVColumn("QINDIV_8_LOOK4")
   @JobAdditionalProperty("respondentLookingForWork8")
   private String respondentLookingForWork8;
 
@@ -375,7 +361,6 @@ public class LegacySampleLFSDataIngest {
 
   // // Respondent 9
 
-  @CSVColumn("QINDIV_9_WRKING")
   @JobAdditionalProperty("respondentWorkIndicator9")
   private String respondentWorkIndicator9;
 
@@ -388,7 +373,6 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "QINDIV_9_RELBUS", ignored = true)
   private String qindiv9Relbus;
 
-  @CSVColumn("QINDIV_9_LOOK4")
   @JobAdditionalProperty("respondentLookingForWork9")
   private String respondentLookingForWork9;
 
@@ -401,7 +385,6 @@ public class LegacySampleLFSDataIngest {
 
   // // Respondent 10
 
-  @CSVColumn("QINDIV_10_WRKING")
   @JobAdditionalProperty("respondentWorkIndicator10")
   private String respondentWorkIndicator10;
 
@@ -414,7 +397,6 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "QINDIV_10_RELBUS", ignored = true)
   private String qindiv10Relbus;
 
-  @CSVColumn("QINDIV_10_LOOK4")
   @JobAdditionalProperty("respondentLookingForWork10")
   private String respondentLookingForWork10;
 
@@ -427,7 +409,6 @@ public class LegacySampleLFSDataIngest {
 
   // // Respondent 11
 
-  @CSVColumn("QINDIV_11_WRKING")
   @JobAdditionalProperty("respondentWorkIndicator11")
   private String respondentWorkIndicator11;
 
@@ -440,7 +421,6 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "QINDIV_11_RELBUS", ignored = true)
   private String qindiv11Relbus;
 
-  @CSVColumn("QINDIV_11_LOOK4")
   @JobAdditionalProperty("respondentLookingForWork11")
   private String respondentLookingForWork11;
 
@@ -453,7 +433,6 @@ public class LegacySampleLFSDataIngest {
 
   // // Respondent 12
 
-  @CSVColumn("QINDIV_12_WRKING")
   @JobAdditionalProperty("respondentWorkIndicator12")
   private String respondentWorkIndicator12;
 
@@ -466,7 +445,6 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "QINDIV_12_RELBUS", ignored = true)
   private String qindiv12Relbus;
 
-  @CSVColumn("QINDIV_12_LOOK4")
   @JobAdditionalProperty("respondentLookingForWork12")
   private String respondentLookingForWork12;
 
@@ -479,7 +457,6 @@ public class LegacySampleLFSDataIngest {
 
   // // Respondent 13
 
-  @CSVColumn("QINDIV_13_WRKING")
   @JobAdditionalProperty("respondentWorkIndicator13")
   private String respondentWorkIndicator13;
 
@@ -492,7 +469,6 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "QINDIV_13_RELBUS", ignored = true)
   private String qindiv13Relbus;
 
-  @CSVColumn("QINDIV_13_LOOK4")
   @JobAdditionalProperty("respondentLookingForWork13")
   private String respondentLookingForWork13;
 
@@ -505,7 +481,6 @@ public class LegacySampleLFSDataIngest {
 
   // // Respondent 14
 
-  @CSVColumn("QINDIV_14_WRKING")
   @JobAdditionalProperty("respondentWorkIndicator14")
   private String respondentWorkIndicator14;
 
@@ -518,7 +493,6 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "QINDIV_14_RELBUS", ignored = true)
   private String qindiv14Relbus;
 
-  @CSVColumn("QINDIV_14_LOOK4")
   @JobAdditionalProperty("respondentLookingForWork14")
   private String respondentLookingForWork14;
 
@@ -531,7 +505,6 @@ public class LegacySampleLFSDataIngest {
 
   // // Respondent 15
 
-  @CSVColumn("QINDIV_15_WRKING")
   @JobAdditionalProperty("respondentWorkIndicator15")
   private String respondentWorkIndicator15;
 
@@ -544,7 +517,6 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "QINDIV_15_RELBUS", ignored = true)
   private String qindiv15Relbus;
 
-  @CSVColumn("QINDIV_15_LOOK4")
   @JobAdditionalProperty("respondentLookingForWork15")
   private String respondentLookingForWork15;
 
@@ -557,7 +529,6 @@ public class LegacySampleLFSDataIngest {
 
   // // Respondent 16
 
-  @CSVColumn("QINDIV_16_WRKING")
   @JobAdditionalProperty("respondentWorkIndicator16")
   private String respondentWorkIndicator16;
 
@@ -570,7 +541,6 @@ public class LegacySampleLFSDataIngest {
   @CSVColumn(value = "QINDIV_16_RELBUS", ignored = true)
   private String qindiv16Relbus;
 
-  @CSVColumn("QINDIV_16_LOOK4")
   @JobAdditionalProperty("respondentLookingForWork16")
   private String respondentLookingForWork16;
 
