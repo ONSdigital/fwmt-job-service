@@ -65,8 +65,6 @@ public final class LegacySampleUtils {
     String look4;
     String difJob;
 
-    System.out.println(record);
-
     LegacySampleLFSDataIngest lfs = instance.getLfsData();
     Class lfsClass =lfs.getClass();
 
@@ -90,13 +88,13 @@ public final class LegacySampleUtils {
       }
 
       try {
-        if (workIndicator.equals("1") || jbaway.equals("1") || ownbus.equals("1") || relbus.equals("1")) {
+        if ("1".equals(workIndicator) || "1".equals(jbaway) || "1".equals(ownbus) || "1".equals(relbus)) {
           workIndicatorMethod.invoke(lfs, "W");
         } else {
           workIndicatorMethod.invoke(lfs,"N");
         }
 
-        if (look4.equals("1") || difJob.equals("1")) {
+        if ("1".equals(look4) || "1".equals(difJob)) {
           look4WorkMethod.invoke(lfs,"L");
         } else {
           look4WorkMethod.invoke(lfs,"N");

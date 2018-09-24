@@ -26,7 +26,7 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
   }
 
   @Override
-  public LegacySampleIngest ingest(CSVRecord record) throws FWMTCommonException {
+  public LegacySampleIngest ingest(CSVRecord record) throws FWMTCommonException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
     // handle fields specific to a survey type
     LegacySampleIngest instance = new LegacySampleIngest();
     switch (legacySampleSurveyType) {
@@ -72,7 +72,7 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     LegacySampleAnnotationProcessor.process(instance.getGffData(), record, null);
   }
 
-  protected void parseLegacySampleLFSData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException {
+  protected void parseLegacySampleLFSData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     // set normal fields
     LegacySampleAnnotationProcessor.process(instance, record, "LFS");
     // set derived due date
@@ -88,12 +88,8 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
 
     try {
       instance.setLfsData(LegacySampleUtils.checkSetLookingForWorkIndicator(instance, record));
-    } catch (NoSuchMethodException e) {
-      e.printStackTrace();
-    } catch (InvocationTargetException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
+    } catch (NoSuchMethodException|IllegalAccessException|InvocationTargetException e) {
+      throw e;
     }
 
     LegacySampleAnnotationProcessor.process(instance.getLfsData(), record, null);
