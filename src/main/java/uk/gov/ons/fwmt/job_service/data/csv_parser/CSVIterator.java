@@ -1,12 +1,12 @@
 package uk.gov.ons.fwmt.job_service.data.csv_parser;
 
-import java.util.Iterator;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Iterator;
 
 @Slf4j
 public abstract class CSVIterator<T> implements Iterator<CSVParseResult<T>> {
@@ -18,7 +18,7 @@ public abstract class CSVIterator<T> implements Iterator<CSVParseResult<T>> {
       this.iter = parser.iterator();
     }
 
-    abstract public T ingest(CSVRecord record) throws FWMTCommonException;
+    abstract public T ingest(CSVRecord record) throws FWMTCommonException, NoSuchMethodException, IllegalAccessException, InvocationTargetException;
 
     @Override
     public boolean hasNext() {
