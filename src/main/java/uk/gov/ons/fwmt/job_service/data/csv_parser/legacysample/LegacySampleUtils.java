@@ -4,6 +4,7 @@ import org.apache.commons.csv.CSVRecord;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleLFSDataIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
+import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.client.FieldPeriodResourceServiceClient;
 import uk.gov.ons.fwmt.job_service.rest.client.dto.FieldPeriodDto;
@@ -56,7 +57,7 @@ public final class LegacySampleUtils {
     }
   }
 
-  public static LegacySampleLFSDataIngest checkSetLookingForWorkIndicator (LegacySampleIngest instance, CSVRecord record) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+  public static LegacySampleLFSDataIngest checkSetLookingForWorkIndicator (LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException{
 
     String workIndicator;
     String jbaway;
@@ -83,11 +84,7 @@ public final class LegacySampleUtils {
       try {
         workIndicatorMethod = lfsClass.getDeclaredMethod("setRespondentWorkIndicator" + i, String.class);
         look4WorkMethod = lfsClass.getDeclaredMethod("setRespondentLookingForWork" + i, String.class);
-      } catch (NoSuchMethodException e) {
-        throw e;
-      }
 
-      try {
         if ("1".equals(workIndicator) || "1".equals(jbaway) || "1".equals(ownbus) || "1".equals(relbus)) {
           workIndicatorMethod.invoke(lfs, "W");
         } else {
@@ -100,10 +97,8 @@ public final class LegacySampleUtils {
           look4WorkMethod.invoke(lfs,"N");
         }
       }
-       catch(IllegalAccessException e){
-        throw e;
-      } catch(InvocationTargetException e) {
-        throw e;
+       catch(IllegalAccessException|NoSuchMethodException|InvocationTargetException e){
+        throw new FWMTCommonException(ExceptionCode.CSV_OTHER,"Error within job indicator", e);
       }
     }
     return lfs;
