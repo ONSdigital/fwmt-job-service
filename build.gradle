@@ -1,9 +1,6 @@
 
-import org.apache.tools.ant.filters.ReplaceTokens
 
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import org.apache.tools.ant.filters.ReplaceTokens
 
 buildscript {
     repositories {
@@ -109,6 +106,7 @@ dependencies {
     compile(files(genJaxb.classesDir).builtBy(genJaxb))
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.5.13.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web-services', version: '1.5.13.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '1.5.13.RELEASE'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-cloudfoundry-connector', version: '1.2.5.RELEASE'
     compile(group: 'org.springframework.cloud', name: 'spring-cloud-spring-service-connector', version: '1.2.5.RELEASE') {
         exclude(module: 'log4j')
