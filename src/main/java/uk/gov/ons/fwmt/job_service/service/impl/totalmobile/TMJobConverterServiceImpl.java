@@ -151,17 +151,17 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
 
   private void setLfsDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
     if (ingest.getDivAddInd().equals("1")){
-      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "/n"
+      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
           + "** Divided address – This part only **");
     } else if (ingest.getDivAddInd().equals("2") && ingest.getTla().equals("LFS")) {
-      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "/n"
+      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
           + "** Divided Address – This part or one not listed **");
     }
   }
 
   private void setGffDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
     if (ingest.getDivAddInd().equals("1"))
-      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "/n"
+      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
           + ("** Warning Divided Address **"));
   }
 
