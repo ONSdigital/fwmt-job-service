@@ -152,7 +152,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     if (ingest.getDivAddInd().equals("1")){
       request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
           + "** Divided address – This part only **");
-    } else if (ingest.getDivAddInd().equals("2") && ingest.getTla().equals("LFS")) {
+    } else if (ingest.getDivAddInd().equals("2")) {
       request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
           + "** Divided Address – This part or one not listed **");
     }
