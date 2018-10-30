@@ -120,17 +120,14 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
         .from(ingest.getDueDate().atTime(23, 59, 59).atZone(ZoneId.of("UTC")));
     request.getJob().setDueDate(datatypeFactory.newXMLGregorianCalendar(dueDateCalendar));
 
-    if (ingest.getDivAddInd().equals("0"))
-      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
-
     request.getJob().getAllocatedTo().setUsername(username);
 
-    // additional properties
+    // additional properties and divided addresses
     setFromAdditionalPropertyAnnotations(ingest, request);
     switch (ingest.getLegacySampleSurveyType()) {
     case GFF:
       // TODO does splitSampleType need extra mapping?
-      setGffDividedAddressIndicator(ingest,request);
+      setGffDividedAddressIndicator(ingest, request);
       setFromAdditionalPropertyAnnotations(ingest.getGffData(), request);
       break;
     case LFS:
@@ -149,19 +146,28 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   }
 
   private void setLfsDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
-    if (ingest.getDivAddInd().equals("1")){
+    switch (ingest.getDivAddInd()) {
+    case "1":
       request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
           + "** Divided address – This part only **");
-    } else if (ingest.getDivAddInd().equals("2")) {
+      break;
+    case "2":
       request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
           + "** Divided Address – This part or one not listed **");
+      break;
+    default:
+      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
+      break;
     }
   }
 
   private void setGffDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
-    if (ingest.getDivAddInd().equals("1") || ingest.getDivAddInd().equals("2"))
+    if (ingest.getDivAddInd().equals("1") || ingest.getDivAddInd().equals("2")) {
       request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
           + ("** Warning Divided Address **"));
+    } else {
+      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
+    }
   }
 
   protected void addAddressLines(List<String> addressLines, String addressLine) {
@@ -171,7 +177,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   }
 
   protected void checkNumberOfAddressLines(List<String> addressLines) {
-    if (addressLines.size() == 6 ) {
+    if (addressLines.size() == 6) {
       String addressConcat = addressLines.get(2) + " " + addressLines.get(3);
       addressLines.set(2, addressConcat);
       addressLines.remove(3);

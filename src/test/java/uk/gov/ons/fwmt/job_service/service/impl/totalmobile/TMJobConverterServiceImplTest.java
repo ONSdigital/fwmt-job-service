@@ -198,6 +198,40 @@ public class TMJobConverterServiceImplTest {
   }
 
   @Test
+  public void createLFSJobRequestWithDividedAddressIndicatorIsEmpty(){
+    //Given
+    String username = "testUser";
+    String expectedDescriptionDivAddInd = "testTla Wave testWave";
+
+    LegacySampleIngest testDivAddInd = new TestIngestBuilder().ingestBuildDivAddIndIsEmpty();
+    testDivAddInd.setLfsData(new LegacySampleLFSDataIngest());
+    testDivAddInd.setLegacySampleSurveyType(LFS);
+
+    //When
+    CreateJobRequest resultDivAddInd = tmJobConverterService.createJobRequestFromIngest(testDivAddInd, username);
+
+    //Then
+    assertEquals(expectedDescriptionDivAddInd,resultDivAddInd.getJob().getDescription());
+  }
+
+  @Test
+  public void createLFSJobRequestWithDividedAddressIndicatorIsUnexpectedValue(){
+    //Given
+    String username = "testUser";
+    String expectedDescriptionDivAddInd = "testTla Wave testWave";
+
+    LegacySampleIngest testDivAddInd = new TestIngestBuilder().ingestBuildDivAddIndIsNotExpectedNumber();
+    testDivAddInd.setLfsData(new LegacySampleLFSDataIngest());
+    testDivAddInd.setLegacySampleSurveyType(LFS);
+
+    //When
+    CreateJobRequest resultDivAddInd = tmJobConverterService.createJobRequestFromIngest(testDivAddInd, username);
+
+    //Then
+    assertEquals(expectedDescriptionDivAddInd,resultDivAddInd.getJob().getDescription());
+  }
+
+  @Test
   public void createGFFJobRequestWithDividedAddressIndicatorValueOfOne(){
     //Given
     String username = "testUser";
@@ -224,6 +258,40 @@ public class TMJobConverterServiceImplTest {
         + "** Warning Divided Address **";
 
     LegacySampleIngest testDivAddIndTwo = new TestIngestBuilder().ingestBuildDivAddIndTwo();
+    testDivAddIndTwo.setGffData(new LegacySampleGFFDataIngest());
+    testDivAddIndTwo.setLegacySampleSurveyType(GFF);
+
+    //When
+    CreateJobRequest resultDivAddInd2 = tmJobConverterService.createJobRequestFromIngest(testDivAddIndTwo, username);
+
+    //Then
+    assertEquals(expectedDescriptionDivAddInd,resultDivAddInd2.getJob().getDescription());
+  }
+
+  @Test
+  public void createGFFJobRequestWithDividedAddressIndicatorIsEmpty(){
+    //Given
+    String username = "testUser";
+    String expectedDescriptionDivAddInd = "testTla Wave testWave";
+
+    LegacySampleIngest testDivAddIndTwo = new TestIngestBuilder().ingestBuildDivAddIndIsEmpty();
+    testDivAddIndTwo.setGffData(new LegacySampleGFFDataIngest());
+    testDivAddIndTwo.setLegacySampleSurveyType(GFF);
+
+    //When
+    CreateJobRequest resultDivAddInd2 = tmJobConverterService.createJobRequestFromIngest(testDivAddIndTwo, username);
+
+    //Then
+    assertEquals(expectedDescriptionDivAddInd,resultDivAddInd2.getJob().getDescription());
+  }
+
+  @Test
+  public void createGFFJobRequestWithDividedAddressIndicatorUnexpectedValue(){
+    //Given
+    String username = "testUser";
+    String expectedDescriptionDivAddInd = "testTla Wave testWave";
+
+    LegacySampleIngest testDivAddIndTwo = new TestIngestBuilder().ingestBuildDivAddIndIsNotExpectedNumber();
     testDivAddIndTwo.setGffData(new LegacySampleGFFDataIngest());
     testDivAddIndTwo.setLegacySampleSurveyType(GFF);
 
