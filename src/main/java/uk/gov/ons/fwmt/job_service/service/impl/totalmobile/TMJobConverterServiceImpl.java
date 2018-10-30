@@ -44,6 +44,9 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   protected static final String JOB_SKILL = "Survey";
   protected static final String JOB_WORK_TYPE = "SS";
   protected static final String JOB_WORLD = "Default";
+  private static final String GFF_DIVIDED_ADDRESS_RESPONSE = "** Warning Divided Address **";
+  private static final String LFS_DIVIDED_ADDRESS_RESPONSE_ONE = "** Divided address – This part only **";
+  private static final String LFS_DIVIDED_ADDRESS_RESPONSE_MANY = "** Divided Address – This part or one not listed **";
 
   private final DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
   private final ObjectFactory factory = new ObjectFactory();
@@ -149,11 +152,11 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     switch (ingest.getDivAddInd()) {
     case "1":
       request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
-          + "** Divided address – This part only **");
+          + LFS_DIVIDED_ADDRESS_RESPONSE_ONE);
       break;
     case "2":
       request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
-          + "** Divided Address – This part or one not listed **");
+          + LFS_DIVIDED_ADDRESS_RESPONSE_MANY);
       break;
     default:
       request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
@@ -164,7 +167,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   private void setGffDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
     if (ingest.getDivAddInd().equals("1") || ingest.getDivAddInd().equals("2")) {
       request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
-          + ("** Warning Divided Address **"));
+          + GFF_DIVIDED_ADDRESS_RESPONSE);
     } else {
       request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
     }
