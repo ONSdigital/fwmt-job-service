@@ -75,7 +75,6 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
           addAdditionalProperty(request, jobAdditionalProperty.value(), value.toString());
         } else {
           log.warn("Unprocessed job property: " + field.getName());
-          addAdditionalProperty(request, jobAdditionalProperty.value(), "");
         }
       }
     }
