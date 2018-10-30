@@ -160,7 +160,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   }
 
   private void setGffDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
-    if (ingest.getDivAddInd().equals("1") | ingest.getDivAddInd().equals("2"))
+    if (ingest.getDivAddInd().equals("1") || ingest.getDivAddInd().equals("2"))
       request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
           + ("** Warning Divided Address **"));
   }
