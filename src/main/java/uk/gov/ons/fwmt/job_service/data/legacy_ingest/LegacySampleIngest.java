@@ -181,4 +181,7 @@ public class LegacySampleIngest {
     return (this.getLegacySampleSurveyType() == LegacySampleSurveyType.GFF) &&
         (Integer.parseInt(this.getStage().substring(1, 3)) > 12);
   }
+
+  @CSVColumn("DIVADDIND")
+  private String divAddInd;
 }

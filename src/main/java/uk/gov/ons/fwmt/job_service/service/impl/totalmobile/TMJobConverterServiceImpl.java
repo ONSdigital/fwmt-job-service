@@ -44,6 +44,9 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   protected static final String JOB_SKILL = "Survey";
   protected static final String JOB_WORK_TYPE = "SS";
   protected static final String JOB_WORLD = "Default";
+  private static final String GFF_DIVIDED_ADDRESS_RESPONSE = "** Warning Divided Address **";
+  private static final String LFS_DIVIDED_ADDRESS_RESPONSE_ONE = "** Divided address – This part only **";
+  private static final String LFS_DIVIDED_ADDRESS_RESPONSE_MANY = "** Divided Address – This part or one not listed **";
 
   private final DatatypeFactory datatypeFactory = DatatypeFactory.newInstance();
   private final ObjectFactory factory = new ObjectFactory();
@@ -75,7 +78,6 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
           addAdditionalProperty(request, jobAdditionalProperty.value(), value.toString());
         } else {
           log.warn("Unprocessed job property: " + field.getName());
-          addAdditionalProperty(request, jobAdditionalProperty.value(), "");
         }
       }
     }
@@ -120,17 +122,19 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     GregorianCalendar dueDateCalendar = GregorianCalendar
         .from(ingest.getDueDate().atTime(23, 59, 59).atZone(ZoneId.of("UTC")));
     request.getJob().setDueDate(datatypeFactory.newXMLGregorianCalendar(dueDateCalendar));
-    request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
+
     request.getJob().getAllocatedTo().setUsername(username);
 
-    // additional properties
+    // additional properties and divided addresses
     setFromAdditionalPropertyAnnotations(ingest, request);
     switch (ingest.getLegacySampleSurveyType()) {
     case GFF:
       // TODO does splitSampleType need extra mapping?
+      setGffDividedAddressIndicator(ingest, request);
       setFromAdditionalPropertyAnnotations(ingest.getGffData(), request);
       break;
     case LFS:
+      setLfsDividedAddressIndicator(ingest, request);
       setFromAdditionalPropertyAnnotations(ingest.getLfsData(), request);
       break;
     }
@@ -144,6 +148,37 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     return request;
   }
 
+  private void setLfsDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
+    if (ingest.getDivAddInd() == null) {
+      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
+    } else {
+      switch (ingest.getDivAddInd()) {
+      case "1":
+        request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
+            + LFS_DIVIDED_ADDRESS_RESPONSE_ONE);
+        break;
+      case "2":
+        request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
+            + LFS_DIVIDED_ADDRESS_RESPONSE_MANY);
+        break;
+      default:
+        request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
+        break;
+      }
+    }
+  }
+
+  private void setGffDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
+    if (ingest.getDivAddInd() == null) {
+      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
+    } else if (ingest.getDivAddInd().equals("1") || ingest.getDivAddInd().equals("2")) {
+      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
+          + GFF_DIVIDED_ADDRESS_RESPONSE);
+    } else {
+      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
+    }
+  }
+
   protected void addAddressLines(List<String> addressLines, String addressLine) {
     if (StringUtils.isNotBlank((addressLine))) {
       addressLines.add(addressLine);
@@ -151,7 +186,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   }
 
   protected void checkNumberOfAddressLines(List<String> addressLines) {
-    if (addressLines.size() == 6 ) {
+    if (addressLines.size() == 6) {
       String addressConcat = addressLines.get(2) + " " + addressLines.get(3);
       addressLines.set(2, addressConcat);
       addressLines.remove(3);
