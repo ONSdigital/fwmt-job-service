@@ -182,6 +182,9 @@ public class LegacySampleIngest {
         (Integer.parseInt(this.getStage().substring(1, 3)) > 12);
   }
 
-  @CSVColumn("DIVADDIND")
+  @CSVColumn(values = {
+      @CSVColumn.Mapping(value = "DivAddInd", when = "GFF"),
+      @CSVColumn.Mapping(value = "DIVADDIND", when = "LFS"),
+  })
   private String divAddInd;
 }
