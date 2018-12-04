@@ -14,6 +14,13 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LegacySampleIngest {
+  @CSVColumn(value = "Auth", mandatory = true)
+  private String auth;
+
+  @CSVColumn(value = "TLA", mandatory = true)
+  @JobAdditionalProperty("TLA")
+  private String tla;
+
   // TODO should this be 'TransmissionDate'?
   @CSVColumn(value = "Transmission_Date", mandatory = true)
   private String timestamp;
@@ -25,10 +32,6 @@ public class LegacySampleIngest {
   }, mandatory = true)
   @JobAdditionalProperty("serno")
   private String serNo;
-
-  @CSVColumn(value = "TLA", mandatory = true)
-  @JobAdditionalProperty("TLA")
-  private String tla;
 
   @CSVColumn(values = {
       @CSVColumn.Mapping(value = "Stage", when = "GFF"),
@@ -137,9 +140,6 @@ public class LegacySampleIngest {
 
   @CSVColumn(value = "EmployeeNo", mandatory = true)
   private String employeeNo;
-
-  @CSVColumn(value = "Auth", mandatory = true)
-  private String auth;
 
   @CSVColumn("Last_Updated")
   private String lastUpdated;
