@@ -1,16 +1,11 @@
-
 import org.apache.tools.ant.filters.ReplaceTokens
-
-import java.util.concurrent.Callable
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 buildscript {
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.2.RELEASE")
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:2.0.2.RELEASE')
     }
 }
 
@@ -23,11 +18,11 @@ apply plugin: 'idea'
 apply plugin: 'application'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'jacoco'
-apply plugin: "findbugs"
+apply plugin: 'findbugs'
 
 mainClassName = 'uk.gov.ons.fwmt.job_service.ApplicationConfig'
 
-description = "fwmt-job-service"
+description = 'fwmt-job-service'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -42,11 +37,13 @@ jar {
 
 repositories {
     mavenCentral()
-    maven { url "http://repo.maven.apache.org/maven2" }
-    maven { url "https://oss.sonatype.org/content/repositories/libs-snapshot" }
-    maven { url "http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot" }
-    maven { url "http://artifactory-sdc.onsdigital.uk/artifactory/libs-release" }
-    maven { url "http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot-local" }
+    maven { url 'http://repo.maven.apache.org/maven2' }
+    maven { url 'https://oss.sonatype.org/content/repositories/libs-snapshot' }
+    if (!project.hasProperty('omitSDCArtifactory')) {
+        maven { url 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot' }
+        maven { url 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-release' }
+        maven { url 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot-local' }
+    }
     flatDir { dirs 'libs' }
 }
 
@@ -76,28 +73,28 @@ task genJaxb {
 
     doLast() {
         project.ant {
-            taskdef name: "xjc", classname: "com.sun.tools.xjc.XJCTask",
+            taskdef name: 'xjc', classname: 'com.sun.tools.xjc.XJCTask',
                     classpath: configurations.jaxb.asPath
             mkdir(dir: sourcesDir)
             mkdir(dir: classesDir)
 
             xjc(destdir: sourcesDir) {
-                arg(value: "-wsdl")
-                produces(dir: sourcesDir, includes: "**/*.java")
-                schema(dir: schema, includes: "**/*.wsdl")
+                arg(value: '-wsdl')
+                produces(dir: sourcesDir, includes: '**/*.java')
+                schema(dir: schema, includes: '**/*.wsdl')
             }
 
             javac(destdir: classesDir, source: 1.8, target: 1.8, debug: true,
-                    debugLevel: "lines,vars,source",
+                    debugLevel: 'lines,vars,source',
                     classpath: configurations.jaxb.asPath) {
                 src(path: sourcesDir)
-                include(name: "**/*.java")
-                include(name: "*.java")
+                include(name: '**/*.java')
+                include(name: '*.java')
             }
 
             copy(todir: classesDir) {
                 fileset(dir: sourcesDir, erroronmissingdir: false) {
-                    exclude(name: "**/*.java")
+                    exclude(name: '**/*.java')
                 }
             }
         }
@@ -105,10 +102,11 @@ task genJaxb {
 }
 
 dependencies {
-    jaxb "com.sun.xml.bind:jaxb-xjc:2.1.7"
+    jaxb 'com.sun.xml.bind:jaxb-xjc:2.1.7'
     compile(files(genJaxb.classesDir).builtBy(genJaxb))
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '1.5.13.RELEASE'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web-services', version: '1.5.13.RELEASE'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '1.5.13.RELEASE'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-cloudfoundry-connector', version: '1.2.5.RELEASE'
     compile(group: 'org.springframework.cloud', name: 'spring-cloud-spring-service-connector', version: '1.2.5.RELEASE') {
         exclude(module: 'log4j')
@@ -135,10 +133,10 @@ dependencies {
     testCompile group: 'io.cucumber', name: 'cucumber-java8', version: '3.0.2'
     testCompile group: 'io.cucumber', name: 'cucumber-junit', version: '3.0.2'
     testCompile group: 'io.cucumber', name: 'cucumber-spring', version: '3.0.2'
-	testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '1.7.0'
+    testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '1.7.0'
     testCompile group: 'org.powermock', name: 'powermock-core', version: '1.7.0'
-	testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '1.7.0'
-	testCompile group: 'org.mockito', name: 'mockito-core', version: '2.7.1'
+    testCompile group: 'org.powermock', name: 'powermock-module-junit4', version: '1.7.0'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.7.1'
 
     integrationTestCompile 'org.assertj:assertj-core:3.0.0'
 
@@ -158,11 +156,11 @@ check.dependsOn integrationTest
 integrationTest.mustRunAfter test
 
 task runMocks(type: com.github.psxpaul.task.JavaExecFork) {
-    String mockJarPath = configurations.integrationTestRuntime.find { it.name.startsWith("fwmt-service-mocks") }
+    String mockJarPath = configurations.integrationTestRuntime.find { it.name.startsWith('fwmt-service-mocks') }
     classpath = sourceSets.main.runtimeClasspath
     main = '-jar'
-    args = [ mockJarPath ]
-    jvmArgs = [ '-Xmx500m' ]
+    args = [mockJarPath]
+    jvmArgs = ['-Xmx500m']
     workingDir = "$buildDir"
     standardOutput = "$buildDir/fwmt-service-mocks.log"
     errorOutput = "$buildDir/fwmt-service-mocks-errors.log"
@@ -174,12 +172,12 @@ integrationTest.dependsOn runMocks
 
 processResources {
     filter ReplaceTokens, tokens: [
-            "project.artifactId": "name",
-            "project.version"   : "version",
-            "scm.url"           : "url",
-            "buildNumber"       : "buildnumber",
-            "scmBranch"         : "branch",
-            "timestamp"         : "timestamp",
+            'project.artifactId': 'name',
+            'project.version'   : 'version',
+            'scm.url'           : 'url',
+            'buildNumber'       : 'buildnumber',
+            'scmBranch'         : 'branch',
+            'timestamp'         : 'timestamp',
     ]
 }
 
@@ -189,7 +187,7 @@ jacocoTestReport {
         html.enabled false
     }
 }
-    //Un comment below lines to run the Jacaco test report locally, commented so that Codacy runs.
+//Un comment below lines to run the Jacaco test report locally, commented so that Codacy runs.
 //    afterEvaluate {
 //        classDirectories = files(classDirectories.files.collect {
 //            fileTree(dir: it, exclude: [
@@ -212,7 +210,7 @@ findbugs {
     ignoreFailures = false
     sourceSets = [sourceSets.main]
     reportsDir = file("$project.buildDir/reports/findbugs")
-    effort = "max"
+    effort = 'max'
 }
 
 
