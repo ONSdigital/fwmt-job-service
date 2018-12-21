@@ -40,9 +40,9 @@ security.user:
   password: "password"
 
 totalmobile:
-  username: "onslegacygateway"
+  username: ""
   password: ""
-  url: "https://ons-dev.totalmobile-cloud.com/Test"
+  url: ""
   message-queue-path: "/Services/TM/v20/Messaging/MessageQueueWs.asmx"
   message-queue-wsdl-path: "src/main/resources/wsdl/Messaging_MessageQueueWs.wsdl"
   message-queue-namespace: "http://schemas.consiliumtechnologies.com/wsdl/mobile/2007/07/messaging/"
