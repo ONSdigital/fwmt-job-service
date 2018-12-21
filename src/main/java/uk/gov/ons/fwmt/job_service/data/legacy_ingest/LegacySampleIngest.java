@@ -168,7 +168,7 @@ public class LegacySampleIngest {
   private String tmJobId;
   private LocalDate dueDate;
   
-  // // // Added the lat and long values after updating the imported CSV 
+  // // // Added the lat and long values 
   @CSVColumn("Lat")
   @JobAdditionalProperty("geoX")
   private Float geoX;
@@ -176,12 +176,6 @@ public class LegacySampleIngest {
   @CSVColumn("Long")
   @JobAdditionalProperty("geoY")
   private Float geoY;
-
-  //@JobAdditionalProperty("geoX")
-  //private Float geoX;
-
-  //@JobAdditionalProperty("geoY")
-  //private Float geoY;
 
   @JobAdditionalProperty("calculatedDueDate")
   private String calculatedDueDate;

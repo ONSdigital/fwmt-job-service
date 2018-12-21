@@ -48,8 +48,8 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     instance.setTmJobId(LegacySampleUtils.constructTmJobId(record, legacySampleSurveyType).trim());
     
     // Match the Lat and Long values
-    instance.setGeoX(instance.getGeoX());
-    instance.setGeoY(instance.getGeoY());
+    instance.setGeoX(Float.parseFloat(record.get("Lat")));
+    instance.setGeoY(Float.parseFloat(record.get("Long")));
   }
 
   protected void parseLegacySampleGFFData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException {

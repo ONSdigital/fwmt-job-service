@@ -27,6 +27,7 @@ import uk.gov.ons.fwmt.job_service.data.annotation.JobAdditionalProperty;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleIngest;
 import uk.gov.ons.fwmt.job_service.service.totalmobile.TMJobConverterService;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import java.lang.annotation.Annotation;
@@ -113,6 +114,9 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
 
     location.getAddressDetail().setPostCode(ingest.getPostcode());
     location.setReference(ingest.getSerNo());
+    
+    location.getAddressDetail().setGeoX(factory.createAddressDetailTypeGeoX(ingest.getGeoX()));     
+    location.getAddressDetail().setGeoY(factory.createAddressDetailTypeGeoX(ingest.getGeoY()));
 
     request.getJob().getContact().setName(ingest.getPostcode());
     request.getJob().getSkills().getSkill().add(JOB_SKILL);
