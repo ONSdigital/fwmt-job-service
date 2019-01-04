@@ -168,13 +168,14 @@ public class LegacySampleIngest {
   private String tmJobId;
   private LocalDate dueDate;
   
+  //Kept the geoX and Y properties
   @JobAdditionalProperty("geoX")
   private Float geoX;
 
   @JobAdditionalProperty("geoY")
   private Float geoY;
   
-  // // // Added the lat and long values 
+  //Added the lat and long values 
   @CSVColumn("Lat")
   @JobAdditionalProperty("Lat")
   private Float Lat;
