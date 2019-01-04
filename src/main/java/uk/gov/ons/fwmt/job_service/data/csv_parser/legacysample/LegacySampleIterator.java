@@ -47,6 +47,17 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     // derive the TM job id
     instance.setTmJobId(LegacySampleUtils.constructTmJobId(record, legacySampleSurveyType).trim());
     
+    // derive the coordinates, if we were given a non-null non-empty grid ref
+    if (instance.getOsGridRef() != null && instance.getOsGridRef().length() > 0) {
+       String[] osGridRefSplit = instance.getOsGridRef().split(",", 2);
+      if (osGridRefSplit.length != 2) {
+        throw FWMTCommonException
+            .makeCsvInvalidFieldException("OSGridRef", "Did not match the expected format of 'X,Y'");
+      }
+      instance.setGeoX(Float.parseFloat(osGridRefSplit[0]));
+      instance.setGeoY(Float.parseFloat(osGridRefSplit[1]));
+    }
+    
     // Match the Lat and Long values
     instance.setGeoX(Float.parseFloat(record.get("Lat")));
     instance.setGeoY(Float.parseFloat(record.get("Long")));
