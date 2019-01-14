@@ -181,7 +181,7 @@ public class LegacySampleIngest {
   private Float lat;
 
   @CSVColumn("Long")
-  @JobAdditionalProperty("lng")
+  @JobAdditionalProperty("long")
   private Float lng;
 
   @JobAdditionalProperty("calculatedDueDate")
