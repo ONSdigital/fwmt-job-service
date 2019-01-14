@@ -49,7 +49,7 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
 
     // derive the coordinates, if we were given a non-null non-empty grid ref
     if (instance.getOsGridRef() != null && instance.getOsGridRef().length() > 0) {
-       String[] osGridRefSplit = instance.getOsGridRef().split(",", 2);
+      String[] osGridRefSplit = instance.getOsGridRef().split(",", 2);
       if (osGridRefSplit.length != 2) {
         throw FWMTCommonException
             .makeCsvInvalidFieldException("OSGridRef", "Did not match the expected format of 'X,Y'");
