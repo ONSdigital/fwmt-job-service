@@ -59,13 +59,9 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     }
 
     // Set Lat and Long from CSV Record
-    if (instance.getLat() != null) {
       instance.setLat(Float.valueOf(record.get("Lat")));
-    }
-
-    if (instance.getLng() != null) {
       instance.setLng(Float.valueOf(record.get("Long")));
-    }
+    
   }
 
   protected void parseLegacySampleGFFData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException {
