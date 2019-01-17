@@ -34,6 +34,8 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setTmJobId("testJobID");
     ingest.setDueDate(LocalDate.of(2018, 10, 10));
     ingest.setDivAddInd("0");
+    ingest.setLat(1111.0f);
+    ingest.setLng(1111.0f);
 
     //additional properties
     ingest.setGeoX(3.56f);
@@ -70,6 +72,8 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setTmJobId("testJobID");
     ingest.setDueDate(LocalDate.of(2018, 10, 10));
     ingest.setDivAddInd("0");
+    ingest.setLat(1111.0f);
+    ingest.setLng(1111.0f);
 
     //additional properties
     ingest.setGeoX(3.56f);
@@ -106,6 +110,8 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setTmJobId("testJobID");
     ingest.setDueDate(LocalDate.of(2018, 10, 10));
     ingest.setDivAddInd("1");
+    ingest.setLat(1111.0f);
+    ingest.setLng(1111.0f);
 
     //additional properties
     ingest.setGeoX(3.56f);
@@ -142,6 +148,8 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setTmJobId("testJobID");
     ingest.setDueDate(LocalDate.of(2018, 10, 10));
     ingest.setDivAddInd("2");
+    ingest.setLat(1111.0f);
+    ingest.setLng(1111.0f);
 
     //additional properties
     ingest.setGeoX(3.56f);
@@ -178,6 +186,8 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setTmJobId("testJobID");
     ingest.setDueDate(LocalDate.of(2018, 10, 10));
     ingest.setDivAddInd("");
+    ingest.setLat(1111.0f);
+    ingest.setLng(1111.0f);
 
     //additional properties
     ingest.setGeoX(3.56f);
@@ -214,6 +224,8 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setTmJobId("testJobID");
     ingest.setDueDate(LocalDate.of(2018, 10, 10));
     ingest.setDivAddInd("unexpected");
+    ingest.setLat(1111.0f);
+    ingest.setLng(1111.0f);
 
     //additional properties
     ingest.setGeoX(3.56f);
@@ -250,6 +262,8 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setTmJobId("testJobID");
     ingest.setDueDate(LocalDate.of(2018, 10, 10));
     ingest.setDivAddInd(null);
+    ingest.setLat(1111.0f);
+    ingest.setLng(1111.0f);
 
     //additional properties
     ingest.setGeoX(3.56f);

@@ -33,8 +33,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-;
-
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({LegacySampleUtils.class, LegacySampleAnnotationProcessor.class})
 public class LegacySampleIteratorTests {
@@ -142,7 +140,9 @@ public class LegacySampleIteratorTests {
     Reader reader = mock(Reader.class);
     CSVRecord csvRecord = mock(CSVRecord.class);
     CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader(""));
-    LegacySampleIngest lsi = LegacySampleIngest.builder().osGridRef("9876,5432").build();
+    LegacySampleIngest lsi = LegacySampleIngest.builder()
+        .osGridRef("9876,5432")
+        .build();
     LegacySampleIterator legacySampleIterator = new LegacySampleIterator(csvParser, LegacySampleSurveyType.GFF, fieldPeriodResourceServiceClient);
 
     PowerMockito.mockStatic(LegacySampleUtils.class);
