@@ -144,7 +144,6 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
       break;
     case LFS:
       location.setReference(ingest.getLfsData().getOrigSerNo());
-      location.setReference(ingest.getSerNo());
       setLfsDividedAddressIndicator(ingest, request);
       setFromAdditionalPropertyAnnotations(ingest.getLfsData(), request);
       break;
