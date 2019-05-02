@@ -113,7 +113,6 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
 
     location.getAddressDetail().setPostCode(ingest.getPostcode());
     location.getAddressDetail().setName(ingest.getAddressLine1() + ", " + ingest.getAddressLine2());
-    location.setReference(ingest.getSerNo());
 
     if (ingest.getLat() != null) {
     	location.getAddressDetail().setGeoX(factory.createAddressDetailTypeGeoX(ingest.getLat()));
