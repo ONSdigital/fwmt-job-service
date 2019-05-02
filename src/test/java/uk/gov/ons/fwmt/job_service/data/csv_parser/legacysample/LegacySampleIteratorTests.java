@@ -193,11 +193,14 @@ public class LegacySampleIteratorTests {
   }
   
   @Test
-  public void givenAcsvRecord_whenParseLegacySampleGFFData_verifyDataIsCopied() throws Exception {
+  public void givenAcsvRecord_whenParseLegacySampleGFFData_NSW_verifyDataIsCopied() throws Exception {
     Reader reader = mock(Reader.class);
     CSVRecord csvRecord = mock(CSVRecord.class);
     CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader(""));
-    LegacySampleIngest lsi = LegacySampleIngest.builder().stage("Old Vic").build();
+    LegacySampleIngest lsi = LegacySampleIngest.builder()
+    		.stage("922")
+    		.tla("NSW")
+    		.build();
     LocalDate now = LocalDate.now();
     LegacySampleGFFDataIngest legacySampleGFFDataIngest = new LegacySampleGFFDataIngest();
 
@@ -206,7 +209,43 @@ public class LegacySampleIteratorTests {
         .calculatedDueDate(String.valueOf(now))
         .legacySampleSurveyType(LegacySampleSurveyType.GFF)
         .gffData(legacySampleGFFDataIngest)
-        .stage("Old Vic")
+        .stage("922")
+        .tla("NSW")
+        .build();
+    
+    LegacySampleIterator legacySampleIterator = new LegacySampleIterator(csvParser, LegacySampleSurveyType.GFF, fieldPeriodResourceServiceClient);
+
+    PowerMockito.mockStatic(LegacySampleAnnotationProcessor.class);
+    PowerMockito.doNothing().when(LegacySampleAnnotationProcessor.class, "process", any(LegacySampleIngest.class), any(CSVRecord.class), eq("GFF"));
+    PowerMockito.doNothing().when(LegacySampleAnnotationProcessor.class, "process", any(LegacySampleIngest.class), any(CSVRecord.class), eq(null));
+
+    PowerMockito.mockStatic(LegacySampleUtils.class);
+    when(LegacySampleUtils.convertToFieldPeriodDate(lsi.getStage(),fieldPeriodResourceServiceClient)).thenReturn(now);
+
+    legacySampleIterator.parseLegacySampleGFFData(lsi, csvRecord);
+
+    assertEquals(expectedLSI, lsi);
+  }
+  
+  @Test
+  public void givenAcsvRecord_whenParseLegacySampleGFFData_GFF_verifyDataIsCopied() throws Exception {
+    Reader reader = mock(Reader.class);
+    CSVRecord csvRecord = mock(CSVRecord.class);
+    CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader(""));
+    LegacySampleIngest lsi = LegacySampleIngest.builder()
+    		.stage("111")
+    		.tla("HAS")
+    		.build();
+    LocalDate now = LocalDate.now();
+    LegacySampleGFFDataIngest legacySampleGFFDataIngest = new LegacySampleGFFDataIngest();
+
+    LegacySampleIngest expectedLSI = LegacySampleIngest.builder()
+    	.stage("111")
+        .dueDate(now)
+        .calculatedDueDate(String.valueOf(now))
+        .legacySampleSurveyType(LegacySampleSurveyType.GFF)
+        .gffData(legacySampleGFFDataIngest)
+        .tla("HAS")
         .build();
     
     LegacySampleIterator legacySampleIterator = new LegacySampleIterator(csvParser, LegacySampleSurveyType.GFF, fieldPeriodResourceServiceClient);
