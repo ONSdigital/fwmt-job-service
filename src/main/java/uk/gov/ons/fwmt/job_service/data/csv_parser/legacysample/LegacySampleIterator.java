@@ -69,18 +69,28 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
   }
 
   protected void parseLegacySampleGFFData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException {
-    // set normal fields
-    LegacySampleAnnotationProcessor.process(instance, record, "GFF");
-    // set derived due date
-    LocalDate date = LegacySampleUtils.convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
-    instance.setDueDate(date);
-    instance.setCalculatedDueDate(String.valueOf(date));
-    // set survey type and extra data
-    instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
-    instance.setGffData(new LegacySampleGFFDataIngest());
-    instance.setLfsData(null);
-    LegacySampleAnnotationProcessor.process(instance.getGffData(), record, null);
-  }
+	    // set normal fields
+	    LegacySampleAnnotationProcessor.process(instance, record, "GFF");
+	    // set derived due date
+	    String tla = instance.getTla().toUpperCase();
+	    int stage = Integer.parseInt(instance.getStage().trim()); 
+        String reissue = instance.getStage().substring(1, 2);
+	    LocalDate date = null;
+	    if (tla.equals("NSW") && (reissue.equals("2") || reissue.equals("3")) && stage > 922){    
+	        date = LegacySampleUtils.convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient).plusDays(15);;
+	    }
+	    else {
+	    	date = LegacySampleUtils.convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
+	    }
+	    instance.setDueDate(date);
+		instance.setCalculatedDueDate(String.valueOf(date));
+	    // set survey type and extra data
+	    instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
+	    instance.setGffData(new LegacySampleGFFDataIngest());
+	    instance.setLfsData(null);
+	    LegacySampleAnnotationProcessor.process(instance.getGffData(), record, null);
+	  }
+
 
   protected void parseLegacySampleLFSData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException{
     // set normal fields
