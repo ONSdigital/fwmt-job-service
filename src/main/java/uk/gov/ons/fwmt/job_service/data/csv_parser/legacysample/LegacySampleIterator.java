@@ -91,7 +91,6 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     LegacySampleAnnotationProcessor.process(instance.getGffData(), record, null);
   }
 
-
   protected void parseLegacySampleLFSData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException{
     // set normal fields
     LegacySampleAnnotationProcessor.process(instance, record, "LFS");
