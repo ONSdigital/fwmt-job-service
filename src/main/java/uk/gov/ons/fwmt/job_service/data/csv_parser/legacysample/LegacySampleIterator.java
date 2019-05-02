@@ -75,12 +75,9 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     String tla = instance.getTla().toUpperCase();
     int stage = Integer.parseInt(instance.getStage().trim()); 
     String reissue = instance.getStage().substring(1, 2);
-    LocalDate date = null;
+    LocalDate date = LegacySampleUtils.convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
     if (tla.equals("NSW") && (reissue.equals("2") || reissue.equals("3")) && stage > 922){    
         date = LegacySampleUtils.convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient).plusDays(15);;
-    }
-    else {
-    	date = LegacySampleUtils.convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
     }
     instance.setDueDate(date);
 	instance.setCalculatedDueDate(String.valueOf(date));
