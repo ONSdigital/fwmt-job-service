@@ -11,7 +11,6 @@ import uk.gov.ons.fwmt.job_service.rest.client.dto.FieldPeriodDto;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.time.LocalDate;
 import java.util.Optional;
 
 public final class LegacySampleUtils {
@@ -46,19 +45,18 @@ public final class LegacySampleUtils {
     }
   }
 
-  
-  public static LocalDate convertToFieldPeriodDate(String stage, FieldPeriodResourceServiceClient fieldPeriodResourceServiceClient) throws FWMTCommonException{
-    final Optional<FieldPeriodDto> existsByFieldperiod = fieldPeriodResourceServiceClient.findByFieldPeriod(stage);
-    if (existsByFieldperiod.isPresent()) {
-      final FieldPeriodDto fieldPeriod = existsByFieldperiod.get();
-      return fieldPeriod.getEndDate();
+  public static FieldPeriodDto convertToFieldPeriodDate(String stage,
+      FieldPeriodResourceServiceClient fieldPeriodResourceServiceClient) throws FWMTCommonException {
+    final Optional<FieldPeriodDto> existsByFieldPeriod = fieldPeriodResourceServiceClient.findByFieldPeriod(stage);
+    if (existsByFieldPeriod.isPresent()) {
+      final FieldPeriodDto fieldPeriod = existsByFieldPeriod.get();
+      return fieldPeriod;
     } else {
       throw FWMTCommonException.makeUnknownFieldPeriodException(stage);
     }
   }
 
   public static LegacySampleLFSDataIngest checkSetLookingForWorkIndicator (LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException{
-
     String workIndicator;
     String jbaway;
     String ownbus;

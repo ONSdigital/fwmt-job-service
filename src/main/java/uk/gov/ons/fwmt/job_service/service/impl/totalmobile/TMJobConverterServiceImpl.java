@@ -160,19 +160,23 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
 
   private void setLfsDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
     if (ingest.getDivAddInd() == null) {
-      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
+      request.getJob()
+          .setDescription(ingest.getTla() + " Start: " + ingest.getStartDate() + " Wave " + ingest.getWave());
     } else {
       switch (ingest.getDivAddInd()) {
       case "1":
-        request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
+        request.getJob()
+            .setDescription(ingest.getTla() + " Start: " + ingest.getStartDate() + " Wave " + ingest.getWave() + "\n"
             + LFS_DIVIDED_ADDRESS_RESPONSE_ONE);
         break;
       case "2":
-        request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
+        request.getJob()
+            .setDescription(ingest.getTla() + " Start: " + ingest.getStartDate() + " Wave " + ingest.getWave() + "\n"
             + LFS_DIVIDED_ADDRESS_RESPONSE_MANY);
         break;
       default:
-        request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
+        request.getJob()
+            .setDescription(ingest.getTla() + " Start: " + ingest.getStartDate() + " Wave " + ingest.getWave());
         break;
       }
     }
@@ -180,12 +184,15 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
 
   private void setGffDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
     if (ingest.getDivAddInd() == null) {
-      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
+      request.getJob()
+          .setDescription(ingest.getTla() + " Start: " + ingest.getStartDate() + " Wave " + ingest.getWave());
     } else if (ingest.getDivAddInd().equals("1") || ingest.getDivAddInd().equals("2")) {
-      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
+      request.getJob()
+          .setDescription(ingest.getTla() + " Start: " + ingest.getStartDate() + " Wave " + ingest.getWave() + "\n"
           + GFF_DIVIDED_ADDRESS_RESPONSE);
     } else {
-      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
+      request.getJob()
+          .setDescription(ingest.getTla() + " Start: " + ingest.getStartDate() + " Wave " + ingest.getWave());
     }
   }
 

@@ -166,6 +166,7 @@ public class LegacySampleIngest {
   // specific column
 
   private String tmJobId;
+  private LocalDate startDate;
   private LocalDate dueDate;
   
   //Kept the geoX and Y properties

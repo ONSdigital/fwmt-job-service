@@ -56,7 +56,7 @@ public class TMJobConverterServiceImplTest {
   public void createGFFJobRequestFromIngest() {
     //Given
     String username = "testUser";
-    String expectedDescription = "testTla Wave testWave";
+    String expectedDescription = "testTla Start: null Wave testWave";
 
     LegacySampleIngest testIngestData = new TestIngestBuilder().ingestBuild();
     testIngestData.setGffData(new LegacySampleGFFDataIngest());
@@ -93,7 +93,7 @@ public class TMJobConverterServiceImplTest {
   public void createLFSJobRequestFromIngest() {
     //Given
     String username = "testUser";
-    String expectedDescription = "testTla Wave testWave";
+    String expectedDescription = "testTla Start: null Wave testWave";
 
     LegacySampleIngest testIngestData = new TestIngestBuilder().ingestBuild();
     testIngestData.setLfsData(new LegacySampleLFSDataIngest());
@@ -131,7 +131,7 @@ public class TMJobConverterServiceImplTest {
   public void createGFFJobRequestFromIngestWithEmptyAddressValues() {
     //Given
     String username = "testUser";
-    String expectedDescription = "testTla Wave testWave";
+    String expectedDescription = "testTla Start: null Wave testWave";
 
     LegacySampleIngest testIngestData = new TestIngestBuilder().ingestBuildWithEmptyAddresses();
     testIngestData.setGffData(new LegacySampleGFFDataIngest());
@@ -166,7 +166,7 @@ public class TMJobConverterServiceImplTest {
   public void createLFSJobRequestWithDividedAddressIndicatorValueOfOne(){
     //Given
     String username = "testUser";
-    String expectedDescriptionDivAddInd = "testTla Wave testWave\n"
+    String expectedDescriptionDivAddInd = "testTla Start: null Wave testWave\n"
         + "** Divided address – This part only **";
 
     LegacySampleIngest testDivAddInd = new TestIngestBuilder().ingestBuildDivAddIndOne();
@@ -184,7 +184,7 @@ public class TMJobConverterServiceImplTest {
   public void createLFSJobRequestWithDividedAddressIndicatorValueOfTwo(){
     //Given
     String username = "testUser";
-    String expectedDescriptionDivAddInd = "testTla Wave testWave\n"
+    String expectedDescriptionDivAddInd = "testTla Start: null Wave testWave\n"
         + "** Divided Address – This part or one not listed **";
 
     LegacySampleIngest testDivAddInd = new TestIngestBuilder().ingestBuildDivAddIndTwo();
@@ -202,7 +202,7 @@ public class TMJobConverterServiceImplTest {
   public void createLFSJobRequestWithDividedAddressIndicatorIsEmpty(){
     //Given
     String username = "testUser";
-    String expectedDescriptionDivAddInd = "testTla Wave testWave";
+    String expectedDescriptionDivAddInd = "testTla Start: null Wave testWave";
 
     LegacySampleIngest testDivAddInd = new TestIngestBuilder().ingestBuildDivAddIndIsEmpty();
     testDivAddInd.setLfsData(new LegacySampleLFSDataIngest());
@@ -219,7 +219,7 @@ public class TMJobConverterServiceImplTest {
   public void createLFSJobRequestWithDividedAddressIndicatorIsUnexpectedValue(){
     //Given
     String username = "testUser";
-    String expectedDescriptionDivAddInd = "testTla Wave testWave";
+    String expectedDescriptionDivAddInd = "testTla Start: null Wave testWave";
 
     LegacySampleIngest testDivAddInd = new TestIngestBuilder().ingestBuildDivAddIndIsNotExpectedNumber();
     testDivAddInd.setLfsData(new LegacySampleLFSDataIngest());
@@ -236,7 +236,7 @@ public class TMJobConverterServiceImplTest {
   public void createLFSJobRequestWithDividedAddressIndicatorIsNull(){
     //Given
     String username = "testUser";
-    String expectedDescriptionDivAddInd = "testTla Wave testWave";
+    String expectedDescriptionDivAddInd = "testTla Start: null Wave testWave";
 
     LegacySampleIngest testDivAddInd = new TestIngestBuilder().ingestBuildDivAddIndIsNull();
     testDivAddInd.setLfsData(new LegacySampleLFSDataIngest());
@@ -253,7 +253,7 @@ public class TMJobConverterServiceImplTest {
   public void createGFFJobRequestWithDividedAddressIndicatorIsNull(){
     //Given
     String username = "testUser";
-    String expectedDescriptionDivAddInd = "testTla Wave testWave";
+    String expectedDescriptionDivAddInd = "testTla Start: null Wave testWave";
 
     LegacySampleIngest testDivAddInd = new TestIngestBuilder().ingestBuildDivAddIndIsNull();
     testDivAddInd.setGffData(new LegacySampleGFFDataIngest());
@@ -270,7 +270,7 @@ public class TMJobConverterServiceImplTest {
   public void createGFFJobRequestWithDividedAddressIndicatorValueOfOne(){
     //Given
     String username = "testUser";
-    String expectedDescriptionDivAddInd = "testTla Wave testWave\n"
+    String expectedDescriptionDivAddInd = "testTla Start: null Wave testWave\n"
         + "** Warning Divided Address **";
 
     LegacySampleIngest testDivAddIndOne = new TestIngestBuilder().ingestBuildDivAddIndOne();
@@ -289,7 +289,7 @@ public class TMJobConverterServiceImplTest {
   public void createGFFJobRequestWithDividedAddressIndicatorValueOfTwo(){
     //Given
     String username = "testUser";
-    String expectedDescriptionDivAddInd = "testTla Wave testWave\n"
+    String expectedDescriptionDivAddInd = "testTla Start: null Wave testWave\n"
         + "** Warning Divided Address **";
 
     LegacySampleIngest testDivAddIndTwo = new TestIngestBuilder().ingestBuildDivAddIndTwo();
@@ -307,7 +307,7 @@ public class TMJobConverterServiceImplTest {
   public void createGFFJobRequestWithDividedAddressIndicatorIsEmpty(){
     //Given
     String username = "testUser";
-    String expectedDescriptionDivAddInd = "testTla Wave testWave";
+    String expectedDescriptionDivAddInd = "testTla Start: null Wave testWave";
 
     LegacySampleIngest testDivAddIndTwo = new TestIngestBuilder().ingestBuildDivAddIndIsEmpty();
     testDivAddIndTwo.setGffData(new LegacySampleGFFDataIngest());
@@ -324,7 +324,7 @@ public class TMJobConverterServiceImplTest {
   public void createGFFJobRequestWithDividedAddressIndicatorUnexpectedValue(){
     //Given
     String username = "testUser";
-    String expectedDescriptionDivAddInd = "testTla Wave testWave";
+    String expectedDescriptionDivAddInd = "testTla Start: null Wave testWave";
 
     LegacySampleIngest testDivAddIndTwo = new TestIngestBuilder().ingestBuildDivAddIndIsNotExpectedNumber();
     testDivAddIndTwo.setGffData(new LegacySampleGFFDataIngest());
@@ -341,7 +341,7 @@ public class TMJobConverterServiceImplTest {
   public void createLFSJobRequestFromIngestEmptyAddressValues() {
     //Given
     String username = "testUser";
-    String expectedDescription = "testTla Wave testWave";
+    String expectedDescription = "testTla Start: null Wave testWave";
 
     LegacySampleIngest testIngestData = new TestIngestBuilder().ingestBuildWithEmptyAddresses();
     testIngestData.setLfsData(new LegacySampleLFSDataIngest());
@@ -368,7 +368,7 @@ public class TMJobConverterServiceImplTest {
     assertEquals(testIngestData.getPostTown(),
         result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(3));
     assertEquals(testIngestData.getPostcode(), result.getJob().getLocation().getAddressDetail().getPostCode());
-    assertEquals(testIngestData.getSerNo(), result.getJob().getLocation().getReference());
+    assertEquals(testIngestData.getLfsData().getOrigSerNo(), result.getJob().getLocation().getReference());
     assertEquals(expectedDescription,result.getJob().getDescription());
   }
 

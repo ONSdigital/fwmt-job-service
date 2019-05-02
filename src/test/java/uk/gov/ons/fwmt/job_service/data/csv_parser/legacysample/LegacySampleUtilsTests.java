@@ -86,10 +86,10 @@ public class LegacySampleUtilsTests {
     when(fieldPeriodDto.getEndDate()).thenReturn(date);
 
     //When
-    LocalDate result = LegacySampleUtils.convertToFieldPeriodDate(stage, fieldPeriodResourceServiceClient);
+    FieldPeriodDto fieldPeriodDto = LegacySampleUtils.convertToFieldPeriodDate(stage, fieldPeriodResourceServiceClient);
 
     //Then
-    assertEquals(date, result);
+    assertEquals(date, fieldPeriodDto.getEndDate());
   }
 
   @Test
@@ -115,10 +115,11 @@ public class LegacySampleUtilsTests {
     when(fieldPeriodDto.getEndDate()).thenReturn(date);
 
     //When
-    LocalDate result = LegacySampleUtils.convertToFieldPeriodDate(fieldPeriod, fieldPeriodResourceServiceClient);
+    FieldPeriodDto fieldPeriodDto = LegacySampleUtils
+        .convertToFieldPeriodDate(fieldPeriod, fieldPeriodResourceServiceClient);
 
     //Then
-    assertEquals(date, result);
+    assertEquals(date, fieldPeriodDto.getEndDate());
   }
 
   @Test

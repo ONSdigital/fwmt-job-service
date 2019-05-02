@@ -15,6 +15,7 @@ import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleLFSDataIngest;
 import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.client.FieldPeriodResourceServiceClient;
+import uk.gov.ons.fwmt.job_service.rest.client.dto.FieldPeriodDto;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -199,6 +200,8 @@ public class LegacySampleIteratorTests {
     CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader(""));
     LegacySampleIngest lsi = LegacySampleIngest.builder().stage("Old Vic").build();
     LocalDate now = LocalDate.now();
+    FieldPeriodDto fieldPeriodDto = new FieldPeriodDto();
+    fieldPeriodDto.setEndDate(LocalDate.parse("2019-05-02"));
     LegacySampleGFFDataIngest legacySampleGFFDataIngest = new LegacySampleGFFDataIngest();
 
     LegacySampleIngest expectedLSI = LegacySampleIngest.builder()
@@ -216,7 +219,8 @@ public class LegacySampleIteratorTests {
     PowerMockito.doNothing().when(LegacySampleAnnotationProcessor.class, "process", any(LegacySampleIngest.class), any(CSVRecord.class), eq(null));
 
     PowerMockito.mockStatic(LegacySampleUtils.class);
-    when(LegacySampleUtils.convertToFieldPeriodDate(lsi.getStage(),fieldPeriodResourceServiceClient)).thenReturn(now);
+    when(LegacySampleUtils.convertToFieldPeriodDate(lsi.getStage(), fieldPeriodResourceServiceClient))
+        .thenReturn(fieldPeriodDto);
 
     legacySampleIterator.parseLegacySampleGFFData(lsi, csvRecord);
 
@@ -231,6 +235,8 @@ public class LegacySampleIteratorTests {
     CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader(""));
     LegacySampleIngest lsi = LegacySampleIngest.builder().stage("Old Vic").build();
     LegacySampleIterator legacySampleIterator = new LegacySampleIterator(csvParser, LegacySampleSurveyType.LFS, fieldPeriodResourceServiceClient);
+    FieldPeriodDto fieldPeriodDto = new FieldPeriodDto();
+    fieldPeriodDto.setEndDate(LocalDate.parse("2019-05-02"));
     LocalDate now = LocalDate.now();
     LegacySampleLFSDataIngest legacySampleLFSDataIngest = new LegacySampleLFSDataIngest();
 
@@ -247,7 +253,8 @@ public class LegacySampleIteratorTests {
     PowerMockito.doNothing().when(LegacySampleAnnotationProcessor.class, "process", any(LegacySampleIngest.class), any(CSVRecord.class), eq(null));
 
     PowerMockito.mockStatic(LegacySampleUtils.class);
-    when(LegacySampleUtils.convertToFieldPeriodDate(lsi.getStage(),fieldPeriodResourceServiceClient)).thenReturn(now);
+    when(LegacySampleUtils.convertToFieldPeriodDate(lsi.getStage(), fieldPeriodResourceServiceClient))
+        .thenReturn(fieldPeriodDto);
     when(LegacySampleUtils.checkSetLookingForWorkIndicator(lsi,csvRecord)).thenReturn(legacySampleLFSDataIngest);
     legacySampleIterator.parseLegacySampleLFSData(lsi, csvRecord);
 

@@ -10,8 +10,7 @@ import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.client.FieldPeriodResourceServiceClient;
-
-import java.time.LocalDate;
+import uk.gov.ons.fwmt.job_service.rest.client.dto.FieldPeriodDto;
 
 public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
   private LegacySampleSurveyType legacySampleSurveyType;
@@ -72,9 +71,7 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     // set normal fields
     LegacySampleAnnotationProcessor.process(instance, record, "GFF");
     // set derived due date
-    LocalDate date = LegacySampleUtils.convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
-    instance.setDueDate(date);
-    instance.setCalculatedDueDate(String.valueOf(date));
+    fieldPeriodLookup(instance);
     // set survey type and extra data
     instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
     instance.setGffData(new LegacySampleGFFDataIngest());
@@ -86,9 +83,7 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     // set normal fields
     LegacySampleAnnotationProcessor.process(instance, record, "LFS");
     // set derived due date
-    LocalDate date = LegacySampleUtils.convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
-    instance.setDueDate(date);
-    instance.setCalculatedDueDate(String.valueOf(date));
+    fieldPeriodLookup(instance);
     // set if the record is looking for work
 
     // set survey type and extra data
@@ -103,6 +98,14 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     }
 
     LegacySampleAnnotationProcessor.process(instance.getLfsData(), record, null);
+  }
+
+  private void fieldPeriodLookup(LegacySampleIngest instance) {
+    FieldPeriodDto fieldPeriodDto = LegacySampleUtils
+        .convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
+    instance.setDueDate(fieldPeriodDto.getEndDate());
+    instance.setStartDate(fieldPeriodDto.getStartDate());
+    instance.setCalculatedDueDate(String.valueOf(fieldPeriodDto.getEndDate()));
   }
 
 }
