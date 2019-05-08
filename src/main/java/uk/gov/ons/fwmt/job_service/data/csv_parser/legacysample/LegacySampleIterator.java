@@ -65,14 +65,22 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     if(instance.getLng() != null) {
       instance.setLng(Float.valueOf(record.get("Long")));
     }
-    
   }
 
   protected void parseLegacySampleGFFData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException {
     // set normal fields
     LegacySampleAnnotationProcessor.process(instance, record, "GFF");
     // set derived due date
-    LocalDate date = LegacySampleUtils.convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
+    String tla = instance.getTla().toUpperCase();
+    int stage = Integer.parseInt(instance.getStage().trim()); 
+    String reissue = instance.getStage().substring(1, 2);
+    LocalDate date = null;
+    if (tla.equals("NSW") && (reissue.equals("2") || reissue.equals("3")) && stage > 922){    
+        date = LegacySampleUtils.convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient).plusDays(15);;
+    }
+    else {
+    	date = LegacySampleUtils.convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
+    }
     instance.setDueDate(date);
     instance.setCalculatedDueDate(String.valueOf(date));
     // set survey type and extra data
