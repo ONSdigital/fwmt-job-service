@@ -65,7 +65,6 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     if(instance.getLng() != null) {
       instance.setLng(Float.valueOf(record.get("Long")));
     }
-    
   }
 
   protected void parseLegacySampleGFFData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException {
@@ -83,7 +82,7 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     	date = LegacySampleUtils.convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
     }
     instance.setDueDate(date);
-	instance.setCalculatedDueDate(String.valueOf(date));
+    instance.setCalculatedDueDate(String.valueOf(date));
     // set survey type and extra data
     instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
     instance.setGffData(new LegacySampleGFFDataIngest());
