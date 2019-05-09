@@ -112,6 +112,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     checkNumberOfAddressLines(addressLines);
 
     location.getAddressDetail().setPostCode(ingest.getPostcode());
+    location.setReference(ingest.getSerNo());
     location.getAddressDetail().setName(ingest.getAddressLine1() + ", " + ingest.getAddressLine2());
 
     if (ingest.getLat() != null) {
@@ -138,12 +139,10 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     switch (ingest.getLegacySampleSurveyType()) {
     case GFF:
       // TODO does splitSampleType need extra mapping?
-      location.setReference(ingest.getSerNo());
       setGffDividedAddressIndicator(ingest, request);
       setFromAdditionalPropertyAnnotations(ingest.getGffData(), request);
       break;
     case LFS:
-      location.setReference(ingest.getLfsData().getOrigSerNo());
       setLfsDividedAddressIndicator(ingest, request);
       setFromAdditionalPropertyAnnotations(ingest.getLfsData(), request);
       break;

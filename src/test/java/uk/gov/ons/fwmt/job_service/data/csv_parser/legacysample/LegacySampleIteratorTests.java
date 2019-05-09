@@ -201,7 +201,7 @@ public class LegacySampleIteratorTests {
     LegacySampleIngest lsi = LegacySampleIngest.builder().stage("Old Vic").build();
     LocalDate now = LocalDate.now();
     FieldPeriodDto fieldPeriodDto = new FieldPeriodDto();
-    fieldPeriodDto.setEndDate(LocalDate.parse("2019-05-02"));
+    fieldPeriodDto.setEndDate(LocalDate.parse("2019-05-09"));
     LegacySampleGFFDataIngest legacySampleGFFDataIngest = new LegacySampleGFFDataIngest();
 
     LegacySampleIngest expectedLSI = LegacySampleIngest.builder()
@@ -236,7 +236,7 @@ public class LegacySampleIteratorTests {
     LegacySampleIngest lsi = LegacySampleIngest.builder().stage("Old Vic").build();
     LegacySampleIterator legacySampleIterator = new LegacySampleIterator(csvParser, LegacySampleSurveyType.LFS, fieldPeriodResourceServiceClient);
     FieldPeriodDto fieldPeriodDto = new FieldPeriodDto();
-    fieldPeriodDto.setEndDate(LocalDate.parse("2019-05-02"));
+    fieldPeriodDto.setEndDate(LocalDate.parse("2019-05-09"));
     LocalDate now = LocalDate.now();
     LegacySampleLFSDataIngest legacySampleLFSDataIngest = new LegacySampleLFSDataIngest();
 

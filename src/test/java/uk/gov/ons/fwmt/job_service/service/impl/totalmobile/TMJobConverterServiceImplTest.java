@@ -98,7 +98,6 @@ public class TMJobConverterServiceImplTest {
     LegacySampleIngest testIngestData = new TestIngestBuilder().ingestBuild();
     testIngestData.setLfsData(new LegacySampleLFSDataIngest());
     testIngestData.setLegacySampleSurveyType(LFS);
-    testIngestData.getLfsData().setOrigSerNo("testSerNo");
 
     //When
     CreateJobRequest result = tmJobConverterService.createJobRequestFromIngest(testIngestData, username);
@@ -123,7 +122,7 @@ public class TMJobConverterServiceImplTest {
     assertEquals(testIngestData.getPostTown(),
         result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(4));
     assertEquals(testIngestData.getPostcode(), result.getJob().getLocation().getAddressDetail().getPostCode());
-    assertEquals(testIngestData.getLfsData().getOrigSerNo(), result.getJob().getLocation().getReference());
+    assertEquals(testIngestData.getSerNo(), result.getJob().getLocation().getReference());
     assertEquals(expectedDescription,result.getJob().getDescription());
   }
 
@@ -368,7 +367,7 @@ public class TMJobConverterServiceImplTest {
     assertEquals(testIngestData.getPostTown(),
         result.getJob().getLocation().getAddressDetail().getLines().getAddressLine().get(3));
     assertEquals(testIngestData.getPostcode(), result.getJob().getLocation().getAddressDetail().getPostCode());
-    assertEquals(testIngestData.getLfsData().getOrigSerNo(), result.getJob().getLocation().getReference());
+    assertEquals(testIngestData.getSerNo(), result.getJob().getLocation().getReference());
     assertEquals(expectedDescription,result.getJob().getDescription());
   }
 
