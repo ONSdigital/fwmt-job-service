@@ -11,6 +11,8 @@ import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.client.FieldPeriodResourceServiceClient;
 import uk.gov.ons.fwmt.job_service.rest.client.dto.FieldPeriodDto;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
   private LegacySampleSurveyType legacySampleSurveyType;
@@ -104,7 +106,12 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     FieldPeriodDto fieldPeriodDto = LegacySampleUtils
         .convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
     instance.setDueDate(fieldPeriodDto.getEndDate());
-    instance.setStartDate(fieldPeriodDto.getStartDate());
+    // Change the formatting of the start date
+    LocalDate startDate = fieldPeriodDto.getStartDate();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    String text = startDate.format(formatter);
+    LocalDate parsedDate = LocalDate.parse(text, formatter); 
+    instance.setStartDate(parsedDate);
     instance.setCalculatedDueDate(String.valueOf(fieldPeriodDto.getEndDate()));
   }
 
