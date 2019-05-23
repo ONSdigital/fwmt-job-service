@@ -106,12 +106,7 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     FieldPeriodDto fieldPeriodDto = LegacySampleUtils
         .convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
     instance.setDueDate(fieldPeriodDto.getEndDate());
-    // Change the formatting of the start date
-    LocalDate startDate = fieldPeriodDto.getStartDate();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-    String text = startDate.format(formatter);
-    LocalDate parsedDate = LocalDate.parse(text, formatter); 
-    instance.setStartDate(parsedDate);
+    instance.setStartDate(fieldPeriodDto.getStartDate());
     instance.setCalculatedDueDate(String.valueOf(fieldPeriodDto.getEndDate()));
   }
 
