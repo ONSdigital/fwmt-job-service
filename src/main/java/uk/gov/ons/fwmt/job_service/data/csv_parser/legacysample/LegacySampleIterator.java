@@ -66,7 +66,6 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     if(instance.getLng() != null) {
       instance.setLng(Float.valueOf(record.get("Long")));
     }
-    
   }
 
   protected void parseLegacySampleGFFData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException {
