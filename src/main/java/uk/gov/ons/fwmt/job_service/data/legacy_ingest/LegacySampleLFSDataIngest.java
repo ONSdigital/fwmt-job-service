@@ -8,6 +8,7 @@ import uk.gov.ons.fwmt.job_service.data.annotation.JobAdditionalProperty;
 @Data
 @NoArgsConstructor
 public class LegacySampleLFSDataIngest {
+
   @CSVColumn(value = "Quota_No", ignored = true)
   private String quotaNo;
 

@@ -31,7 +31,9 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -113,6 +115,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
 
     location.getAddressDetail().setPostCode(ingest.getPostcode());
     location.setReference(ingest.getSerNo());
+    location.getAddressDetail().setName(ingest.getAddressLine1() + ", " + ingest.getAddressLine2());
 
     if (ingest.getLat() != null) {
     	location.getAddressDetail().setGeoX(factory.createAddressDetailTypeGeoX(ingest.getLat()));
@@ -158,19 +161,23 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
 
   private void setLfsDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
     if (ingest.getDivAddInd() == null) {
-      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
+      request.getJob()
+          	.setDescription(getTLAStartWaveStr(ingest));
     } else {
       switch (ingest.getDivAddInd()) {
       case "1":
-        request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
+        request.getJob()
+            .setDescription(getTLAStartWaveStr(ingest) + "\n"
             + LFS_DIVIDED_ADDRESS_RESPONSE_ONE);
         break;
       case "2":
-        request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
+        request.getJob()
+            .setDescription(getTLAStartWaveStr(ingest) + "\n"
             + LFS_DIVIDED_ADDRESS_RESPONSE_MANY);
         break;
       default:
-        request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
+        request.getJob()
+            .setDescription(getTLAStartWaveStr(ingest));
         break;
       }
     }
@@ -178,13 +185,40 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
 
   private void setGffDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
     if (ingest.getDivAddInd() == null) {
-      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
+      request.getJob()
+          .setDescription(getTLAStartWaveStr(ingest));
     } else if (ingest.getDivAddInd().equals("1") || ingest.getDivAddInd().equals("2")) {
-      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave() + "\n"
+      request.getJob()
+          .setDescription(getTLAStartWaveStr(ingest) + "\n"
           + GFF_DIVIDED_ADDRESS_RESPONSE);
     } else {
-      request.getJob().setDescription(ingest.getTla() + " Wave " + ingest.getWave());
+      request.getJob()
+          .setDescription(getTLAStartWaveStr(ingest));
     }
+  }
+  
+  private String getTLAStartWaveStr(LegacySampleIngest ingest) {	
+  	// Change the formatting of the start date
+   	LocalDate startDate = ingest.getStartDate();
+   	String sDate = "null";
+   	if(startDate != null){
+   		sDate = startDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+   	}
+  	//Display wave information if not NSW LCF or FRS 
+	  boolean isWave = true;
+	  String[] tlas = {"NSW", "LCF", "FRS"};
+	  for(String tla : tlas) {
+	  	if(ingest.getTla().toUpperCase().equals(tla)) {
+	  		isWave = false;
+	  		break;
+	  	}
+	  } 
+  	if(isWave) {
+  		return ingest.getTla() + " Start: " + sDate + " Wave " + ingest.getWave();
+  	}
+  	else{
+  		return ingest.getTla() + " Start: " + sDate;
+  	}
   }
 
   protected void addAddressLines(List<String> addressLines, String addressLine) {

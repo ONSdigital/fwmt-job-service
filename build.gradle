@@ -27,7 +27,7 @@ description = 'fwmt-job-service'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-version = '1.0.0'
+version = '1.0.1'
 
 jar {
     group = 'uk.gov.ons.fwmt'

@@ -10,8 +10,9 @@ import uk.gov.ons.fwmt.job_service.data.legacy_ingest.LegacySampleSurveyType;
 import uk.gov.ons.fwmt.job_service.exceptions.ExceptionCode;
 import uk.gov.ons.fwmt.job_service.exceptions.types.FWMTCommonException;
 import uk.gov.ons.fwmt.job_service.rest.client.FieldPeriodResourceServiceClient;
-
+import uk.gov.ons.fwmt.job_service.rest.client.dto.FieldPeriodDto;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
   private LegacySampleSurveyType legacySampleSurveyType;
@@ -70,19 +71,20 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
   protected void parseLegacySampleGFFData(LegacySampleIngest instance, CSVRecord record) throws FWMTCommonException {
     // set normal fields
     LegacySampleAnnotationProcessor.process(instance, record, "GFF");
-    // set derived due date
+    
+    //Check to see if is NSW re-issue 
     String tla = instance.getTla().toUpperCase();
     int stage = Integer.parseInt(instance.getStage().trim()); 
     String reissue = instance.getStage().substring(1, 2);
-    LocalDate date = null;
     if (tla.equals("NSW") && (reissue.equals("2") || reissue.equals("3")) && stage > 922){    
-        date = LegacySampleUtils.convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient).plusDays(15);;
+    		// set NSW re-issue derived dates 
+    		NSWReIssueFieldPeriodLookup(instance);
     }
     else {
-    	date = LegacySampleUtils.convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
+    	 	// set derived due date
+      	fieldPeriodLookup(instance);
     }
-    instance.setDueDate(date);
-    instance.setCalculatedDueDate(String.valueOf(date));
+    
     // set survey type and extra data
     instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
     instance.setGffData(new LegacySampleGFFDataIngest());
@@ -94,9 +96,7 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     // set normal fields
     LegacySampleAnnotationProcessor.process(instance, record, "LFS");
     // set derived due date
-    LocalDate date = LegacySampleUtils.convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
-    instance.setDueDate(date);
-    instance.setCalculatedDueDate(String.valueOf(date));
+    fieldPeriodLookup(instance);
     // set if the record is looking for work
 
     // set survey type and extra data
@@ -113,4 +113,19 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     LegacySampleAnnotationProcessor.process(instance.getLfsData(), record, null);
   }
 
+  private void fieldPeriodLookup(LegacySampleIngest instance) {
+    FieldPeriodDto fieldPeriodDto = LegacySampleUtils
+        .convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
+    instance.setDueDate(fieldPeriodDto.getEndDate());
+    instance.setStartDate(fieldPeriodDto.getStartDate());
+    instance.setCalculatedDueDate(String.valueOf(fieldPeriodDto.getEndDate()));
+  }
+  
+  private void NSWReIssueFieldPeriodLookup(LegacySampleIngest instance) {	
+  	 FieldPeriodDto fieldPeriodDto = LegacySampleUtils
+         .convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
+     instance.setDueDate(fieldPeriodDto.getEndDate().plusDays(15));
+     instance.setStartDate(fieldPeriodDto.getStartDate());
+     instance.setCalculatedDueDate(String.valueOf(fieldPeriodDto.getEndDate().plusDays(15)));
+  }
 }
