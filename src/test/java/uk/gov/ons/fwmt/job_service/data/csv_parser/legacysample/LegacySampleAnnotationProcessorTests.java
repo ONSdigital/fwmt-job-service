@@ -43,7 +43,7 @@ public class LegacySampleAnnotationProcessorTests {
 
     //Then
     assertEquals("tla_1", testIngestData.getTla());
-    assertEquals("testLcfIncentive1", testIngestData.getLcfIncentive());
+    assertEquals("testIncentive1", testIngestData.getIncentive());
   }
 
   @Test(expected = NoSuchElementException.class)
