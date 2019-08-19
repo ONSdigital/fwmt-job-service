@@ -146,7 +146,7 @@ public class LegacySampleIngest {
 
   @CSVColumn("Spare9")
   @JobAdditionalProperty("Incentive")
-  private String Incentive;
+  private String incentive;
 
   // pulled from GFFData
   @CSVColumn("LAUA")
