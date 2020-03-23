@@ -46,6 +46,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   protected static final String JOB_SKILL = "Survey";
   protected static final String JOB_WORK_TYPE = "SS";
   protected static final String JOB_WORLD = "Default";
+  private static final String LFS_TELLNO_RESPONSE = "** Telephone Number Available **";
   private static final String GFF_DIVIDED_ADDRESS_RESPONSE = "** Warning Divided Address **";
   private static final String LFS_DIVIDED_ADDRESS_RESPONSE_ONE = "** Divided address – This part only **";
   private static final String LFS_DIVIDED_ADDRESS_RESPONSE_MANY = "** Divided Address – This part or one not listed **";
@@ -146,6 +147,8 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
       break;
     case LFS:
       setLfsDividedAddressIndicator(ingest, request);
+      //Added for covid-19 outbreak, indicator for available phone number for wave 1 cases 
+      setLfsWave1TelloIndicator(ingest, request);
       setFromAdditionalPropertyAnnotations(ingest.getLfsData(), request);
       break;
     }
@@ -157,6 +160,13 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     request.getJob().setEmergency(false);
 
     return request;
+  }
+  
+  private void setLfsWave1TelloIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
+  	if (ingest.getWave() == "1" && ingest.getTelNo() != null) {
+  		request.getJob().setDescription(request.getJob().getDescription() + "\n"
+  				+ LFS_TELLNO_RESPONSE); 
+  	}
   }
 
   private void setLfsDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
