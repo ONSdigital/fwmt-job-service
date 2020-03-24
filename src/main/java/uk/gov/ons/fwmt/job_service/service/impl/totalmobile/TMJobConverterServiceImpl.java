@@ -147,11 +147,14 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
       break;
     case LFS:
       setLfsDividedAddressIndicator(ingest, request);
+      
+      //Added for covid-19 outbreak, indicator for available phone number for wave 1 cases 
+      
       setFromAdditionalPropertyAnnotations(ingest.getLfsData(), request);
       break;
     }
-    //Added for covid-19 outbreak, indicator for available phone number for wave 1 cases 
-    setWave1TelloIndicator(ingest, request);
+    
+    setWave1TellNoIndicator(ingest, request);
     request.getJob().setDuration(1);
     request.getJob().setVisitComplete(false);
     request.getJob().setDispatched(false);
@@ -161,7 +164,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     return request;
   }
   
-  private void setWave1TelloIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
+  private void setWave1TellNoIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
   	if (ingest.getWave() == "1" && ingest.getTelNo() != null) {
   		request.getJob().setDescription(request.getJob().getDescription() + "\n"
   				+ TELLNO_RESPONSE); 
