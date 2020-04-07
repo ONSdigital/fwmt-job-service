@@ -46,7 +46,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   protected static final String JOB_SKILL = "Survey";
   protected static final String JOB_WORK_TYPE = "SS";
   protected static final String JOB_WORLD = "Default";
-  private static final String TELLNO_RESPONSE = "** Telephone Number Available **";
+  private static final String TELLNO_RESPONSE = "** TEL **";
   private static final String GFF_DIVIDED_ADDRESS_RESPONSE = "** Warning Divided Address **";
   private static final String LFS_DIVIDED_ADDRESS_RESPONSE_ONE = "** Divided address – This part only **";
   private static final String LFS_DIVIDED_ADDRESS_RESPONSE_MANY = "** Divided Address – This part or one not listed **";
@@ -139,6 +139,10 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
 
     // additional properties and divided addresses
     setFromAdditionalPropertyAnnotations(ingest, request);
+    setTLAStartWaveDecription(ingest, request);
+    //Added for covid-19 outbreak, indicator for available wave 1 cases phone number  
+    setTelNoIndicator(ingest, request);
+    setContactName(ingest, request);
     switch (ingest.getLegacySampleSurveyType()) {
     case GFF:
       // TODO does splitSampleType need extra mapping?
@@ -148,13 +152,13 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     case LFS:
       setLfsDividedAddressIndicator(ingest, request);
       
-      //Added for covid-19 outbreak, indicator for available phone number for wave 1 cases 
+      
       
       setFromAdditionalPropertyAnnotations(ingest.getLfsData(), request);
       break;
     }
     
-    setWave1TellNoIndicator(ingest, request);
+    
     request.getJob().setDuration(1);
     request.getJob().setVisitComplete(false);
     request.getJob().setDispatched(false);
@@ -164,48 +168,47 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     return request;
   }
   
-  private void setWave1TellNoIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
-  	if (ingest.getWave() == "1" && ingest.getTelNo() != null) {
+  private void setTLAStartWaveDecription(LegacySampleIngest ingest, CreateJobRequest request) {
+  	request.getJob().setDescription(getTLAStartWaveStr(ingest));
+  }
+  
+  private void setTelNoIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
+  	if (!ingest.getTelNo().isEmpty())  {
+  		request.getJob().setDescription(request.getJob().getDescription() + " " + TELLNO_RESPONSE + "\n" 
+  					+ "Tel No: " + ingest.getTelNo()); 
+  	}
+  }
+  
+  private void setContactName(LegacySampleIngest ingest, CreateJobRequest request) {
+  	if (!ingest.getContactName().isEmpty() && ingest.getWave().equals("1")) {
   		request.getJob().setDescription(request.getJob().getDescription() + "\n"
-  				+ TELLNO_RESPONSE); 
+  					+ "Contact Name: " + ingest.getContactName());
   	}
   }
 
   private void setLfsDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
-    if (ingest.getDivAddInd() == null) {
-      request.getJob()
-          	.setDescription(getTLAStartWaveStr(ingest));
-    } else {
-      switch (ingest.getDivAddInd()) {
+    if (!ingest.getDivAddInd().isEmpty()) {
+    	switch (ingest.getDivAddInd()) {
       case "1":
         request.getJob()
-            .setDescription(getTLAStartWaveStr(ingest) + "\n"
+            .setDescription(request.getJob().getDescription() + "\n"
             + LFS_DIVIDED_ADDRESS_RESPONSE_ONE);
         break;
       case "2":
         request.getJob()
-            .setDescription(getTLAStartWaveStr(ingest) + "\n"
+            .setDescription(request.getJob().getDescription() + "\n"
             + LFS_DIVIDED_ADDRESS_RESPONSE_MANY);
-        break;
-      default:
-        request.getJob()
-            .setDescription(getTLAStartWaveStr(ingest));
         break;
       }
     }
-  }
+  } 
+     
 
   private void setGffDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
-    if (ingest.getDivAddInd() == null) {
+    if (ingest.getDivAddInd().equals("1") || ingest.getDivAddInd().equals("2")) {
       request.getJob()
-          .setDescription(getTLAStartWaveStr(ingest));
-    } else if (ingest.getDivAddInd().equals("1") || ingest.getDivAddInd().equals("2")) {
-      request.getJob()
-          .setDescription(getTLAStartWaveStr(ingest) + "\n"
+          .setDescription(request.getJob().getDescription() + "\n"
           + GFF_DIVIDED_ADDRESS_RESPONSE);
-    } else {
-      request.getJob()
-          .setDescription(getTLAStartWaveStr(ingest));
     }
   }
   
