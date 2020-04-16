@@ -198,4 +198,9 @@ public class LegacySampleIngest {
       @CSVColumn.Mapping(value = "DIVADDIND", when = "LFS"),
   })
   private String divAddInd;
+  
+  @CSVColumn("ContactName")
+  @JobAdditionalProperty("ContactName")
+  private String contactName;
+  
 }

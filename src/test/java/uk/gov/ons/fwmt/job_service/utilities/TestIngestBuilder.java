@@ -41,6 +41,7 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setGeoX(3.56f);
     ingest.setGeoY(3.56f);
     ingest.setIncentive("testIncentive");
+    ingest.setContactName("TestName");
     return ingest;
   }
 
@@ -79,6 +80,7 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setGeoX(3.56f);
     ingest.setGeoY(3.56f);
     ingest.setIncentive("testLcfIncentive");
+    ingest.setContactName("TestName");
     return ingest;
   }
 
@@ -117,6 +119,7 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setGeoX(3.56f);
     ingest.setGeoY(3.56f);
     ingest.setIncentive("testLcfIncentive");
+    ingest.setContactName("TestName");
     return ingest;
   }
 
@@ -155,6 +158,7 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setGeoX(3.56f);
     ingest.setGeoY(3.56f);
     ingest.setIncentive("testLcfIncentive");
+    ingest.setContactName("TestName");
     return ingest;
   }
 
@@ -193,6 +197,7 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setGeoX(3.56f);
     ingest.setGeoY(3.56f);
     ingest.setIncentive("testLcfIncentive");
+    ingest.setContactName("Test Name");
     return ingest;
   }
 
@@ -231,6 +236,7 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setGeoX(3.56f);
     ingest.setGeoY(3.56f);
     ingest.setIncentive("testLcfIncentive");
+    ingest.setContactName("TestName");
     return ingest;
   }
 
@@ -269,6 +275,7 @@ public class TestIngestBuilder extends LegacySampleIngest {
     ingest.setGeoX(3.56f);
     ingest.setGeoY(3.56f);
     ingest.setIncentive("testLcfIncentive");
+    ingest.setContactName("TestName");
     return ingest;
   }
 }

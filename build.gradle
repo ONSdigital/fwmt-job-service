@@ -37,7 +37,7 @@ jar {
 
 repositories {
     mavenCentral()
-    maven { url 'http://repo.maven.apache.org/maven2' }
+    maven { url 'https://repo.maven.apache.org/maven2' }
     maven { url 'https://oss.sonatype.org/content/repositories/libs-snapshot' }
     if (!project.hasProperty('omitSDCArtifactory')) {
         maven { url 'http://artifactory-sdc.onsdigital.uk/artifactory/libs-snapshot' }
