@@ -140,7 +140,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     // additional properties and divided addresses
     setFromAdditionalPropertyAnnotations(ingest, request);
     setTLAStartWaveDecription(ingest, request);
-    //Added for covid-19 outbreak, indicator for available wave 1 cases phone number  
+    //Added for covid-19 outbreak, indicator for available wave 1 cases phone number with phone number and Name
     setTelNoIndicator(ingest, request);
     setContactName(ingest, request);
     switch (ingest.getLegacySampleSurveyType()) {
@@ -151,13 +151,9 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
       break;
     case LFS:
       setLfsDividedAddressIndicator(ingest, request);
-      
-      
-      
       setFromAdditionalPropertyAnnotations(ingest.getLfsData(), request);
       break;
     }
-    
     
     request.getJob().setDuration(1);
     request.getJob().setVisitComplete(false);
@@ -179,7 +175,6 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     					+ "Tel No: " + ingest.getTelNo()); 
     	}
   	}
-  	
   }
   
   private void setContactName(LegacySampleIngest ingest, CreateJobRequest request) {
@@ -210,7 +205,6 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     }
   } 
      
-
   private void setGffDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
 		if (ingest.getDivAddInd() != null	) {
 			if (ingest.getDivAddInd().equals("1") || ingest.getDivAddInd().equals("2")) {
@@ -220,8 +214,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
 	    }
 	  }
 	}
-    
-  
+     
   private String getTLAStartWaveStr(LegacySampleIngest ingest) {	
   	// Change the formatting of the start date
    	LocalDate startDate = ingest.getStartDate();

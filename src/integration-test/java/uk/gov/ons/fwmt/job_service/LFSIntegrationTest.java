@@ -52,7 +52,9 @@ public class LFSIntegrationTest {
   @Test
   public void lfsIntegrationTest() throws InterruptedException {
     // // // Create request
-    RestTemplate restTemplate = new RestTemplate();
+    RestTemplate restTemplate = new RestTemplate(); 
+    
+    
 
     LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
     map.add("file", new ClassPathResource("sampledata/integration_tests/sample_LFS_2018-06-06T06-06-06Z.csv"));
