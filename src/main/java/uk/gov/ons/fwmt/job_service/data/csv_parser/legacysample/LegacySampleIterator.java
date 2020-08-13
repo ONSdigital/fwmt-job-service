@@ -76,7 +76,7 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     String tla = instance.getTla().toUpperCase();
     int stage = Integer.parseInt(instance.getStage().trim()); 
     String reissue = instance.getStage().substring(1, 2);
-    if (tla.equals("NSW") && (reissue.equals("2") || reissue.equals("3")) && stage > 922){    
+    if (tla.equals("NSW") && (reissue.equals("2") || reissue.equals("3"))){    
     		// set NSW re-issue derived dates 
     		NSWReIssueFieldPeriodLookup(instance);
     }

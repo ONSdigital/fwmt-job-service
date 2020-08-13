@@ -203,4 +203,9 @@ public class LegacySampleIngest {
   @JobAdditionalProperty("ContactName")
   private String contactName;
   
+  @CSVColumn("UAC")
+  @JobAdditionalProperty("UAC")
+  private String UAC;
+ 
+  
 }

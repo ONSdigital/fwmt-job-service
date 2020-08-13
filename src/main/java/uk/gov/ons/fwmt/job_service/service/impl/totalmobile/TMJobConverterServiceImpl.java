@@ -141,8 +141,10 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     setFromAdditionalPropertyAnnotations(ingest, request);
     setTLAStartWaveDecription(ingest, request);
     //Added for covid-19 outbreak, indicator for available wave 1 cases phone number with phone number and Name
-    setTelNoIndicator(ingest, request);
-    setContactName(ingest, request);
+    if(ingest.getTelNo() != null && !ingest.getTelNo().isEmpty()) {
+    	setContactInfoDescription(ingest, request);
+    }
+    
     switch (ingest.getLegacySampleSurveyType()) {
     case GFF:
       // TODO does splitSampleType need extra mapping?
@@ -168,21 +170,58 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   	request.getJob().setDescription(getTLAStartWaveStr(ingest));
   }
   
-  private void setTelNoIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
-  	if(ingest.getTelNo() != null) {
-  		if (!ingest.getTelNo().isEmpty())  {
-    		request.getJob().setDescription(request.getJob().getDescription() + " " + TELLNO_RESPONSE + "\n" 
-    					+ "Tel No: " + ingest.getTelNo()); 
-    	}
-  	}
+  private void setContactInfoDescription(LegacySampleIngest ingest, CreateJobRequest request) {
+  	setTelNoIndicator(request);
+  	
+  	//Set unique UAC value for the case
+  	setUAC(ingest, request);
+  	
+  	//Construct the different contact details description 
+  	String telNos[] = ingest.getTelNo().split(",",-1);
+  	String names[] = ingest.getContactName().split(",",-1);
+  	int maxLength = Math.max(names.length, telNos.length);
+  	
+  	for(int i=0; i<maxLength; i++) {
+  		SetContactID(request, i+1);
+  		
+  		if(i <= names.length -1) {
+  			setContactName(request, names[i]);
+  		}
+  		if(i <= telNos.length -1) {
+  			setContactNumber(request, telNos[i]);
+  		}
+  		setNewLine(request);
+  	} 
   }
   
-  private void setContactName(LegacySampleIngest ingest, CreateJobRequest request) {
-  	if(ingest.getTelNo() != null) {
-	  	if (!ingest.getContactName().isEmpty()  && ingest.getWave().equals("1")) {
-	  		request.getJob().setDescription(request.getJob().getDescription() + "\n"
-	  					+ "Contact Name: " + ingest.getContactName());
-	  	}
+  private void SetContactID(CreateJobRequest request, int num) {
+  	request.getJob().setDescription(request.getJob().getDescription() + "\n" 
+				+ "Contact " + num + ":" ); 
+  }
+  
+  private void setContactName(CreateJobRequest request, String name) {
+
+	  request.getJob().setDescription(request.getJob().getDescription() + "\n"
+	  		+ name);
+  }
+  
+  private void setContactNumber(CreateJobRequest request, String telNo) {
+  	request.getJob().setDescription(request.getJob().getDescription() + "\n" 
+    		+ telNo); 
+  }
+  
+  private void setNewLine(CreateJobRequest request) {
+  	request.getJob().setDescription(request.getJob().getDescription() + "\n");
+  }
+  
+  private void setTelNoIndicator(CreateJobRequest request) {
+  	request.getJob().setDescription(request.getJob().getDescription() + TELLNO_RESPONSE + "\n"); 
+  }
+  
+  private void setUAC(LegacySampleIngest ingest, CreateJobRequest request) {
+  	if(ingest.getUAC() != null && !ingest.getUAC().isEmpty()) {
+  		request.getJob().setDescription(request.getJob().getDescription() + "\n"
+  				+ "UAC: " + ingest.getUAC() + "\n");
   	}
   }
 
