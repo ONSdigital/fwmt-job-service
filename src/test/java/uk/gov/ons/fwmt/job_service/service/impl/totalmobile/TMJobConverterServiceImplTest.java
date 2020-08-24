@@ -349,6 +349,26 @@ public class TMJobConverterServiceImplTest {
     //Then
     assertEquals(expectedDescriptionDivAddInd,resultDivAddInd2.getJob().getDescription());
   }
+  
+  @Test
+  public void createGFFJobRequestWithUAC(){
+    //Given
+    String username = "testUser";
+    String expectedDescriptionDivAddInd = "testTla Start: null Wave testWave ** TEL **\n"  
+    		+ "UAC: 0000 1111 2222\n"
+    		+ "\n"
+    		+ "Tel No: testTelNo";
+
+    LegacySampleIngest testDivAddInd = new TestIngestBuilder().ingestBuildUAC();
+    testDivAddInd.setGffData(new LegacySampleGFFDataIngest());
+    testDivAddInd.setLegacySampleSurveyType(GFF);
+
+    //When
+    CreateJobRequest resultDivAddInd = tmJobConverterService.createJobRequestFromIngest(testDivAddInd, username);
+
+    //Then
+    assertEquals(expectedDescriptionDivAddInd,resultDivAddInd.getJob().getDescription());
+  }
 
   @Test
   public void createLFSJobRequestFromIngestEmptyAddressValues() {
