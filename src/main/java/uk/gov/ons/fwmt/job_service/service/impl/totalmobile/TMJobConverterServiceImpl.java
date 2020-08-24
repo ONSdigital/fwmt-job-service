@@ -141,6 +141,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     setFromAdditionalPropertyAnnotations(ingest, request);
     setTLAStartWaveDecription(ingest, request);
     //Added for covid-19 outbreak, indicator for available wave 1 cases phone number with phone number and Name
+    setUAC(ingest, request);
     setTelNoIndicator(ingest, request);
     setContactName(ingest, request);
     switch (ingest.getLegacySampleSurveyType()) {
@@ -168,6 +169,15 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   	request.getJob().setDescription(getTLAStartWaveStr(ingest));
   }
   
+  private void setUAC(LegacySampleIngest ingest, CreateJobRequest request) {
+  	if(ingest.getUAC() != null) {
+  		if (!ingest.getUAC().isEmpty())  {
+    		request.getJob().setDescription(request.getJob().getDescription() + "\n" 
+    					+ "UAC: " + ingest.getUAC() + "\n"); 
+    	}
+  	}
+  }
+  
   private void setTelNoIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
   	if(ingest.getTelNo() != null) {
   		if (!ingest.getTelNo().isEmpty())  {
@@ -185,6 +195,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
 	  	}
   	}
   }
+  
 
   private void setLfsDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
     if (ingest.getDivAddInd() != null	) {
