@@ -141,8 +141,9 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     setFromAdditionalPropertyAnnotations(ingest, request);
     setTLAStartWaveDecription(ingest, request);
     //Added for covid-19 outbreak, indicator for available wave 1 cases phone number with phone number and Name
-    setUAC(ingest, request);
     setTelNoIndicator(ingest, request);
+    setUAC(ingest, request);
+    setTelNo(ingest, request);
     setContactName(ingest, request);
     switch (ingest.getLegacySampleSurveyType()) {
     case GFF:
@@ -169,6 +170,15 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   	request.getJob().setDescription(getTLAStartWaveStr(ingest));
   }
   
+  
+  private void setTelNoIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
+  	if(ingest.getTelNo() != null) {
+  		if (!ingest.getTelNo().isEmpty())  {
+    		request.getJob().setDescription(request.getJob().getDescription() + " " + TELLNO_RESPONSE ); 
+    	}
+  	}
+  }
+  
   private void setUAC(LegacySampleIngest ingest, CreateJobRequest request) {
   	if(ingest.getUAC() != null) {
   		if (!ingest.getUAC().isEmpty())  {
@@ -178,10 +188,10 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   	}
   }
   
-  private void setTelNoIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
+  private void setTelNo(LegacySampleIngest ingest, CreateJobRequest request) {
   	if(ingest.getTelNo() != null) {
   		if (!ingest.getTelNo().isEmpty())  {
-    		request.getJob().setDescription(request.getJob().getDescription() + " " + TELLNO_RESPONSE + "\n" 
+    		request.getJob().setDescription(request.getJob().getDescription() + "\n" 
     					+ "Tel No: " + ingest.getTelNo()); 
     	}
   	}
