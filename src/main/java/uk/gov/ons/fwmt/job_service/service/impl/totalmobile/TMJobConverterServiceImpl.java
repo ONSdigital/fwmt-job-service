@@ -143,8 +143,10 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
     //Added for covid-19 outbreak, indicator for available wave 1 cases phone number with phone number and Name
     setTelNoIndicator(ingest, request);
     setUAC(ingest, request);
-    setTelNo(ingest, request);
-    setContactName(ingest, request);
+    if(ingest.getTelNo() != null && !ingest.getTelNo().isEmpty()){
+    	setContactDetails(ingest, request);
+    }
+    
     switch (ingest.getLegacySampleSurveyType()) {
     case GFF:
       // TODO does splitSampleType need extra mapping?
@@ -183,29 +185,49 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   	if(ingest.getUAC() != null) {
   		if (!ingest.getUAC().isEmpty())  {
     		request.getJob().setDescription(request.getJob().getDescription() + "\n" 
-    					+ "UAC: " + ingest.getUAC() + "\n"); 
+    					+ "UAC: " + ingest.getUAC()); 
     	}
   	}
   }
   
-  private void setTelNo(LegacySampleIngest ingest, CreateJobRequest request) {
-  	if(ingest.getTelNo() != null) {
-  		if (!ingest.getTelNo().isEmpty())  {
-    		request.getJob().setDescription(request.getJob().getDescription() + "\n" 
-    					+ "Tel No: " + ingest.getTelNo()); 
-    	}
-  	}
+  private void setTelNo(CreateJobRequest request, int Index, String telNo) {
+	  request.getJob().setDescription(request.getJob().getDescription() + "\n" 
+			  + "Tel No " + (Index + 1) + ": " + telNo); 
   }
   
-  private void setContactName(LegacySampleIngest ingest, CreateJobRequest request) {
-  	if(ingest.getTelNo() != null) {
-	  	if (!ingest.getContactName().isEmpty()  && ingest.getWave().equals("1")) {
-	  		request.getJob().setDescription(request.getJob().getDescription() + "\n"
-	  					+ "Contact Name: " + ingest.getContactName());
-	  	}
-  	}
+  private void setContactNames(CreateJobRequest request,String names) {
+	  String nameAndSources[] = names.split(":", -1);
+	  for(String name:nameAndSources) {
+		  if (name.isEmpty()) {
+			  if (nameAndSources.length == 1) {
+				  request.getJob().setDescription(request.getJob().getDescription() + "\n"
+						  + "**unknown name and source**");
+			  } else {
+			  continue;
+			  }
+		  } else if (name.indexOf(",") == 0) {
+			  request.getJob().setDescription(request.getJob().getDescription() + "\n"
+					  + "**no name given**" + name);
+		  } else if (name.substring(name.indexOf(",") + 1).equals(" ")) {
+			  request.getJob().setDescription(request.getJob().getDescription() + "\n"
+					  + name + "**unknown source**");
+		  } else {
+			  request.getJob().setDescription(request.getJob().getDescription() + "\n"
+					  + name);
+		  }  
+	  }
   }
   
+  private void setContactDetails(LegacySampleIngest ingest, CreateJobRequest request) {
+	  String telNos[] = ingest.getTelNo().split(";", -1);
+	  String allNames[] = ingest.getContactName().split(";", -1);
+	  for (int i = 0;i < telNos.length; i++) {
+		  request.getJob().setDescription(request.getJob().getDescription() + "\n");
+		  setTelNo(request,i,telNos[i]);
+		  setContactNames(request,allNames[i]);
+	  }
+	  request.getJob().setDescription(request.getJob().getDescription() + "\n");
+}
 
   private void setLfsDividedAddressIndicator(LegacySampleIngest ingest, CreateJobRequest request) {
     if (ingest.getDivAddInd() != null	) {
