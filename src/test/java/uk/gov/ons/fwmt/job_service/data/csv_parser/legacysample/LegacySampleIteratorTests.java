@@ -198,7 +198,7 @@ public class LegacySampleIteratorTests {
     Reader reader = mock(Reader.class);
     CSVRecord csvRecord = mock(CSVRecord.class);
     CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader(""));
-    LegacySampleIngest lsi = LegacySampleIngest.builder().stage("905").tla("NSW").build();
+    LegacySampleIngest lsi = LegacySampleIngest.builder().stage("112").tla("LCF").build();
     LocalDate now = LocalDate.now();
     FieldPeriodDto fieldPeriodDto = new FieldPeriodDto();
     fieldPeriodDto.setEndDate(now);
@@ -209,43 +209,8 @@ public class LegacySampleIteratorTests {
         .calculatedDueDate(String.valueOf(now))
         .legacySampleSurveyType(LegacySampleSurveyType.GFF)
         .gffData(legacySampleGFFDataIngest)
-        .tla("NSW")
-        .stage("905")
-        .build();
-    
-    LegacySampleIterator legacySampleIterator = new LegacySampleIterator(csvParser, LegacySampleSurveyType.GFF, fieldPeriodResourceServiceClient);
-
-    PowerMockito.mockStatic(LegacySampleAnnotationProcessor.class);
-    PowerMockito.doNothing().when(LegacySampleAnnotationProcessor.class, "process", any(LegacySampleIngest.class), any(CSVRecord.class), eq("GFF"));
-    PowerMockito.doNothing().when(LegacySampleAnnotationProcessor.class, "process", any(LegacySampleIngest.class), any(CSVRecord.class), eq(null));
-
-    PowerMockito.mockStatic(LegacySampleUtils.class);
-    when(LegacySampleUtils.convertToFieldPeriodDate(lsi.getStage(), fieldPeriodResourceServiceClient))
-        .thenReturn(fieldPeriodDto);
-
-    legacySampleIterator.parseLegacySampleGFFData(lsi, csvRecord);
-
-    assertEquals(expectedLSI, lsi);
-  }
-  
-  @Test
-  public void givenAcsvRecord_whenParseLegacySampleNSWReIssueData_verifyDataIsCopied() throws Exception {
-    Reader reader = mock(Reader.class);
-    CSVRecord csvRecord = mock(CSVRecord.class);
-    CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader(""));
-    LegacySampleIngest lsi = LegacySampleIngest.builder().stage("925").tla("NSW").build();
-    LocalDate now = LocalDate.now();
-    FieldPeriodDto fieldPeriodDto = new FieldPeriodDto();
-    fieldPeriodDto.setEndDate(now);
-    LegacySampleGFFDataIngest legacySampleGFFDataIngest = new LegacySampleGFFDataIngest();
-
-    LegacySampleIngest expectedLSI = LegacySampleIngest.builder()
-        .dueDate(now.plusDays(15))
-        .calculatedDueDate(String.valueOf(now.plusDays(15)))
-        .legacySampleSurveyType(LegacySampleSurveyType.GFF)
-        .gffData(legacySampleGFFDataIngest)
-        .tla("NSW")
-        .stage("925")
+        .tla("LCF")
+        .stage("112")
         .build();
     
     LegacySampleIterator legacySampleIterator = new LegacySampleIterator(csvParser, LegacySampleSurveyType.GFF, fieldPeriodResourceServiceClient);
