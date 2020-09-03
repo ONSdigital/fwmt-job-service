@@ -190,21 +190,27 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
   	}
   }
   
+  // adds telno to description
   private void setTelNo(CreateJobRequest request, int Index, String telNo) {
 	  request.getJob().setDescription(request.getJob().getDescription() + "\n" 
 			  + "Tel No " + (Index + 1) + ": " + telNo); 
   }
   
+  // for each telno added adds a list of names and sources for those names to the description under the number. 
   private void setContactNames(CreateJobRequest request,String names) {
+	  //creates an array of names and sources related to the teleno and then
+	  //replaces missing names and sources with unknown when adding them to the description
 	  String nameAndSources[] = names.split(":", -1);
+	  int countEmties = 0;
 	  for(String name:nameAndSources) {
+		  // if all names and sources are empty add unknown note
 		  if (name.isEmpty()) {
-			  if (nameAndSources.length == 1) {
+			  countEmties ++;
+			  if (nameAndSources.length == countEmties) {
 				  request.getJob().setDescription(request.getJob().getDescription() + "\n"
 						  + "**unknown name and source**");
-			  } else {
-			  continue;
 			  }
+			  continue;
 		  } else if (name.indexOf(",") == 0) {
 			  request.getJob().setDescription(request.getJob().getDescription() + "\n"
 					  + "**no name given**" + name);
@@ -218,6 +224,7 @@ public class TMJobConverterServiceImpl implements TMJobConverterService {
 	  }
   }
   
+  // creates arrays from the telnos and names adds the contact details to the description
   private void setContactDetails(LegacySampleIngest ingest, CreateJobRequest request) {
 	  String telNos[] = ingest.getTelNo().split(";", -1);
 	  String allNames[] = ingest.getContactName().split(";", -1);

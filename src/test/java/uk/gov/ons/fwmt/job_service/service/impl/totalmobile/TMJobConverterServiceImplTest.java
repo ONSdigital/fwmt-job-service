@@ -441,9 +441,7 @@ public class TMJobConverterServiceImplTest {
     String expectedDescription = "testTla Start: null Wave testWave ** TEL **\n"
     		+ "UAC: 0000 0000 0000\n\n"
     		+ "Tel No 1: testTelNo1\n"
-    		+ "Testname1, source1\n"
-    		+ "Testname2, source1, source2\n"
-    		+ "**no name given**, source3\n\n"
+    		+ "**unknown name and source**\n\n"
     		+ "Tel No 2: testTelNo2\n"
     		+ "Testname3, source3\n"
     		+ "Testname4, source1, source3\n";
@@ -466,9 +464,7 @@ public class TMJobConverterServiceImplTest {
 	    String expectedDescription = "testTla Start: null Wave testWave ** TEL **\n"
 	    		+ "UAC: 0000 0000 0000\n\n"
 	    		+ "Tel No 1: testTelNo1\n"
-	    		+ "Testname1, source1\n"
-	    		+ "Testname2, source1, source2\n"
-	    		+ "**no name given**, source3\n\n"
+	    		+ "**unknown name and source**\n\n"
 	    		+ "Tel No 2: testTelNo2\n"
 	    		+ "Testname3, source3\n"
 	    		+ "Testname4, source1, source3\n";
@@ -537,6 +533,47 @@ public class TMJobConverterServiceImplTest {
     //Then
     assertEquals(expectedDescription,resultDivAddInd.getJob().getDescription());
   }
+  
+  @Test
+  public void createLFSJobRequestContactDetails4() {
+    //Given
+    String username = "testUser";
+    String expectedDescription = "testTla Start: null Wave testWave ** TEL **\n"
+    		+ "UAC: 0000 0000 0000\n\n"
+    		+ "Tel No 1: testTelNo1 Source1\n"
+    		+ "Testname1\n";
+
+    LegacySampleIngest testDivAddInd = new TestIngestBuilder().ContactDetails4Build();
+    testDivAddInd.setLfsData(new LegacySampleLFSDataIngest());
+    testDivAddInd.setLegacySampleSurveyType(LFS);
+
+    //When
+    CreateJobRequest resultDivAddInd = tmJobConverterService.createJobRequestFromIngest(testDivAddInd, username);
+
+    //Then
+    assertEquals(expectedDescription,resultDivAddInd.getJob().getDescription());
+  }
+
+  @Test
+  public void createGFFJobRequestContactDetails4(){
+    //Given
+	    String username = "testUser";
+	    String expectedDescription = "testTla Start: null Wave testWave ** TEL **\n"
+	    		+ "UAC: 0000 0000 0000\n\n"
+	    		+ "Tel No 1: testTelNo1 Source1\n"
+	    		+ "Testname1\n";;
+	    
+    LegacySampleIngest testDivAddInd = new TestIngestBuilder().ContactDetails4Build();
+    testDivAddInd.setGffData(new LegacySampleGFFDataIngest());
+    testDivAddInd.setLegacySampleSurveyType(GFF);
+
+    //When
+    CreateJobRequest resultDivAddInd = tmJobConverterService.createJobRequestFromIngest(testDivAddInd, username);
+
+    //Then
+    assertEquals(expectedDescription,resultDivAddInd.getJob().getDescription());
+  }
+  
   
   @Test
   public void createLFSJobRequestBlankUAC(){
