@@ -72,16 +72,7 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     // set normal fields
     LegacySampleAnnotationProcessor.process(instance, record, "GFF");
     
-    // Che
-    
-    //Check to see if is NSW
-    String tla = instance.getTla().toUpperCase();
-    if (tla.equals("NSW")) {
-    	NSWFieldPeriodLookup(instance);
-    } else {
-    	 	// set derived due date
-      	fieldPeriodLookup(instance);
-    }
+    fieldPeriodLookup(instance);
     
     // set survey type and extra data
     instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
@@ -119,11 +110,5 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     instance.setCalculatedDueDate(String.valueOf(fieldPeriodDto.getEndDate()));
   }
  
-  private void NSWFieldPeriodLookup(LegacySampleIngest instance) {
-	  FieldPeriodDto fieldPeriodDto = LegacySampleUtils
-	        .convertToFieldPeriodDate("N" + instance.getStage(), fieldPeriodResourceServiceClient);
-	    instance.setDueDate(fieldPeriodDto.getEndDate());
-	    instance.setStartDate(fieldPeriodDto.getStartDate());
-	    instance.setCalculatedDueDate(String.valueOf(fieldPeriodDto.getEndDate()));
-  }
+
 }
