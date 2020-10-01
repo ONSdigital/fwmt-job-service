@@ -72,18 +72,7 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     // set normal fields
     LegacySampleAnnotationProcessor.process(instance, record, "GFF");
     
-    //Check to see if is NSW re-issue 
-    String tla = instance.getTla().toUpperCase();
-    int stage = Integer.parseInt(instance.getStage().trim()); 
-    String reissue = instance.getStage().substring(1, 2);
-    if (tla.equals("NSW") && (reissue.equals("2") || reissue.equals("3")) && stage > 922){    
-    		// set NSW re-issue derived dates 
-    		NSWReIssueFieldPeriodLookup(instance);
-    }
-    else {
-    	 	// set derived due date
-      	fieldPeriodLookup(instance);
-    }
+    fieldPeriodLookup(instance);
     
     // set survey type and extra data
     instance.setLegacySampleSurveyType(LegacySampleSurveyType.GFF);
@@ -120,12 +109,6 @@ public class LegacySampleIterator extends CSVIterator<LegacySampleIngest> {
     instance.setStartDate(fieldPeriodDto.getStartDate());
     instance.setCalculatedDueDate(String.valueOf(fieldPeriodDto.getEndDate()));
   }
-  
-  private void NSWReIssueFieldPeriodLookup(LegacySampleIngest instance) {	
-  	 FieldPeriodDto fieldPeriodDto = LegacySampleUtils
-         .convertToFieldPeriodDate(instance.getStage(), fieldPeriodResourceServiceClient);
-     instance.setDueDate(fieldPeriodDto.getEndDate().plusDays(15));
-     instance.setStartDate(fieldPeriodDto.getStartDate());
-     instance.setCalculatedDueDate(String.valueOf(fieldPeriodDto.getEndDate().plusDays(15)));
-  }
+ 
+
 }
